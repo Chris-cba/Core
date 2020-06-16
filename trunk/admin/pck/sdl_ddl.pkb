@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.26   Mar 17 2020 14:28:36   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.27   Jun 16 2020 12:22:50   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Mar 17 2020 14:28:36  $
-    --       Date fetched Out : $Modtime:   Mar 17 2020 13:05:36  $
-    --       PVCS Version     : $Revision:   1.26  $
+    --       Date into PVCS   : $Date:   Jun 16 2020 12:22:50  $
+    --       Date fetched Out : $Modtime:   Jun 16 2020 12:20:52  $
+    --       PVCS Version     : $Revision:   1.27  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -30,21 +30,23 @@ AS
     g_default_role            VARCHAR2 (30)
         := NVL (hig.get_sysopt ('SDL_ROLE'), 'SDL_USER');
 
-	FUNCTION get_srid
-    RETURN NUMBER;
-		
+    FUNCTION get_srid
+        RETURN NUMBER;
+
     g_srid                    NUMBER := get_srid;
 
     qq                        VARCHAR2 (1) := CHR (39);
+
     --
     ----------------------------------------------------------------------------
-    --	
+    --
     FUNCTION get_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_sccsid;
     END get_version;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -54,26 +56,31 @@ AS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
+
     --
     ----------------------------------------------------------------------------
-    --	
+    --
     PROCEDURE gen_profile_ld_view (p_profile_id   IN     NUMBER,
                                    p_view_sql        OUT VARCHAR2);
+
     --
     ----------------------------------------------------------------------------
     --
     PROCEDURE gen_profile_ne_view (p_profile_id   IN     NUMBER,
                                    p_view_sql        OUT VARCHAR2);
+
     --
     ----------------------------------------------------------------------------
     --
     PROCEDURE gen_profile_ld_stats_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
+
     --
     ----------------------------------------------------------------------------
     --
     PROCEDURE gen_profile_ne_stats_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
+
     --
     ----------------------------------------------------------------------------
     --
@@ -87,6 +94,7 @@ AS
         p_role                IN VARCHAR2 DEFAULT g_default_role,
         p_dim                 IN NUMBER,
         p_gtype               IN NUMBER);
+
     --
     ----------------------------------------------------------------------------
     --
@@ -94,6 +102,7 @@ AS
                                    p_column_name   IN VARCHAR2,
                                    p_diminfo          sdo_dim_array,
                                    p_srid             NUMBER);
+
     --
     ----------------------------------------------------------------------------
     --
@@ -120,6 +129,7 @@ AS
 
         RETURN g_srid;
     END get_srid;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -134,9 +144,10 @@ AS
         gen_profile_ld_stats_view (p_profile_id, l_view_sql);
 
         gen_profile_ne_stats_view (p_profile_id, l_view_sql);
-        
+
         gen_datum_view (p_profile_id);
     END gen_sdl_profile_views;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -182,6 +193,7 @@ AS
         EXECUTE IMMEDIATE p_view_sql;
     --
     END gen_profile_ld_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -296,6 +308,7 @@ AS
 
         EXECUTE IMMEDIATE p_view_sql;
     END gen_profile_ne_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -356,6 +369,7 @@ AS
         EXECUTE IMMEDIATE p_view_sql;
     --
     END gen_profile_ld_stats_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -415,6 +429,7 @@ AS
 
         EXECUTE IMMEDIATE p_view_sql;
     END gen_profile_ne_stats_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -442,6 +457,7 @@ AS
 
         RETURN retval;
     END get_hash_code;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -487,6 +503,7 @@ AS
 
         EXECUTE IMMEDIATE p_view_sql;
     END gen_profile_match_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -523,21 +540,26 @@ AS
 
         EXECUTE IMMEDIATE p_view_sql;
     END gen_profile_no_match_view;
+
     --
     ----------------------------------------------------------------------------
     --
     PROCEDURE gen_datum_view (p_profile IN NUMBER)
     IS
-        sql_str           VARCHAR (32767);
-        l_col_list        VARCHAR2 (4000);
-        l_def_list        VARCHAR2 (4000);
-        l_is_group_type   VARCHAR2 (1);
-        l_nt_type         VARCHAR2 (4);
-        l_gty_type        VARCHAR2 (4);
-        l_profile_view    VARCHAR2 (30);
-        l_profile_name    VARCHAR2 (30);
-        l_dummy           NUMBER;
-        l_datum_nt        VARCHAR2 (4);
+        sql_str              VARCHAR (32767);
+        l_col_list           VARCHAR2 (4000);
+        l_def_list           VARCHAR2 (4000);
+        l_is_group_type      VARCHAR2 (1);
+        l_nt_type            VARCHAR2 (4);
+        l_gty_type           VARCHAR2 (4);
+        l_profile_view       VARCHAR2 (30);
+        l_profile_name       VARCHAR2 (30);
+        l_dummy              NUMBER;
+        l_datum_nt           VARCHAR2 (4);
+        l_ne_length_exists   NUMBER;
+        l_length_str         VARCHAR2 (1000)
+            := 'sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom)';
+        qq                   CHAR (1) := CHR (39);
     BEGIN
         BEGIN
             SELECT UPPER ('V_SDL_' || REPLACE (sp_name, ' ', '_') || '_NE'),
@@ -600,25 +622,50 @@ AS
             --datum type - use the natural view without need for the datum attribute mapping
 
             SELECT LISTAGG (sam_ne_column_name, ',')
-                       WITHIN GROUP (ORDER BY sam_col_id)    col_list,
+                       WITHIN GROUP (ORDER BY sam_col_id)
+                       col_list,
                    LISTAGG (sam_ne_column_name, ',')
-                       WITHIN GROUP (ORDER BY sam_col_id)    def_list
-              INTO l_col_list, l_def_list
+                       WITHIN GROUP (ORDER BY sam_col_id)
+                       def_list,
+                   MAX (
+                       CASE sam_ne_column_name
+                           WHEN 'NE_LENGTH' THEN 1
+                           ELSE 0
+                       END)
+              INTO l_col_list, l_def_list, l_ne_length_exists
               FROM sdl_attribute_mapping
              WHERE sam_sp_id = p_profile;
         END IF;
 
         sql_str :=
                'create or replace view v_sdl_wip_'
-            ||  REPLACE (l_profile_name, ' ', '_')
+            || REPLACE (l_profile_name, ' ', '_')
             || '_datums '
-            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, status, manual_override, GEOM, ne_length, ne_no_start, ne_no_end, ne_type, ne_nt_type'
+            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, status, manual_override, GEOM, ';
+
+        IF l_ne_length_exists = 0
+        THEN
+            sql_str := sql_str || 'ne_length, ';
+        END IF;
+
+
+        sql_str :=
+               sql_str
+            || ' ne_no_start, ne_no_end, ne_type, ne_nt_type'
             || CASE
                    WHEN l_col_list IS NOT NULL THEN ', ' || l_col_list
                    ELSE NULL
                END
             || ' ) as '
-            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.pct_match, d.status, d.manual_override,  d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
+            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.pct_match, d.status, d.manual_override,  d.GEOM, ';
+
+        IF l_ne_length_exists = 0
+        THEN
+            sql_str := sql_str || l_length_str;
+        END IF;
+
+        sql_str :=
+               sql_str
             || 'NULL, NULL, '
             || qq
             || 'S'
@@ -635,11 +682,12 @@ AS
             || l_profile_view
             || ' l where d.sld_key = l.sld_key ';
 
-        --        nm_debug.debug_on;
-        --        nm_debug.debug (sql_str);
+        nm_debug.debug_on;
+        nm_debug.debug (sql_str);
 
         EXECUTE IMMEDIATE sql_str;
     END gen_datum_view;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -756,6 +804,7 @@ AS
                       p_dim                 => 2,
                       p_gtype               => 2002);
     END refresh_base_sdl_themes;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -807,6 +856,7 @@ AS
             p_gtype               => 3302);
     --
     END create_profile_themes;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -831,6 +881,7 @@ AS
         THEN
             NULL;
     END insert_sdo_metadata;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -860,7 +911,10 @@ AS
                                     SYS_CONTEXT ('NM3CORE',
                                                  'APPLICATION_OWNER')
                                 AND view_name LIKE
-                                        'V_SDL_%' || UPPER (REPLACE (sp_name, ' ', '_')) || '%');
+                                           'V_SDL_%'
+                                        || UPPER (
+                                               REPLACE (sp_name, ' ', '_'))
+                                        || '%');
 
         DELETE FROM mdsys.sdo_geom_metadata_table
               WHERE sdo_table_name IN
@@ -870,7 +924,10 @@ AS
                                     SYS_CONTEXT ('NM3CORE',
                                                  'APPLICATION_OWNER')
                                 AND view_name LIKE
-                                        'V_SDL_%' || UPPER (REPLACE (sp_name, ' ', '_')) || '%');
+                                           'V_SDL_%'
+                                        || UPPER (
+                                               REPLACE (sp_name, ' ', '_'))
+                                        || '%');
 
         DELETE FROM nm_themes_all
               WHERE nth_feature_table IN
@@ -880,6 +937,7 @@ AS
               WHERE sdo_table_name IN
                         ('SDL_LOAD_DATA', 'SDL_WIP_DATUMS', 'SDL_WIP_NODES');
     END drop_sdl_themes;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -1100,8 +1158,8 @@ AS
                              WHERE     ntg_theme_id = nth_theme_id
                                    AND ntg_gtype = p_gtype);
     END insert_theme;
-    --
-    ----------------------------------------------------------------------------
-    --	
+--
+----------------------------------------------------------------------------
+--
 END sdl_ddl;
 /
