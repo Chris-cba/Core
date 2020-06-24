@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.28   May 04 2020 11:31:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.29   Jun 24 2020 16:10:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   May 04 2020 11:31:38  $
-    --       Date fetched Out : $Modtime:   May 04 2020 11:26:06  $
-    --       PVCS Version     : $Revision:   1.28  $
+    --       Date into PVCS   : $Date:   Jun 24 2020 16:10:44  $
+    --       Date fetched Out : $Modtime:   Jun 24 2020 15:53:50  $
+    --       PVCS Version     : $Revision:   1.29  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -213,10 +213,10 @@ AS
                 THEN
                     NULL;
                 ELSE
-                    l_tolerance :=
+                    l_tolerance := ABS (
                           tolerance
                         * SDO_LRS.geom_segment_end_measure (geom)
-                        / SDO_GEOM.sdo_length (geom);
+                        / SDO_GEOM.sdo_length (geom));
                 END IF;
             END IF;
 
