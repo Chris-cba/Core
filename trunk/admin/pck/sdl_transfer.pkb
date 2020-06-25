@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.10   May 29 2020 16:12:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.11   Jun 25 2020 16:17:56   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   May 29 2020 16:12:14  $
-    --       Date fetched Out : $Modtime:   May 29 2020 16:10:18  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Jun 25 2020 16:17:56  $
+    --       Date fetched Out : $Modtime:   Jun 25 2020 16:16:50  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -148,7 +148,7 @@ AS
                AND d.batch_id = p_batch_id
                AND n.start_node = s.hashcode
                AND n.end_node = e.hashcode
-               AND d.status = 'LOAD'
+--             AND d.status = 'LOAD'
                AND sfs_id = d.batch_id
                AND sp_id = sfs_sp_id
                AND (   EXISTS
@@ -362,6 +362,9 @@ AS
             EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
                 USING p_batch_id, ne_ids, p_batch_id;
         ELSE
+        
+        --we are dealing with a datum-based batch
+        
             SELECT ins_str
               INTO l_ins_str
               FROM (WITH
@@ -370,7 +373,7 @@ AS
                             (SELECT ptr_id        sam_id,
                                     ptr_value     sam_ne_column_name
                                FROM TABLE (l_attrib_list))
-                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_admin_unit, '
+                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_admin_unit, ne_no_start, ne_no_end, '
                            || LISTAGG (sam_ne_column_name, ',')
                                   WITHIN GROUP (ORDER BY sam_id)
                            || ')'    ins_str
@@ -384,11 +387,11 @@ AS
                             (SELECT ptr_id        sam_id,
                                     ptr_value     sam_ne_column_name
                                FROM TABLE (l_attrib_list))
-                    SELECT    ' select ne_id_seq.nextval, '
+                    SELECT    ' select t.ptr_value, '
                            || ''''
-                           || 'G'
+                           || 'S'
                            || ''''
-                           || ', :l_datum_nt_type, 1,  '
+                           || ', :l_datum_nt_type, 1, start_node, end_node, '
                            || LISTAGG (
                                   CASE
                                       WHEN sam_id < 0 THEN 'NULL'
@@ -397,18 +400,33 @@ AS
                                   ',')
                               WITHIN GROUP (ORDER BY sam_id)
                            || ' from '
-                           || l_profile_view
-                           || ' ln '
-                           || ' where batch_id = :p_batch_id '
-                           || ' and status = '
-                           || ''''
-                           || 'LOAD'
-                           || ''''
-                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
-                           || ''''
-                           || 'LOAD'
-                           || ''''
-                           || '  and d.sld_key = ln.sld_key )'    sel_str
+                           ||' (select d.*, s.existing_node_id start_node, e.existing_node_id end_node, '
+                   || ' ( select last_date from (select max(no_start_date) over (partition by dn.swd_id order by node_type rows between unbounded preceding and unbounded following) last_date '
+                   || ' from sdl_wip_nodes n, sdl_wip_datum_nodes dn, nm_nodes nn '
+                   || ' where n.hashcode=dn.hashcode and n.existing_node_id = nn.no_node_id and dn.SWD_ID = d.swd_id ) where rownum = 1 ) last_date '
+                   || 'from '
+                   || l_datum_view
+                   || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
+                   || 'where d.swd_id = n.swd_id '
+                   || 'and d.batch_id = :batch_id '
+                   || 'and n.start_node = s.hashcode '
+                   || 'and n.end_node = e.hashcode '
+                   || ') , '
+                   || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id' sel_str
+--
+--
+--                           || l_profile_view
+--                           || ' ln '
+--                           || ' where batch_id = :p_batch_id '
+--                           || ' and status = '
+--                           || ''''
+--                           || 'LOAD'
+--                           || ''''
+--                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
+--                           || ''''
+--                           || 'VALID'
+--                           || ''''
+--                           || '  and d.sld_key = ln.sld_key )'    sel_str
                       FROM attribs);
 
             nm_debug.debug (l_ins_str);
@@ -418,7 +436,7 @@ AS
             --raise_application_error(-20001, 'Stop');
 
             EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
-                USING l_datum_nt_type, p_batch_id, ne_ids;
+                USING l_datum_nt_type, p_batch_id, ne_ids, p_batch_id;
         END IF;
 
         --        nm_debug.debug_on;
@@ -446,8 +464,8 @@ AS
             || ' ), TABLE (:ne_ids) t '
             || ' WHERE t.ptr_id = swd_id ';
 
-        --        nm_debug.debug_on;
-        --        nm_debug.debug (l_ins_str);
+                nm_debug.debug_on;
+                nm_debug.debug (l_ins_str);
         --
         --nm_debug.debug('Just nserted the spatial data');
 
