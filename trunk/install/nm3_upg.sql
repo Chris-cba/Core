@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3_upg.sql-arc   1.0   Jun 01 2020 14:15:00   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3_upg.sql-arc   1.1   Jun 26 2020 14:46:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_upg.sql  $
---       Date into PVCS   : $Date:   Jun 01 2020 14:15:00  $
---       Date fetched Out : $Modtime:   May 11 2020 15:57:16  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jun 26 2020 14:46:24  $
+--       Date fetched Out : $Modtime:   Jun 26 2020 14:29:52  $
+--       Version          : $Revision:   1.1  $
 --
 --   Product upgrade script
 --
@@ -316,21 +316,42 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---                        ****************   Apply SDO_LRS replacement code if Oracle Spatial is not installed *******************
+--                        ****************   Drop SDO_LRS replacement code if Oracle Spatial is installed *******************
 SET TERM ON
-Prompt Applying SDO_LRS replacement, if Oracle Spatial not installed...
+Prompt Drop SDO_LRS replacement, if Oracle Spatial is valid...
 SET TERM OFF
 
-select decode(count(*), 0 , '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
-                            '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
-from dba_registry
-where comp_name='Spatial'
-and status = 'VALID'
+DECLARE
+  --
+  CURSOR c1 IS
+  select count(*)
+   from dba_registry 
+  where comp_name='Spatial'
+    and status = 'VALID';
+  --
+  lv_return      PLS_INTEGER;
+  obj_not_exist  EXCEPTION;
+  PRAGMA exception_init( obj_not_exist, -4043);
+  --
+BEGIN
+--
+  OPEN c1;
+  FETCH c1 INTO lv_return;
+  CLOSE c1;
+  
+  IF lv_return = 1
+  THEN
+    --
+	EXECUTE IMMEDIATE 'DROP package sdo_lrs';
+  END IF;
+  --
+EXCEPTION 
+  WHEN obj_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
 /
-
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 -- Grant privileges to PROXY_OWNER Role
 --------------------------------------------------------------------------------
@@ -502,7 +523,7 @@ SET FEEDBACK OFF
 --                        ****************   VERSION NUMBER   *******************
 SET TERM ON
 Prompt Setting The Version Number...
-SET TERM OFF
+--SET TERM OFF
 BEGIN
       hig2.upgrade('HIG','nm3_upg.sql','Upgrade from &core_version to &new_version','&new_version');
       hig2.upgrade('NET','nm3_upg.sql','Upgrade from &core_version to &new_version','&new_version');
@@ -516,7 +537,9 @@ SET HEADING OFF
 SELECT 'Product updated to version '||hpr_product||' ' ||hpr_version product_version
 FROM hig_products
 WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP');
+
 spool off
+exit;
 
 ---------------------------------------------------------------------------------------------------
 --                        ****************   END OF SCRIPT   *******************
