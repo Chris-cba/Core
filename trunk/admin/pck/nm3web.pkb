@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.7   Sep 02 2019 12:56:38   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.8   Jun 26 2020 11:21:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2019 12:56:38  $
---       Date fetched Out : $Modtime:   Sep 02 2019 12:55:08  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jun 26 2020 11:21:14  $
+--       Date fetched Out : $Modtime:   Jun 26 2020 11:19:50  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on         : 1.55
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
@@ -1752,7 +1752,7 @@ BEGIN
 
   htp.p(' var doc_location;');
   htp.p('if (parent.frames.length == 0){');
-  htp.p('  doc_location = ''"'' + document.location + ''"'';');
+  htp.p('  doc_location = ''%22'' + document.location + ''%22'';');
   FOR i IN 1..13
    LOOP
   htp.p('  doc_location = doc_location.replace("'||CHR(38)||'","~");');
