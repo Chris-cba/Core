@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.1   Mar 18 2020 16:08:26   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.2   Jul 30 2020 08:24:54   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_themes.sql  $
---       Date into PVCS   : $Date:   Mar 18 2020 16:08:26  $
---       Date fetched Out : $Modtime:   Mar 18 2020 16:07:44  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 30 2020 08:24:54  $
+--       Date fetched Out : $Modtime:   Jul 23 2020 21:04:46  $
+--       Version          : $Revision:   1.2  $
 --
 -- Description: To create base table metadata and themes relating to SDL geometry tables
 --
@@ -135,6 +135,25 @@ WHERE table_name IN ('V_SDL_DATUM_ACCURACY_0_TO_20',
                      'V_SDL_WIP_NODES_0_TO_1',
                      'V_SDL_WIP_NODES_OVER_1',
                      'V_SDL_WIP_NODES_UNDER_0');
+					 
+DELETE FROM user_sdo_styles
+WHERE name IN ('M.SDL_DATUM_ARROW',
+               'T.SDL_TITLE',
+               'L.SDL_ORIG_SUBMISSION',
+               'L.SDL_DATUMS',
+               'L.SDL_TRANS_DATUMS',
+               'L.SDL_LINE',
+               'L.SDL_LINE1',
+               'L.SDL_LINE2',
+               'L.SDL_LINE3',
+               'L.SDL_LINE4',
+               'L.SDL_LINE5',
+               'L.SDL_LINE6',
+               'L.SDL_LINE7',
+               'M.SDL_NODE',
+               'M.SDL_NODE1',
+               'M.SDL_NODE2',
+               'M.SDL_NODE3');
 					 
 DECLARE
   --
@@ -663,14 +682,235 @@ BEGIN
 	--
 END;
 /
+PROMPT Inserting SDL user_sdo_styles...
+-- SDL Styles
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION, IMAGE)
+SELECT 'M.SDL_DATUM_ARROW', 'MARKER', 'SDL Datum Arrow', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+  <desc></desc>
+  <g class="marker" style="width:50;height:50;font-family:Dialog;font-size:12;font-fill:#FF0000">
+    <image x="0" y="0" width="1" height="1" markerType="gif" href="dummy.gif"/>
+  </g>
+</svg>', (TO_BLOB(UTL_ENCODE.BASE64_DECODE(UTL_RAW.CAST_TO_RAW('iVBORw0KGgoAAAANSUhEUgAAAJEAAACRCAYAAADD2FojAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAutJREFUeF7t3U1rG1cUBmCFLlpo00hyUneTWiOL9IPS7gqlDZhIVnDabbpsf0Kh/x/SoySTBnKTSrY1c+7M88DLMdroGl4MvscaTwAAAAAAAAAAAAAAAAAAAAAAAAAAAKAu82bzR4wX97/+5e6rV+BA0/P1XzFe7DI93/wZ887uddjb2yVqM1+tf44J+ymVqM2DxcWXMeHDPlSiN1ldfRwTyvYqUWTeXD6PCe/at0RtZufb72PCfw4tUZu7jy7ux4Trl2iX6fLy78nk+UfxNWN2kxK1mS82T2MyVrdRojb3zrZNTMbmNkvUxgplZI5Rol2sUEbkWCVqY4UyAscuURsrlAHrqkRvYoUyPJ2XKGKFMjB9lKiNFcpA9FmiNlYolctQol2sUCqWpURtrFAqlK1EbaxQKpK1RG2sUCqQvUS7WKEkV0OJ2lSxQpkv1//EKH4DkidfNOvTmGkVDy1Jk3SFUj6spE3GFUrxoJI/mVYoxQNKPcmwQikeTOpK3yuU4qGkzvS1QikeRupO1yuU4iFkGOlqhVJ8cxlOulihFN9YhpXF4uKTmEdTfFMZRu492ixjHl3xzaXuzJaXz2J2pngIqTg97NfKB5HqMj/fPozZi+KBpJ7MlptfY/aqeDDJn0yfFikeUHIn2+fWioeUnJk16x9iplM8rORK6j/cny3Xv8coHlxy5PR0+2lMMqnl0x4ni+03Mckoe4niV/bfYpJZ6hJ5IFYdMpYofvp8FZNaZCpRhttmriFDiTybqHJ9l+iz1dWDmNSsrxJNm6c/xmQIui6Rx8QMUJcl8sCqgeqiRCdnm29jMlTHLNHrXSRDd7QSuW0ej9sukdvmEbqtEs2a9eOYjNFNS+S2mRuVyG0zL12nRCfNk59iwiuHlMhtM0X7lmi+uvo8Jrzr/0o0X62/iwnv974S+Reb7K1UomM/BIqBebtE0+bJ2csX4RC7m2a3zQAAAAAAAAAAAAAAAAAAAAAAAAAAHG4y+Rfpm7IZEOaIJgAAAABJRU5ErkJggg=='))))
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'M.SDL_DATUM_ARROW');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_ORIG_SUBMISSION', 'LINE', 'SDL Original Submission', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#FF6600;stroke-width:4">
+<line class="base" style="fill:#000000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_ORIG_SUBMISSION');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_DATUMS', 'LINE', 'SDL Datums', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#BFFF00;stroke-width:3;marker-name:M.SDL_DATUM_ARROW;marker-position:0.75;marker-size:15;multiple-marker:true">
+<line class="base" style="fill:#008000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_DATUMS');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_TRANS_DATUMS', 'LINE', 'SDL Transferred Datums', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#FFFF00;stroke-width:4">
+<line class="base" style="fill:#7B3F00;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_TRANS_DATUMS');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE', 'LINE', 'SDL Line Style', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#FFBF00;stroke-width:3">
+<line class="base" /></g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE1', 'LINE', 'SDL Line Style1', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#89CFF0;stroke-width:3">
+<line class="base" style="fill:#000000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE1');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE2', 'LINE', 'SDL Line Style2', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#8A2BE2;stroke-width:3">
+<line class="base" style="fill:#000000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE2');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE3', 'LINE', 'SDL Line Style3', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#964B00;stroke-width:3">
+<line class="base" /></g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE3');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE4', 'LINE', 'SDL Line Style4', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#FF7F50;stroke-width:3">
+<line class="base" style="fill:#000000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE4');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE5', 'LINE', 'SDL Line Style5', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#4B0082;stroke-width:3">
+<line class="base" /></g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE5');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE6', 'LINE', 'SDL Line Style6', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#FFE5B4;stroke-width:3">
+<line class="base" style="fill:#000000;stroke-width:1" />
+</g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE6');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'L.SDL_LINE7', 'LINE', 'SDL Line Style7', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+<desc></desc>
+<g class="line" style="fill:#E30B5C;stroke-width:3">
+<line class="base" /></g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'L.SDL_LINE7');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'M.SDL_NODE', 'MARKER', 'SDL Node marker style', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+  <desc></desc>
+  <g class="marker" style="stroke:#FF0000;fill:#FF0000;width:7;height:7;font-family:Dialog;font-size:12;font-fill:#FF0000">
+    <circle cx="0" cy="0" r="0" />
+  </g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'M.SDL_NODE');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'M.SDL_NODE1', 'MARKER', 'SDL Node marker style1', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+  <desc></desc>
+  <g class="marker" style="stroke:#000000;stroke-width:2.0;fill:#FFD700;width:7;height:7;font-family:Dialog;font-size:12;font-fill:#FF0000">
+    <circle cx="0" cy="0" r="0" />
+  </g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'M.SDL_NODE1');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'M.SDL_NODE2', 'MARKER', 'SDL Node marker style2', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+  <desc></desc>
+  <g class="marker" style="stroke:#4B0082;stroke-width:2.0;fill:#4B0082;width:7;height:7;font-family:Dialog;font-size:12;font-fill:#FF0000">
+    <circle cx="0" cy="0" r="0" />
+  </g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'M.SDL_NODE2');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'M.SDL_NODE3', 'MARKER', 'SDL Node marker style3', '<?xml version="1.0" standalone="yes"?>
+<svg width="1in" height="1in">
+  <desc></desc>
+  <g class="marker" style="stroke:#008000;fill:#008000;width:7;height:7;font-family:Dialog;font-size:12;font-fill:#FF0000">
+    <circle cx="0" cy="0" r="0" />
+  </g>
+</svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'M.SDL_NODE3');
+/
+INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
+SELECT 'T.SDL_TITLE', 'TEXT', 'SDL Submission ID Title', '<?xml version="1.0" standalone="yes"?>
+  <svg width="1in" height="1in" >
+  <desc></desc>
+    <g class="text" 
+        style="font-style:plain;font-family:SansSerif;font-size:1pt;font-weight:bold;text-align:center;fill:#FFFFFF"> Hello World!
+        <opoint halign="center" valign="middle"/>
+        <text-along-path halign="center" valign="baseline"/>
+    </g>
+  </svg>'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM user_sdo_styles
+                   WHERE NAME = 'T.SDL_TITLE');
+/
 PROMPT Inserting SDL user_sdo_themes...
 -- SDL Layers
 INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STYLING_RULES)
 SELECT 'ORIGINAL SDL SUBMISSION', null, 'V_SDL_LOAD_DATA', 'SLD_WORKING_GEOMETRY', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="C.SANDY BROWN"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_ORIG_SUBMISSION"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -692,8 +932,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'SDL MATCH DETAIL', null, 'V_SDL_PLINE_STATS', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="ID">
   <rule>
-    <features style="C.YELLOW"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -715,8 +955,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'SDL TRANSFERRED DATUMS', null, 'V_SDL_TRANSFERRED_DATUMS', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="C.BLACK"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>    
+    <features style="L.SDL_TRANS_DATUMS"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>    
   </rule>
   <custom_tags>
     <tag>
@@ -734,8 +974,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'SDL BATCH NODE DATA', null, 'V_SDL_WIP_NODES', 'NODE_GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="NODE_ID">
   <rule>
-    <features style="M.CIRCLE"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="M.SDL_NODE"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -758,8 +998,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'SDL DATUMS AND STATS', null, 'V_SDL_DATUM_ACCURACY', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="SWD_ID">
   <rule>
-    <features style="C.CHARCOAL W/ ROSY BROWN BORDER"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_DATUMS"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -781,8 +1021,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY 0 TO 20', null, 'V_SDL_DATUM_ACCURACY_0_TO_20', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_1"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE1"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -804,8 +1044,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY 20 TO 40', null, 'V_SDL_DATUM_ACCURACY_20_TO_40', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_2"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE2"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -827,8 +1067,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY 40 TO 60', null, 'V_SDL_DATUM_ACCURACY_40_TO_60', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_3"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE3"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -850,8 +1090,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY 60 TO 80', null, 'V_SDL_DATUM_ACCURACY_60_TO_80', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_4"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE4"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -873,8 +1113,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY 80 TO 100', null, 'V_SDL_DATUM_ACCURACY_80_TO_100', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_5"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE5"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -896,8 +1136,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY OVER 100', null, 'V_SDL_DATUM_ACCURACY_OVER_100', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_6"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE6"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -919,8 +1159,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'DATUM ACCURACY NO STATS', null, 'V_SDL_DATUM_ACCURACY_NO_STATS', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.FC_CODE_7"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE7"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -943,8 +1183,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL 0 TO 20', null, 'V_SDL_PLINE_STATS_0_TO_20', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_B"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE1"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -966,8 +1206,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL 20 TO 40', null, 'V_SDL_PLINE_STATS_20_TO_40', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_C"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE2"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -989,8 +1229,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL 40 TO 60', null, 'V_SDL_PLINE_STATS_40_TO_60', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_D"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE3"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1012,8 +1252,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL 60 TO 80', null, 'V_SDL_PLINE_STATS_60_TO_80', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_G"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE4"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1035,8 +1275,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL 80 TO 100', null, 'V_SDL_PLINE_STATS_80_TO_100', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_H"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE5"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1058,8 +1298,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL OVER 100', null, 'V_SDL_PLINE_STATS_OVER_100', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_K"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE6"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1081,8 +1321,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'MATCH DETAIL NO STATS', null, 'V_SDL_PLINE_STATS_NO_STATS', 'GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules>
   <rule>
-    <features style="L.URBN_CODE_A"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="L.SDL_LINE7"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1105,8 +1345,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'BATCH NODE 0 TO 1', null, 'V_SDL_WIP_NODES_0_TO_1', 'NODE_GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="NODE_ID">
   <rule>
-    <features style="M.CIRCLE"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="M.SDL_NODE1"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1128,8 +1368,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'BATCH NODE OVER 1', null, 'V_SDL_WIP_NODES_OVER_1', 'NODE_GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="NODE_ID">
   <rule>
-    <features style="M.TRIANGLE"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="M.SDL_NODE2"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1151,8 +1391,8 @@ INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STY
 SELECT 'BATCH NODE UNDER 0', null, 'V_SDL_WIP_NODES_UNDER_0', 'NODE_GEOM', '<?xml version="1.0" standalone="yes"?>
 <styling_rules key_column="NODE_ID">
   <rule>
-    <features style="M.STAR"> </features>
-    <label column="BATCH_ID" style="T.TITLE"> 1 </label>
+    <features style="M.SDL_NODE3"> </features>
+    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
