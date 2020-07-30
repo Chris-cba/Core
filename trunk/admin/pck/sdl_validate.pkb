@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.19   May 29 2020 10:28:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.20   Jul 30 2020 08:02:04   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 29 2020 10:28:26  $
-    --       Date fetched Out : $Modtime:   May 29 2020 10:26:34  $
-    --       PVCS Version     : $Revision:   1.19  $
+    --       Date into PVCS   : $Date:   Jul 30 2020 08:02:04  $
+    --       Date fetched Out : $Modtime:   Jul 29 2020 21:24:16  $
+    --       PVCS Version     : $Revision:   1.20  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -766,17 +766,50 @@ AS
                    'S',
                    sld_key,
                    'SLD_LOAD_GEOMETRY',
-                   -99,
-                   SDO_GEOM.validate_geometry_with_context (
-                       sld_working_geometry,
-                       l_diminfo)
-              FROM sdl_load_data
-             WHERE     sld_sfs_id = p_batch_id
-                   AND SDO_GEOM.validate_geometry_with_context (
-                           sld_working_geometry,
-                           l_diminfo) !=
-                       'TRUE';
-
+                   error_code,
+                   error_msg
+              FROM (  SELECT sld_key,
+                             CASE WHEN error_code IS NOT NULL
+                                  THEN error_code
+                                  WHEN LENGTH(TRIM(TRANSLATE(error_msg, '0123456789', ' '))) IS NULL
+                                  THEN TO_NUMBER(error_msg)
+                                  ELSE -99
+                             END error_code,
+                             CASE WHEN error_code IS NOT NULL
+                                  THEN get_rdbms_error_message(error_code) || ' - ' || error_msg
+                                  WHEN LENGTH(TRIM(TRANSLATE(error_msg, '0123456789', ' '))) IS NULL
+                                  THEN get_rdbms_error_message(TO_NUMBER(error_msg)) || ' - ' || error_msg
+                                  ELSE error_msg
+                             END error_msg
+                        FROM (SELECT sld_key,
+                                     FIRST_VALUE (error_code)
+                                         OVER (PARTITION BY sld_key
+                                               ORDER BY sld_key)    error_code,
+                                     FIRST_VALUE (error_msg)
+                                         OVER (PARTITION BY sld_key
+                                               ORDER BY sld_key)    error_msg
+                                FROM (SELECT sld_key,
+                                             TO_NUMBER (
+                                                 SUBSTR (
+                                                     status,
+                                                     1,
+                                                     INSTR (status, ' ', 1)))
+                                                 error_code,
+                                             status
+                                                 error_msg
+                                        FROM (SELECT sld_key,
+                                                       SDO_GEOM.validate_geometry_with_context (
+                                                         sld_working_geometry,
+                                                         l_diminfo)    status
+                                                FROM sdl_load_data
+                                               WHERE     sld_sfs_id = p_batch_id
+                                                     AND SDO_GEOM.validate_geometry_with_context (
+                                                             sld_working_geometry,
+                                                             l_diminfo) !=
+                                                         'TRUE')))
+                    GROUP BY sld_key,
+                             error_code,
+                             error_msg);
 
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
@@ -952,7 +985,7 @@ AS
                    swd_id,
                    'GEOM',
                    ERROR_CODE,
-                   error_msg
+                   get_rdbms_error_message(ERROR_CODE) || ' - ' || error_msg
               FROM (  SELECT sld_key,
                              swd_id,
                              ERROR_CODE,
