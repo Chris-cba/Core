@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.23   Feb 24 2019 10:07:38   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.24   Jul 30 2020 10:53:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Feb 24 2019 10:07:38  $
---       Date fetched Out : $Modtime:   Oct 23 2018 20:26:50  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Jul 30 2020 10:53:26  $
+--       Date fetched Out : $Modtime:   Jul 30 2020 10:52:38  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -2199,7 +2199,11 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
           , pl.pl_start                     nm_begin_mp
           , pl.pl_end                       nm_end_mp
           , pl.pl_measure                   nm_slk
-    FROM TABLE ( pi_placement_array.npa_placement_array ) pl;
+          , nm_cardinality                  nm_cardinality
+    FROM TABLE ( pi_placement_array.npa_placement_array ) pl, nm_members_all
+    where nm_ne_id_in = pi_route_ne_id
+    and nm_ne_id_of = pl.pl_ne_id
+    and nm_end_date = pi_effective_date;
 
     CURSOR c_memb2 IS
     SELECT  *
@@ -2231,7 +2235,7 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
               ,NULL
               ,i.nm_end_mp
               ,i.nm_slk
-              ,r_nm_members.nm_cardinality   -- use same value as was on previous membership
+              ,i.nm_cardinality
               ,r_nm_members.nm_admin_unit);	 -- use same value as was on previous membership
 
   END LOOP;
