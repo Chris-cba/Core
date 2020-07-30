@@ -5,11 +5,11 @@ DECLARE
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/sdl_profiles_ai.trg-arc   1.0   Mar 16 2020 14:24:04   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/sdl_profiles_ai.trg-arc   1.1   Jul 30 2020 08:19:34   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_profiles_ai.trg  $
---       Date into PVCS   : $Date:   Mar 16 2020 14:24:04  $
---       Date fetched Out : $Modtime:   Mar 14 2020 19:12:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 30 2020 08:19:34  $
+--       Date fetched Out : $Modtime:   Jul 30 2020 08:15:36  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -18,7 +18,7 @@ DECLARE
 BEGIN
   -- Create by default fixed range data of review levels for the new SDL profile.
   INSERT INTO sdl_spatial_review_levels (ssrl_sp_id, ssrl_percent_from, ssrl_percent_to, ssrl_coverage_level, ssrl_default_action)
-    VALUES(:NEW.sp_id , -999.999, -0.001, 'No Statistics', 'NO_ACTION');
+    VALUES(:NEW.sp_id , -999.999, -0.001, 'No Statistics', 'REVIEW');
   INSERT INTO sdl_spatial_review_levels (ssrl_sp_id, ssrl_percent_from, ssrl_percent_to, ssrl_coverage_level, ssrl_default_action)
     VALUES(:NEW.sp_id , 0.000, 19.999, 'Very Low', 'LOAD');
   INSERT INTO sdl_spatial_review_levels (ssrl_sp_id, ssrl_percent_from, ssrl_percent_to, ssrl_coverage_level, ssrl_default_action)
