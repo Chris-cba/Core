@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.2   Jul 30 2020 08:24:54   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.3   Aug 04 2020 20:20:04   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_themes.sql  $
---       Date into PVCS   : $Date:   Jul 30 2020 08:24:54  $
---       Date fetched Out : $Modtime:   Jul 23 2020 21:04:46  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Aug 04 2020 20:20:04  $
+--       Date fetched Out : $Modtime:   Aug 04 2020 20:05:38  $
+--       Version          : $Revision:   1.3  $
 --
 -- Description: To create base table metadata and themes relating to SDL geometry tables
 --
@@ -60,24 +60,24 @@ DELETE FROM mdsys.sdo_geom_metadata_table
                              'V_SDL_DATUM_ACCURACY',
                              'V_SDL_TRANSFERRED_DATUMS',
                              'SDL_WIP_NODES',
-                            'V_SDL_WIP_NODES',
-                            'V_SDL_PLINE_STATS',
-                            'V_SDL_DATUM_ACCURACY_NO_STATS',
-                            'V_SDL_DATUM_ACCURACY_20_TO_40',
-                            'V_SDL_DATUM_ACCURACY_40_TO_60',
-                            'V_SDL_DATUM_ACCURACY_60_TO_80',
-                            'V_SDL_DATUM_ACCURACY_80_TO_100',
-                            'V_SDL_DATUM_ACCURACY_OVER_100',
-                            'V_SDL_WIP_NODES_UNDER_0',
-                            'V_SDL_WIP_NODES_0_TO_1',
-                            'V_SDL_WIP_NODES_OVER_1',
-                            'V_SDL_PLINE_STATS_NO_STATS',
-                            'V_SDL_PLINE_STATS_0_TO_20',
-                            'V_SDL_PLINE_STATS_20_TO_40',
-                            'V_SDL_PLINE_STATS_40_TO_60',
-                            'V_SDL_PLINE_STATS_60_TO_80',
-                            'V_SDL_PLINE_STATS_80_TO_100',
-                            'V_SDL_PLINE_STATS_OVER_100');
+                             'V_SDL_WIP_NODES',
+                             'V_SDL_PLINE_STATS',
+                             'V_SDL_DATUM_ACCURACY_NO_STATS',
+                             'V_SDL_DATUM_ACCURACY_20_TO_40',
+                             'V_SDL_DATUM_ACCURACY_40_TO_60',
+                             'V_SDL_DATUM_ACCURACY_60_TO_80',
+                             'V_SDL_DATUM_ACCURACY_80_TO_100',
+                             'V_SDL_DATUM_ACCURACY_OVER_100',
+                             'V_SDL_WIP_NODES_UNDER_0',
+                             'V_SDL_WIP_NODES_0_TO_1',
+                             'V_SDL_WIP_NODES_OVER_1',
+                             'V_SDL_PLINE_STATS_NO_STATS',
+                             'V_SDL_PLINE_STATS_0_TO_20',
+                             'V_SDL_PLINE_STATS_20_TO_40',
+                             'V_SDL_PLINE_STATS_40_TO_60',
+                             'V_SDL_PLINE_STATS_60_TO_80',
+                             'V_SDL_PLINE_STATS_80_TO_100',
+                             'V_SDL_PLINE_STATS_OVER_100');
 						  
 DELETE FROM sde.layers 
 WHERE table_name IN ('V_SDL_DATUM_ACCURACY_0_TO_20',
@@ -138,7 +138,6 @@ WHERE table_name IN ('V_SDL_DATUM_ACCURACY_0_TO_20',
 					 
 DELETE FROM user_sdo_styles
 WHERE name IN ('M.SDL_DATUM_ARROW',
-               'T.SDL_TITLE',
                'L.SDL_ORIG_SUBMISSION',
                'L.SDL_DATUMS',
                'L.SDL_TRANS_DATUMS',
@@ -154,7 +153,31 @@ WHERE name IN ('M.SDL_DATUM_ARROW',
                'M.SDL_NODE1',
                'M.SDL_NODE2',
                'M.SDL_NODE3');
-					 
+
+DELETE FROM user_sdo_themes 
+WHERE NAME IN ('ORIGINAL SDL SUBMISSION',
+               'SDL DATUMS AND STATS',
+               'SDL TRANSFERRED DATUMS',
+               'SDL BATCH NODE DATA',
+               'SDL MATCH DETAIL',
+               'DATUM ACCURACY 0 TO 20',
+               'DATUM ACCURACY 20 TO 40',
+               'DATUM ACCURACY 40 TO 60',
+               'DATUM ACCURACY 60 TO 80',
+               'DATUM ACCURACY 80 TO 100',
+               'DATUM ACCURACY OVER 100',
+               'DATUM ACCURACY NO STATS',
+               'MATCH DETAIL 0 TO 20',
+               'MATCH DETAIL 20 TO 40',
+               'MATCH DETAIL 40 TO 60',
+               'MATCH DETAIL 60 TO 80',
+               'MATCH DETAIL 80 TO 100',
+               'MATCH DETAIL OVER 100',
+               'MATCH DETAIL NO STATS',
+               'BATCH NODE 0 TO 1',
+               'BATCH NODE OVER 1',
+               'BATCH NODE UNDER 0');
+
 DECLARE
   --
   view_not_exist  EXCEPTION;
@@ -443,11 +466,11 @@ EXCEPTION
     RAISE;
 END;
 /
-
+--
 DELETE from user_sdo_maps 
 WHERE name = (SELECT hov_value FROM hig_option_values WHERE hov_id = 'SDLMAPNAME');
-
-
+/
+--
 PROMPT Create SDL Base themes...
 -- Create SDL Base themes 
 BEGIN
@@ -888,21 +911,6 @@ WHERE NOT EXISTS (SELECT 1
                     FROM user_sdo_styles
                    WHERE NAME = 'M.SDL_NODE3');
 /
-INSERT INTO user_sdo_styles (NAME, TYPE, DESCRIPTION, DEFINITION)
-SELECT 'T.SDL_TITLE', 'TEXT', 'SDL Submission ID Title', '<?xml version="1.0" standalone="yes"?>
-  <svg width="1in" height="1in" >
-  <desc></desc>
-    <g class="text" 
-        style="font-style:plain;font-family:SansSerif;font-size:1pt;font-weight:bold;text-align:center;fill:#FFFFFF"> Hello World!
-        <opoint halign="center" valign="middle"/>
-        <text-along-path halign="center" valign="baseline"/>
-    </g>
-  </svg>'
-FROM DUAL
-WHERE NOT EXISTS (SELECT 1
-                    FROM user_sdo_styles
-                   WHERE NAME = 'T.SDL_TITLE');
-/
 PROMPT Inserting SDL user_sdo_themes...
 -- SDL Layers
 INSERT INTO USER_SDO_THEMES (NAME, DESCRIPTION, BASE_TABLE, GEOMETRY_COLUMN, STYLING_RULES)
@@ -910,7 +918,6 @@ SELECT 'ORIGINAL SDL SUBMISSION', null, 'V_SDL_LOAD_DATA', 'SLD_WORKING_GEOMETRY
 <styling_rules>
   <rule>
     <features style="L.SDL_ORIG_SUBMISSION"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -920,6 +927,10 @@ SELECT 'ORIGINAL SDL SUBMISSION', null, 'V_SDL_LOAD_DATA', 'SLD_WORKING_GEOMETRY
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ Y ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -933,7 +944,6 @@ SELECT 'SDL MATCH DETAIL', null, 'V_SDL_PLINE_STATS', 'GEOM', '<?xml version="1.
 <styling_rules key_column="ID">
   <rule>
     <features style="L.SDL_LINE"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -943,6 +953,10 @@ SELECT 'SDL MATCH DETAIL', null, 'V_SDL_PLINE_STATS', 'GEOM', '<?xml version="1.
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -956,12 +970,15 @@ SELECT 'SDL TRANSFERRED DATUMS', null, 'V_SDL_TRANSFERRED_DATUMS', 'GEOM', '<?xm
 <styling_rules>
   <rule>
     <features style="L.SDL_TRANS_DATUMS"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>    
   </rule>
   <custom_tags>
     <tag>
       <name> LegendGroup </name>
       <value> <![CDATA[ SDL Layers ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -975,7 +992,6 @@ SELECT 'SDL BATCH NODE DATA', null, 'V_SDL_WIP_NODES', 'NODE_GEOM', '<?xml versi
 <styling_rules key_column="NODE_ID">
   <rule>
     <features style="M.SDL_NODE"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -985,6 +1001,10 @@ SELECT 'SDL BATCH NODE DATA', null, 'V_SDL_WIP_NODES', 'NODE_GEOM', '<?xml versi
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -999,7 +1019,6 @@ SELECT 'SDL DATUMS AND STATS', null, 'V_SDL_DATUM_ACCURACY', 'GEOM', '<?xml vers
 <styling_rules key_column="SWD_ID">
   <rule>
     <features style="L.SDL_DATUMS"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1009,6 +1028,10 @@ SELECT 'SDL DATUMS AND STATS', null, 'V_SDL_DATUM_ACCURACY', 'GEOM', '<?xml vers
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1022,7 +1045,6 @@ SELECT 'DATUM ACCURACY 0 TO 20', null, 'V_SDL_DATUM_ACCURACY_0_TO_20', 'GEOM', '
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE1"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1032,6 +1054,10 @@ SELECT 'DATUM ACCURACY 0 TO 20', null, 'V_SDL_DATUM_ACCURACY_0_TO_20', 'GEOM', '
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1045,7 +1071,6 @@ SELECT 'DATUM ACCURACY 20 TO 40', null, 'V_SDL_DATUM_ACCURACY_20_TO_40', 'GEOM',
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE2"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1055,6 +1080,10 @@ SELECT 'DATUM ACCURACY 20 TO 40', null, 'V_SDL_DATUM_ACCURACY_20_TO_40', 'GEOM',
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1068,7 +1097,6 @@ SELECT 'DATUM ACCURACY 40 TO 60', null, 'V_SDL_DATUM_ACCURACY_40_TO_60', 'GEOM',
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE3"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1078,6 +1106,10 @@ SELECT 'DATUM ACCURACY 40 TO 60', null, 'V_SDL_DATUM_ACCURACY_40_TO_60', 'GEOM',
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1091,7 +1123,6 @@ SELECT 'DATUM ACCURACY 60 TO 80', null, 'V_SDL_DATUM_ACCURACY_60_TO_80', 'GEOM',
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE4"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1101,6 +1132,10 @@ SELECT 'DATUM ACCURACY 60 TO 80', null, 'V_SDL_DATUM_ACCURACY_60_TO_80', 'GEOM',
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1114,7 +1149,6 @@ SELECT 'DATUM ACCURACY 80 TO 100', null, 'V_SDL_DATUM_ACCURACY_80_TO_100', 'GEOM
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE5"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1124,6 +1158,10 @@ SELECT 'DATUM ACCURACY 80 TO 100', null, 'V_SDL_DATUM_ACCURACY_80_TO_100', 'GEOM
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1137,7 +1175,6 @@ SELECT 'DATUM ACCURACY OVER 100', null, 'V_SDL_DATUM_ACCURACY_OVER_100', 'GEOM',
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE6"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1147,6 +1184,10 @@ SELECT 'DATUM ACCURACY OVER 100', null, 'V_SDL_DATUM_ACCURACY_OVER_100', 'GEOM',
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1160,7 +1201,6 @@ SELECT 'DATUM ACCURACY NO STATS', null, 'V_SDL_DATUM_ACCURACY_NO_STATS', 'GEOM',
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE7"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1170,6 +1210,10 @@ SELECT 'DATUM ACCURACY NO STATS', null, 'V_SDL_DATUM_ACCURACY_NO_STATS', 'GEOM',
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1184,7 +1228,6 @@ SELECT 'MATCH DETAIL 0 TO 20', null, 'V_SDL_PLINE_STATS_0_TO_20', 'GEOM', '<?xml
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE1"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1194,6 +1237,10 @@ SELECT 'MATCH DETAIL 0 TO 20', null, 'V_SDL_PLINE_STATS_0_TO_20', 'GEOM', '<?xml
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1207,7 +1254,6 @@ SELECT 'MATCH DETAIL 20 TO 40', null, 'V_SDL_PLINE_STATS_20_TO_40', 'GEOM', '<?x
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE2"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1217,6 +1263,10 @@ SELECT 'MATCH DETAIL 20 TO 40', null, 'V_SDL_PLINE_STATS_20_TO_40', 'GEOM', '<?x
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1230,7 +1280,6 @@ SELECT 'MATCH DETAIL 40 TO 60', null, 'V_SDL_PLINE_STATS_40_TO_60', 'GEOM', '<?x
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE3"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1240,6 +1289,10 @@ SELECT 'MATCH DETAIL 40 TO 60', null, 'V_SDL_PLINE_STATS_40_TO_60', 'GEOM', '<?x
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1253,7 +1306,6 @@ SELECT 'MATCH DETAIL 60 TO 80', null, 'V_SDL_PLINE_STATS_60_TO_80', 'GEOM', '<?x
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE4"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1263,6 +1315,10 @@ SELECT 'MATCH DETAIL 60 TO 80', null, 'V_SDL_PLINE_STATS_60_TO_80', 'GEOM', '<?x
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1276,7 +1332,6 @@ SELECT 'MATCH DETAIL 80 TO 100', null, 'V_SDL_PLINE_STATS_80_TO_100', 'GEOM', '<
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE5"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1286,6 +1341,10 @@ SELECT 'MATCH DETAIL 80 TO 100', null, 'V_SDL_PLINE_STATS_80_TO_100', 'GEOM', '<
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1299,7 +1358,6 @@ SELECT 'MATCH DETAIL OVER 100', null, 'V_SDL_PLINE_STATS_OVER_100', 'GEOM', '<?x
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE6"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1309,6 +1367,10 @@ SELECT 'MATCH DETAIL OVER 100', null, 'V_SDL_PLINE_STATS_OVER_100', 'GEOM', '<?x
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1322,7 +1384,6 @@ SELECT 'MATCH DETAIL NO STATS', null, 'V_SDL_PLINE_STATS_NO_STATS', 'GEOM', '<?x
 <styling_rules>
   <rule>
     <features style="L.SDL_LINE7"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1332,6 +1393,10 @@ SELECT 'MATCH DETAIL NO STATS', null, 'V_SDL_PLINE_STATS_NO_STATS', 'GEOM', '<?x
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1346,7 +1411,6 @@ SELECT 'BATCH NODE 0 TO 1', null, 'V_SDL_WIP_NODES_0_TO_1', 'NODE_GEOM', '<?xml 
 <styling_rules key_column="NODE_ID">
   <rule>
     <features style="M.SDL_NODE1"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1356,6 +1420,10 @@ SELECT 'BATCH NODE 0 TO 1', null, 'V_SDL_WIP_NODES_0_TO_1', 'NODE_GEOM', '<?xml 
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[ N ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1369,7 +1437,6 @@ SELECT 'BATCH NODE OVER 1', null, 'V_SDL_WIP_NODES_OVER_1', 'NODE_GEOM', '<?xml 
 <styling_rules key_column="NODE_ID">
   <rule>
     <features style="M.SDL_NODE2"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1379,6 +1446,10 @@ SELECT 'BATCH NODE OVER 1', null, 'V_SDL_WIP_NODES_OVER_1', 'NODE_GEOM', '<?xml 
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
@@ -1392,7 +1463,6 @@ SELECT 'BATCH NODE UNDER 0', null, 'V_SDL_WIP_NODES_UNDER_0', 'NODE_GEOM', '<?xm
 <styling_rules key_column="NODE_ID">
   <rule>
     <features style="M.SDL_NODE3"> </features>
-    <label column="BATCH_ID" style="T.SDL_TITLE"> 1 </label>
   </rule>
   <custom_tags>
     <tag>
@@ -1402,6 +1472,10 @@ SELECT 'BATCH NODE UNDER 0', null, 'V_SDL_WIP_NODES_UNDER_0', 'NODE_GEOM', '<?xm
     <tag>
       <name> DisplayedAtStartup </name>
       <value> <![CDATA[   N   ]]> </value>
+    </tag>
+    <tag>
+      <name> FilterColumn </name>
+      <value> <![CDATA[ batch_id ]]> </value>
     </tag>
   </custom_tags>
 </styling_rules>'
