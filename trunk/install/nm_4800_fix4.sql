@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix4.sql-arc   1.0   Jul 30 2020 11:50:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix4.sql-arc   1.1   Aug 10 2020 11:07:18   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix4.sql  $ 
---       Date into PVCS   : $Date:   Jul 30 2020 11:50:40  $
---       Date fetched Out : $Modtime:   Jul 29 2020 09:54:04  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 10 2020 11:07:18  $
+--       Date fetched Out : $Modtime:   Aug 10 2020 11:06:50  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -94,7 +94,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4800_fix4.sql'
-				,p_remarks        => 'NET 4800 FIX 4 (Build 1)'
+				,p_remarks        => 'NET 4800 FIX 4 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
