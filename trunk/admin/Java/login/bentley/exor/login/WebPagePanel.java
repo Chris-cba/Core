@@ -1,17 +1,17 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.2   Nov 22 2018 14:55:12   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.3   Aug 14 2020 16:39:50   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   WebPagePanel.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Nov 22 2018 14:55:12  $
- *		Date Fetched Out : $Modtime:   Nov 22 2018 14:51:26  $
- *		PVCS Version     : $Revision:   1.2  $
+ *		Date Into PVCS   : $Date:   Aug 14 2020 16:39:50  $
+ *		Date Fetched Out : $Modtime:   Aug 14 2020 16:34:14  $
+ *		PVCS Version     : $Revision:   1.3  $
  *
  *	
  *
  ****************************************************************************************************
- *	  Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2020 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -212,24 +212,28 @@ public class WebPagePanel extends VBean {
 							
 							public void statusChanged(WebBrowserEvent e) {
 								if (SwingUtilities.isEventDispatchThread()) {
-									try {
+									try { 
 										String tnsVal = null;
 										
 										if(tnsName != null && tnsName.length() > 0) {
 											webBrowser.executeJavascript("setTNSName('" + tnsName + "')");
 										}
 										
-										String obj = (String)webBrowser.executeJavascriptWithResult("return getTestString()");
+										String claims = null; 
 										
-										if((obj != null) && !"null".equals(obj)) {
+										try {
+											claims  = (String)webBrowser.executeJavascriptWithResult("return getClaims()"); 
+										} catch(Exception e1) {
+										}
+										
+										if((claims != null) && !"null".equals(claims.toString())) { 
 											WebPagePanel.this.setSize(0, 0);
 											WebPagePanel.this.setVisible(false);
+											WebPagePanel.this.dispatchCustomEvent("IMSLoginStatusEvent", claims); 
 											
-											WebPagePanel.this.dispatchCustomEvent("IMSLoginStatusEvent", obj);
+											ExorDebugger.reportDebugInfo("statusChanged(): Closing Native Interface... "); 
 											
-											ExorDebugger.reportDebugInfo("statusChanged(): Closing Native Interface...");
-											
-											NativeInterface.close();
+											NativeInterface.close(); 
 										}
 									} catch(Exception ex) {
 										ex.printStackTrace();
@@ -288,8 +292,8 @@ public class WebPagePanel extends VBean {
         }
     }
 	
-	protected void dispatchCustomEvent(String eventType, String returnStr) {
-		try {
+	protected void dispatchCustomEvent(String eventType, String returnStr) { 
+		try { 
 			ExorDebugger.reportDebugInfo("dispatchCustomEvent(): Dispatching Custom Event...");
 			
 			ID ELEMENT_TEXT_CONTENT = ID.registerProperty("ELEMENT_TEXT_CONTENT");
