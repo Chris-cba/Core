@@ -1,19 +1,19 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.2   Sep 07 2017 14:41:30   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.3   Aug 14 2020 16:39:14   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   LoginUtil.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Sep 07 2017 14:41:30  $
- *		Date Fetched Out : $Modtime:   Sep 04 2017 16:08:40  $
- *		PVCS Version     : $Revision:   1.2  $
+ *		Date Into PVCS   : $Date:   Aug 14 2020 16:39:14  $
+ *		Date Fetched Out : $Modtime:   Aug 14 2020 16:34:52  $
+ *		PVCS Version     : $Revision:   1.3  $
  *
  *	This class is used to make a connection to Oracle Database using a WebLogic Data Source
  *	(jdbc/<TNS-NAME>LOGINDS) and fire queries using it, when connection is not available from Oracle 
  *	Forms Session (generally before logging in to a Forms' Session).
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2020 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -645,6 +645,44 @@ public class LoginUtil {
 		}
 		
 		return returnStrArr;
+	}
+	
+	public static String[][] getClaims(String claimsStr) {
+		String[][] returnStrArr = null;
+		Map<String, String> claimsMap = new HashMap<String, String>(); 
+		
+		try { 
+			int dollarPos = claimsStr.indexOf('$', 0); 
+			
+			while(dollarPos > -1) { 
+				int    strLen   = Integer.parseInt(claimsStr.substring(0, dollarPos));
+				String claim    = claimsStr.substring(dollarPos + 1, dollarPos + strLen + 1); 
+				int    colonPos = claim.indexOf(':', 0); 
+				
+				claimsMap.put(claim.substring(0, colonPos), claim.substring(colonPos + 1)); 
+				
+				claimsStr = claimsStr.substring(dollarPos + strLen + 1); 
+				dollarPos = claimsStr.indexOf('$', 0); 
+			}
+			
+			returnStrArr = new String[claimsMap.size()][2]; 
+			int i = 0; 
+			
+			Iterator itr = claimsMap.keySet().iterator(); 
+			
+			while(itr.hasNext()) {
+				returnStrArr[i][0] = (String)itr.next(); 
+				returnStrArr[i][1] = (String)claimsMap.get(returnStrArr[i][0]); 
+				i++; 
+			}
+		} catch(Exception e) {
+			returnStrArr = new String[1][1];
+			returnStrArr[0][0] = "ORA-20099: " + e.getMessage();
+			
+			e.printStackTrace(); 
+		}
+		
+		return returnStrArr; 
 	}
 	
 	private static String formDebugMessage(String functionName, String... params) {
