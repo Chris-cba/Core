@@ -14,33 +14,33 @@
 			var buttonX = null;
 			var buttonY = null;
 			
-			var test = "null";
-			
-			function getTestString2(e) {
-				test = getDBConnectStr();
-			}
-			
-			function getTestString() {
-				return test;
-			}
-			
-			function getDBConnectStr() {
-				var emailid = document.getElementById("emailid").value;
-				var tnsName = document.getElementById("tnsName").value;				
-				var returnVal = emailid.length + "$" + emailid + tnsName.length + "$" + tnsName + "test";
-				
-				return returnVal;
-			}
-			
 			function setTNSName(tnsName) {
 				document.getElementById("tnsName").value = tnsName;
-				var emailid = document.getElementById("emailid").value;
-				test = emailid.length + "$" + emailid + tnsName.length + "$" + tnsName + "test";
 				document.getElementById("dbTNSForm").submit();
 			}
 			
 			function setFocus() {
 				document.getElementById("tnsName").focus();
+			}
+			
+			function getClaims() { 
+				var tns = document.getElementById("tnsName").value;
+				
+				if(tns) { 
+					tns = "tnsname" + ":" + tns; 
+					
+					var claims = tns.length + "$" + tns; 
+					var claimsElements = document.getElementsByClassName('claims'); 
+					
+					for(var i = 0; i < claimsElements.length; i++) {
+						var claim = claimsElements[i].name + ":" + claimsElements[i].value; 
+						claims += claim.length + "$" + claim; 
+					}
+					
+					return claims; 
+				} else {
+					return "null"; 
+				} 
 			}
 		</script>
 	</head>
@@ -71,40 +71,38 @@
 		</div>
 		<div id="back" class="divBack"></div>    
 		<div id="front" class="divFront"  onclick="">
-		<form id="dbTNSForm" action="" onsubmit="getTestString2(event)">
-		<%@ page import="java.util.*"%>
-		<%@ page import="com.auth10.federation.Claim"%>
-		<%@ page import="com.auth10.federation.FederatedPrincipal"%>
-		<%@ page import="com.auth10.federation.FederatedConfiguration"%>
-		<%@ page import="com.auth10.federation.WSFederationFilter"%>
-		<%
+			<form id="dbTNSForm" action="" onsubmit="getTestString2(event)">
+			<%@ page import="java.util.*"%>
+			<%@ page import="com.auth10.federation.Claim"%>
+			<%@ page import="com.auth10.federation.FederatedPrincipal"%>
+			<%@ page import="com.auth10.federation.FederatedConfiguration"%>
+			<%@ page import="com.auth10.federation.WSFederationFilter"%>
+			<%
+			
+			// gets the user claims
+			List<Claim> claims = ((FederatedPrincipal)request.getUserPrincipal()).getClaims();
+			
+			Iterator<Claim> itr = claims.iterator();
+			
+			String emailid = null;
+			
+			while(itr.hasNext()) {
+				Claim claim = (Claim)itr.next();
+				String claimType  = claim.getClaimType(); 
+				claimType  = claimType.substring(claimType.lastIndexOf("/") + 1); 
+				String claimValue = claim.getClaimValue(); 
+			%>
+				<input type="hidden" class="claims" name="<%=claimType%>" value="<%=claimValue%>" />
+			<% 
+			}
+			%>
+				<font face="Times New Roman">Database: </font><input id="tnsName" type="text" class="tnsName" />
+				<br/>
+				<br/>
+				<input id="submitbutton" type="submit" class="exp" value="Login" />
+			</form>
+	 	</div>
 		
-		// gets the user claims
-	 	List<Claim> claims = ((FederatedPrincipal)request.getUserPrincipal()).getClaims();
-	 	
-	 	Iterator<Claim> itr = claims.iterator();
-	 	
-	 	String emailid = null;
-	 	
-	 	while(itr.hasNext()) {
-	 		Claim claim = (Claim)itr.next();
-	 		
-	 		if(claim.getClaimType().endsWith("emailaddress")) {
-	 			emailid = claim.getClaimValue();
-	 			break;
-	 		}
-	 	}
-	 	%>
-	 			<input id="emailid" type="hidden" value='<%=emailid%>' />
-	 			
-	 			<font face="Times New Roman">Database: </font><input id="tnsName" type="text" class="tnsName" />
-	 			<br/><br/>
-	 			<input id="submitbutton" type="submit" class="exp" value="Login" />
-	 		</form>
-	 		</div>
-	 	<%
-	 	
-	%>
 		<a tabindex="25" class="copyright-footer" target="_blank" href='https://www.bentley.com'>
 			&copy;&nbsp;<%=Calendar.getInstance().get(Calendar.YEAR) %>&nbsp;Bentley&nbsp;Systems,&nbsp;Incorporated
 		</a>
