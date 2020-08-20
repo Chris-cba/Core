@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY hig_log_api
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_log_api.pkb-arc   1.0   Aug 14 2020 17:04:26   Upendra.Hukeri  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_log_api.pkb-arc   1.1   Aug 20 2020 12:16:50   Upendra.Hukeri  $
     --       Module Name      : $Workfile:   hig_log_api.pkb  $
-    --       Date into PVCS   : $Date:   Aug 14 2020 17:04:26  $
-    --       Date fetched Out : $Modtime:   Aug 14 2020 17:03:16  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Aug 20 2020 12:16:50  $
+    --       Date fetched Out : $Modtime:   Aug 20 2020 12:01:30  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : U. S. Hukeri
     --
@@ -198,6 +198,10 @@ AS
 	BEGIN 
         nm_debug.debug_on;
 		nm_debug.debug('dispatch_log_job: ' || TO_CHAR(SYSDATE, 'DD-MON-YYYY HH24:MI:SS')); 
+		--
+		IF hig.get_user_or_sys_opt('HIGLOGURL') IS NULL THEN 
+			RAISE_APPLICATION_ERROR(-20001, 'Missing Product Option - HIGLOGURL'); 
+		END IF; 
 		-- 
 		v_dispatch_log := 'BEGIN '; 
 		v_dispatch_log := v_dispatch_log || 'hig_log_api.dispatch_log('; 
