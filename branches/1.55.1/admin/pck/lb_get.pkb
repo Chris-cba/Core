@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.55.1.1   Jul 05 2019 09:35:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.55.1.2   Sep 04 2020 00:25:46   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 05 2019 09:35:24  $
-    --       Date fetched Out : $Modtime:   Jul 05 2019 09:29:20  $
-    --       PVCS Version     : $Revision:   1.55.1.1  $
+    --       Date into PVCS   : $Date:   Sep 04 2020 00:25:46  $
+    --       Date fetched Out : $Modtime:   Sep 04 2020 00:24:08  $
+    --       PVCS Version     : $Revision:   1.55.1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.55.1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.55.1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -77,7 +77,7 @@ AS
     -----------------------------------------------------------------------------
     --
 
-FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
+    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                               p_obj_type      IN VARCHAR2,
                               p_obj_id        IN INTEGER,
                               p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
@@ -390,7 +390,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                                     end_m)))
                                     OR p_whole_only = 'FALSE')
                         UNION ALL
---from ( 
+                        --from (
                         SELECT lb_RPt (nm_ne_id_of,
                                        nlt_id,
                                        nm_obj_type,
@@ -400,7 +400,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                        nm_cardinality,
                                        nm_begin_mp,
                                        nm_end_mp,
-                                       nlt_units) rpt
+                                       nlt_units)    rpt
                           FROM nm_members m, nm_linear_types, nm_elements
                          WHERE     p_lb_only = 'FALSE'
                                AND nlt_nt_type = ne_nt_type
@@ -417,8 +417,9 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                          WHERE     c.nm_ne_id_of = refnt
                                                --                                               AND c.nm_ne_id_in =
                                                --                                                   m.nm_ne_id_in
-                                                                              AND nm_obj_type =
-                                                                                  NVL (p_obj_type, nm_obj_type)
+                                               AND nm_obj_type =
+                                                   NVL (p_obj_type,
+                                                        nm_obj_type)
                                                AND (   (    c.nm_begin_mp <
                                                             t.end_m
                                                         AND c.nm_end_mp >
@@ -450,8 +451,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                                     start_m
                                                                  OR l.nm_end_mp >
                                                                     end_m)))
-                                    OR p_whole_only = 'FALSE')
-                                    );
+                                    OR p_whole_only = 'FALSE'));
             END IF;                             -- end p_refnt_tab is not null
         --        ELSIF p_obj_id IS NOT NULL
         --        THEN
@@ -602,8 +602,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                            CHR (10) || 'UNION ALL' || CHR (10))
                   WITHIN GROUP (ORDER BY nlt_id)
                || CHR (10)
-               || ')) s, nm_elements e where e.ne_id = s.ne_id )'
-                   aggr_str
+               || ')) s, nm_elements e where e.ne_id = s.ne_id )'    aggr_str
           INTO lstr
           FROM (SELECT nlt_id, nlt_units, select_string
                   FROM (SELECT nlt_id,
@@ -629,21 +628,25 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                || ' ) = '
                                || ''''
                                || 'TRUE'
-                               || ''''
-                                   select_string
-                          FROM (SELECT nlt_id,
-                                       nlt_units,
-                                       nth_feature_pk_column        pk,
-                                       nth_feature_shape_column     shape,
-                                       nth_feature_table            feat_tab
-                                  FROM v_nm_datum_themes
-                                 --                               WHERE
-                                 --                               nlt_id IN (SELECT COLUMN_VALUE
-                                 --                                                  FROM TABLE (p_nlt_ids)))));
-                                 --                                     OR nlt_is_empty = 'Y')));
-                                 WHERE nlt_id IN
-                                           (SELECT COLUMN_VALUE
-                                              FROM TABLE (p_nlt_ids)))));
+                               || ''''    select_string
+                          FROM (  SELECT nlt_id,
+                                         nlt_units,
+                                         nth_feature_pk_column        pk,
+                                         nth_feature_shape_column     shape,
+                                         nth_feature_table            feat_tab
+                                    FROM v_nm_datum_themes
+                                   --                               WHERE
+                                   --                               nlt_id IN (SELECT COLUMN_VALUE
+                                   --                                                  FROM TABLE (p_nlt_ids)))));
+                                   --                                     OR nlt_is_empty = 'Y')));
+                                   WHERE nlt_id IN
+                                             (SELECT COLUMN_VALUE
+                                                FROM TABLE (p_nlt_ids))
+                                GROUP BY nlt_id,
+                                         nlt_units,
+                                         nth_feature_pk_column,
+                                         nth_feature_shape_column,
+                                         nth_feature_table)));
 
         --                                     OR nlt_is_empty = 'Y')));
 
@@ -790,8 +793,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                        || nth_feature_table
                        || ' s where s.'
                        || nth_feature_pk_column
-                       || ' = refnt ) '
-                           case_stmt
+                       || ' = refnt ) '    case_stmt
                   FROM nm_nw_themes, nm_themes_all, nm_linear_types
                  WHERE     nth_theme_id = nnth_nth_theme_id
                        AND nlt_id = nnth_nlt_id
@@ -1689,8 +1691,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                    ROWS BETWEEN UNBOUNDED
                                                                 PRECEDING
                                                         AND     CURRENT ROW)
-                                         + 1
-                                             AS inv_segment_id
+                                         + 1    AS inv_segment_id
                                     FROM (SELECT j.*,
                                                  DECODE (
                                                      start_node,
@@ -1701,8 +1702,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                                                            inv_prior_ce, 0,
                                                                                            1),
                                                                          1),
-                                                     1)
-                                                     inv_conn_flag
+                                                     1)    inv_conn_flag
                                             FROM (SELECT i.*,
                                                          NVL (
                                                              LAG (nm_seg_no, 1)
@@ -2189,8 +2189,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                     AND r.element_xsp = i.xsp),
                                             xsp)
                                    FROM DUAL)
-                        END
-                            rvrs_xsp
+                        END    rvrs_xsp
                    FROM input_tab i)
         SELECT lb_XRPt (refnt,
                         refnt_type,
@@ -2266,8 +2265,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                    ROWS BETWEEN UNBOUNDED
                                                                 PRECEDING
                                                         AND     CURRENT ROW)
-                                         + 1
-                                             AS inv_segment_id
+                                         + 1    AS inv_segment_id
                                     FROM (SELECT j.*,
                                                  DECODE (
                                                      start_node,
@@ -2278,8 +2276,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                                                                            inv_prior_ce, 0,
                                                                                            1),
                                                                          1),
-                                                     1)
-                                                     inv_conn_flag
+                                                     1)    inv_conn_flag
                                             FROM (SELECT i.*,
                                                          NVL (
                                                              LAG (nm_seg_no, 1)
@@ -3551,8 +3548,7 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
           FROM (  SELECT base_srid,
                          CAST (
                              COLLECT (ordinate ORDER BY rn, cn)
-                                 AS sdo_ordinate_array)
-                             ords
+                                 AS sdo_ordinate_array)    ords
                     FROM (SELECT rn,
                                  cn,
                                  ordinate,
