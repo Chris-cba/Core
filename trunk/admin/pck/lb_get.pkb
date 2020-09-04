@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.63   Jul 19 2019 15:16:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.64   Sep 04 2020 10:50:34   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 19 2019 15:16:50  $
-    --       Date fetched Out : $Modtime:   Jul 19 2019 15:16:12  $
-    --       PVCS Version     : $Revision:   1.63  $
+    --       Date into PVCS   : $Date:   Sep 04 2020 10:50:34  $
+    --       Date fetched Out : $Modtime:   Sep 04 2020 10:49:12  $
+    --       PVCS Version     : $Revision:   1.64  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.63  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.64  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -663,19 +663,24 @@ AS
                                || ''''
                                || 'TRUE'
                                || ''''    select_string
-                          FROM (SELECT nlt_id,
-                                       nlt_units,
-                                       nth_feature_pk_column        pk,
-                                       nth_feature_shape_column     shape,
-                                       nth_feature_table            feat_tab
-                                  FROM v_nm_datum_themes
-                                 --                               WHERE
-                                 --                               nlt_id IN (SELECT COLUMN_VALUE
-                                 --                                                  FROM TABLE (p_nlt_ids)))));
-                                 --                                     OR nlt_is_empty = 'Y')));
-                                 WHERE nlt_id IN
-                                           (SELECT COLUMN_VALUE
-                                              FROM TABLE (p_nlt_ids)))));
+                          FROM (  SELECT nlt_id,
+                                         nlt_units,
+                                         nth_feature_pk_column        pk,
+                                         nth_feature_shape_column     shape,
+                                         nth_feature_table            feat_tab
+                                    FROM v_nm_datum_themes
+                                   --                               WHERE
+                                   --                               nlt_id IN (SELECT COLUMN_VALUE
+                                   --                                                  FROM TABLE (p_nlt_ids)))));
+                                   --                                     OR nlt_is_empty = 'Y')));
+                                   WHERE nlt_id IN
+                                             (SELECT COLUMN_VALUE
+                                                FROM TABLE (p_nlt_ids))
+                                GROUP BY nlt_id,
+                                         nlt_units,
+                                         nth_feature_pk_column,
+                                         nth_feature_shape_column,
+                                         nth_feature_table)));
 
         --                                     OR nlt_is_empty = 'Y')));
 
@@ -807,27 +812,24 @@ AS
     IS
         retval   lb_rpt_tab;
     BEGIN
-        SELECT CAST (
-                   COLLECT (
-                       lb_rpt (
-                           nsd_ne_id,
-                           nlt_id,
-                           NULL,
-                           NULL,
-                           1,
-                           rownum,
-                           nsd_cardinality,
-                           nsd_begin_mp,
-                           nsd_end_mp,
-                           nlt_units)) AS lb_rpt_tab)
-          INTO retval
-          FROM nm_linear_types, nm_elements, nm_saved_extent_member_datums
-         WHERE     nsd_nse_id = p_nse_id
-               AND nsd_ne_id = ne_id
-               AND ne_nt_type = nlt_nt_type
-               AND nlt_g_i_d = 'D'
-          ORDER BY nsd_nsm_id, nsd_seq_no;
-               
+          SELECT CAST (COLLECT (lb_rpt (nsd_ne_id,
+                                        nlt_id,
+                                        NULL,
+                                        NULL,
+                                        1,
+                                        ROWNUM,
+                                        nsd_cardinality,
+                                        nsd_begin_mp,
+                                        nsd_end_mp,
+                                        nlt_units)) AS lb_rpt_tab)
+            INTO retval
+            FROM nm_linear_types, nm_elements, nm_saved_extent_member_datums
+           WHERE     nsd_nse_id = p_nse_id
+                 AND nsd_ne_id = ne_id
+                 AND ne_nt_type = nlt_nt_type
+                 AND nlt_g_i_d = 'D'
+        ORDER BY nsd_nsm_id, nsd_seq_no;
+
 
         RETURN retval;
     END;
