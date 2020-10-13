@@ -4,21 +4,22 @@ create or replace package body sdl_inv_ddl as
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.0   Oct 13 2020 20:31:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.1   Oct 13 2020 20:35:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   sdl_inv_ddl.pkb  $
-   --       Date into PVCS   : $Date:   Oct 13 2020 20:31:56  $
-   --       Date fetched Out : $Modtime:   Oct 13 2020 20:05:44  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Oct 13 2020 20:35:38  $
+   --       Date fetched Out : $Modtime:   Oct 13 2020 20:35:16  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : Rob Coupe
    --
-   --   <Descr>
+   --   The package forms part of the spatial/transporattion data loader and is responsible
+   --   for object creations such as container-based tables and destination views
    --
    -----------------------------------------------------------------------------
    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
    --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   1.0  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   1.1  $';
   
 --
 FUNCTION get_version RETURN varchar2 IS
