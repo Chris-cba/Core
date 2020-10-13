@@ -1,0 +1,65 @@
+CREATE OR REPLACE PACKAGE sdl_invval
+AS
+    --
+    -----------------------------------------------------------------------------
+    --
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkh-arc   1.0   Oct 13 2020 20:40:40   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_invval.pkh  $
+    --       Date into PVCS   : $Date:   Oct 13 2020 20:40:40  $
+    --       Date fetched Out : $Modtime:   Oct 13 2020 20:40:20  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : Rob Coupe
+    --
+    --   Package responsible for bulk validation of inventory data inside the Spatial/Transportation data loader
+    --
+    -----------------------------------------------------------------------------
+    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+    -----------------------------------------------------------------------------
+    --
+
+    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.0  $"';
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --
+    -----------------------------------------------------------------------------
+    --
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    PROCEDURE validate_inv_data (p_sp_id         IN     NUMBER,
+                                 p_sfs_id        IN     NUMBER,
+                                 p_sdh_id        IN     NUMBER,
+                                 p_error_count      OUT NUMBER);
+
+
+    FUNCTION get_domain_validation_sql (p_sp_id    IN NUMBER,
+                                        p_sfs_id   IN NUMBER,
+                                        p_sdh_id   IN NUMBER)
+        RETURN VARCHAR2;
+
+    FUNCTION get_validation_sql (p_sp_id    IN NUMBER,
+                                 p_sfs_id   IN NUMBER,
+                                 p_sdh_id   IN NUMBER)
+        RETURN VARCHAR2;
+
+
+    FUNCTION can_user_load_asset (p_sdh_id IN NUMBER)
+        RETURN VARCHAR2;
+
+    PROCEDURE validate_au_privilege (p_sfs_id        IN     NUMBER,
+                                     p_sdh_id        IN     NUMBER,
+                                     p_error_count      OUT NUMBER);
+
+    PROCEDURE validate_xsp (p_sfs_id        IN     NUMBER,
+                            p_sdh_id        IN     NUMBER,
+                            p_error_count      OUT NUMBER);
+
+    PROCEDURE make_tdl_attribute_adjustments (p_sp_id    IN NUMBER,
+                                              p_sfs_id   IN NUMBER);
+END;
+/
