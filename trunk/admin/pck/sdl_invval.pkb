@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.0   Oct 13 2020 20:40:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.1   Oct 15 2020 11:48:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_invval.pkb  $
-    --       Date into PVCS   : $Date:   Oct 13 2020 20:40:06  $
-    --       Date fetched Out : $Modtime:   Oct 13 2020 20:39:26  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 15 2020 11:48:44  $
+    --       Date fetched Out : $Modtime:   Oct 15 2020 11:47:50  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : Rob Coupe
     --
@@ -19,7 +19,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_sdh_id                 NUMBER;
     g_source_name            VARCHAR2 (30);
@@ -75,6 +75,23 @@ AS
 
         DELETE FROM SDL_VALIDATION_RESULTS
               WHERE svr_sfs_id = p_sfs_id;
+
+        EXECUTE IMMEDIATE   'insert into sdl_row_status (srs_sfs_id, srs_sp_id, srs_tld_id, srs_record_no, srs_status) '
+                         || ' select :p_sfs_id, :p_sp_id, tld_id, rownum, :p_hold '
+                         || ' from '
+                         || g_source_name
+                         || ' where tld_sfs_id = :p_sfs_id '
+                         || ' and not exists ( select 1 from sdl_row_status where srs_sfs_id = :p_sfs_id and srs_tld_id = tld_id )' 
+            USING p_sfs_id,
+                  p_sp_id,
+                  'H',
+                  p_sfs_id,
+                  p_sfs_id;
+
+        UPDATE SDL_ROW_STATUS
+           SET srs_status = 'H'
+         WHERE srs_status IN ('V', 'E') AND srs_sfs_id = p_sfs_id;
+
 
         --        validate_xsp (p_sfs_id, p_sdh_id, l_error_count);
 
