@@ -1,4 +1,3 @@
-/* Formatted on 14/10/2020 13:30:46 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_inv_ddl
 AS
     --
@@ -6,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.2   Oct 15 2020 10:34:18   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.3   Oct 15 2020 21:06:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Oct 15 2020 10:34:18  $
-    --       Date fetched Out : $Modtime:   Oct 14 2020 22:00:18  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Oct 15 2020 21:06:26  $
+    --       Date fetched Out : $Modtime:   Oct 15 2020 21:05:24  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : Rob Coupe
     --
@@ -21,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     --
     FUNCTION get_version
@@ -72,16 +71,16 @@ AS
                              := SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
         l_table_name     VARCHAR2 (60)
             :=    'TDL_'
-               || p_sp_name
+               || replace(p_sp_name, ' ', '_')
                || CASE p_rowcount
                       WHEN 1 THEN NULL
                       ELSE '_' || p_container
                   END
                || '_LD';
         l_pk_name        VARCHAR2 (30)
-            := 'TDL_' || p_sp_name || '_' || p_container || '_LD_PK';
+            := 'TDL_' || replace(p_sp_name, ' ','_') || '_' || p_container || '_LD_PK';
         l_uk_name        VARCHAR2 (30)
-            := 'TDL_' || p_sp_name || '_' || p_container || '_LD_UK';
+            := 'TDL_' || replace(p_sp_name, ' ','_') || '_' || p_container || '_LD_UK';
 
         already_exists   EXCEPTION;
         PRAGMA EXCEPTION_INIT (already_exists, -955); -- name is already used by an existing objec
@@ -135,6 +134,8 @@ AS
             || l_pk_name
             || ' PRIMARY KEY (TLD_ID) '
             || ' ENABLE ';
+
+nm_debug.debug(l_sql);
 
         EXECUTE IMMEDIATE l_sql;
 
@@ -242,7 +243,7 @@ AS
 
         l_source_table :=
                'TDL_'
-            || l_sp_row.sp_name
+            || replace(l_sp_row.sp_name, ' ', '_')
             || CASE container_count
                    WHEN 1 THEN NULL
                    ELSE '_' || l_sdh_row.sdh_source_container
