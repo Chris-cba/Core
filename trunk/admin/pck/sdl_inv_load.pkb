@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.0   Oct 13 2020 20:42:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.1   Oct 15 2020 13:47:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkb  $
-    --       Date into PVCS   : $Date:   Oct 13 2020 20:42:06  $
-    --       Date fetched Out : $Modtime:   Oct 13 2020 19:56:28  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 15 2020 13:47:10  $
+    --       Date fetched Out : $Modtime:   Oct 15 2020 13:46:16  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   1.0  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   1.1  $';
     
     --
     FUNCTION get_version
@@ -160,9 +160,18 @@ AS
             nm_debug.debug (l_sql);
         END;
 
+        declare
+           invalid_metadata exception;
+           pragma exception_init(invalid_metadata, -904 ); --invalid identifier/column issue
+        begin        
+        
         EXECUTE IMMEDIATE l_sql
             USING p_sfs_id, p_sp_id, p_sfs_id;
-
+            
+        exception
+           when invalid_metadata then
+              raise_application_error( -20001, 'Error in the metadata results in erroneous insert so the load fails');
+        end;
         UPDATE sdl_row_status
            SET srs_status = 'I'
          WHERE     srs_sfs_id = p_sfs_id
