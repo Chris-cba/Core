@@ -14,11 +14,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_destination_sequence_columns.vw-arc   1.0   Oct 13 2020 20:44:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_destination_sequence_columns.vw-arc   1.1   Oct 15 2020 11:16:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   v_sdl_destination_sequence_columns.vw  $
-   --       Date into PVCS   : $Date:   Oct 13 2020 20:44:48  $
-   --       Date fetched Out : $Modtime:   Oct 13 2020 20:44:32  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Oct 15 2020 11:16:28  $
+   --       Date fetched Out : $Modtime:   Oct 15 2020 10:45:12  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : Rob Coupe
    --
@@ -35,5 +35,8 @@ AS
            sam_id,
            sam_attribute_formula
       FROM sdl_attribute_mapping, sdl_destination_header
-     WHERE     UPPER (sam_attribute_formula) LIKE '%NEXT%'
+     WHERE     UPPER (sam_attribute_formula||sam_default_value) LIKE '%NEXT%'
            AND sam_sdh_id = sdh_id;
+
+
+select * from V_SDL_DESTINATION_SEQUENCE_COLUMNS
