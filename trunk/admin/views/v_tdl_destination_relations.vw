@@ -19,26 +19,26 @@ CREATE OR REPLACE FORCE VIEW V_TDL_DESTINATION_RELATIONS
 BEQUEATH DEFINER
 AS
     SELECT /*
-   --
-   -----------------------------------------------------------------------------
-   --
-   --   PVCS Identifiers :-
-   --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_tdl_destination_relations.vw-arc   1.0   Oct 13 2020 20:46:06   Rob.Coupe  $
-   --       Module Name      : $Workfile:   v_tdl_destination_relations.vw  $
-   --       Date into PVCS   : $Date:   Oct 13 2020 20:46:06  $
-   --       Date fetched Out : $Modtime:   Oct 13 2020 20:45:36  $
-   --       PVCS Version     : $Revision:   1.0  $
-   --
-   --   Author : Rob Coupe
-   --
-   --   A view to link the destinations of a load profile by their attribute relationships
-   --
-   -----------------------------------------------------------------------------
-   --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
-   -----------------------------------------------------------------------------
-   --    
-*/        
+       --
+       -----------------------------------------------------------------------------
+       --
+       --   PVCS Identifiers :-
+       --
+       --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_tdl_destination_relations.vw-arc   1.1   Oct 15 2020 11:51:46   Rob.Coupe  $
+       --       Module Name      : $Workfile:   v_tdl_destination_relations.vw  $
+       --       Date into PVCS   : $Date:   Oct 15 2020 11:51:46  $
+       --       Date fetched Out : $Modtime:   Oct 15 2020 11:51:00  $
+       --       PVCS Version     : $Revision:   1.1  $
+       --
+       --   Author : Rob Coupe
+       --
+       --   A view to link the destinations of a load profile by their attribute relationships
+       --
+       -----------------------------------------------------------------------------
+       --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+       -----------------------------------------------------------------------------
+       --
+    */
            sdh_p.sdh_sp_id,
            sdh_p.sdh_id,
            sdh_p.sdh_destination_type,
@@ -50,14 +50,14 @@ AS
            sam_p.sam_view_column_name,
            sam_c.sam_id,
            sam_c.sam_view_column_name,
-           sam_p.sam_attribute_formula,
-           sam_c.sam_attribute_formula,
+           sam_p.sam_default_value,
+           sam_c.sam_default_value,
            SUBSTR (
-               sam_c.sam_attribute_formula,
-                 INSTR (sam_c.sam_attribute_formula,
+               sam_c.sam_default_value,
+                 INSTR (sam_c.sam_default_value,
                         nld_p.nld_table_short_name || '.')
                + LENGTH (nld_p.nld_table_short_name || '.'),
-               LENGTH (sam_c.sam_attribute_formula)),
+               LENGTH (sam_c.sam_default_value)),
            (SELECT sdsc_sequence_name
               FROM V_SDL_DESTINATION_SEQUENCE_COLUMNS
              WHERE     sdsc_sam_id = sam_p.sam_id
@@ -74,12 +74,15 @@ AS
            AND sdh_p.sdh_sp_id = sdh_c.sdh_sp_id
            AND sam_p.sam_sdh_id = sdh_p.sdh_id
            AND sam_c.sam_sdh_id = sdh_c.sdh_id
-           AND sam_c.sam_attribute_formula LIKE
+           AND sam_c.sam_attribute_formula || sam_c.sam_default_value LIKE
                    nld_p.nld_table_short_name || '%'
            AND sam_p.sam_view_column_name =
                SUBSTR (
-                   sam_c.sam_attribute_formula,
-                     INSTR (sam_c.sam_attribute_formula,
-                            nld_p.nld_table_short_name || '.')
+                   sam_c.sam_attribute_formula || sam_c.sam_default_value,
+                     INSTR (
+                            sam_c.sam_attribute_formula
+                         || sam_c.sam_default_value,
+                         nld_p.nld_table_short_name || '.')
                    + LENGTH (nld_p.nld_table_short_name || '.'),
-                   LENGTH (sam_c.sam_attribute_formula));
+                   LENGTH (
+                       sam_c.sam_attribute_formula || sam_c.sam_default_value));
