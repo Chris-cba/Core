@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkh-arc   1.0   Oct 13 2020 20:42:04   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkh-arc   1.1   Oct 16 2020 23:23:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkh  $
-    --       Date into PVCS   : $Date:   Oct 13 2020 20:42:04  $
-    --       Date fetched Out : $Modtime:   Oct 13 2020 20:36:22  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 16 2020 23:23:44  $
+    --       Date fetched Out : $Modtime:   Oct 16 2020 23:22:54  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.0  $"';
+    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.1  $"';
 
     FUNCTION get_version
         RETURN VARCHAR2;
@@ -30,6 +30,9 @@ AS
     --
     FUNCTION get_body_version
         RETURN VARCHAR2;
+
+    PROCEDURE load_data (p_sfs_id IN NUMBER);
+
 
     PROCEDURE load_data (p_sp_id            IN     NUMBER,
                          p_sdh_id           IN     NUMBER,
