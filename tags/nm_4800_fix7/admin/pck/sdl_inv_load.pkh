@@ -1,0 +1,42 @@
+CREATE OR REPLACE PACKAGE sdl_inv_load
+AS
+    --
+    -----------------------------------------------------------------------------
+    --
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkh-arc   1.1   Oct 16 2020 23:23:44   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_inv_load.pkh  $
+    --       Date into PVCS   : $Date:   Oct 16 2020 23:23:44  $
+    --       Date fetched Out : $Modtime:   Oct 16 2020 23:22:54  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : Rob Coupe
+    --
+    --   Package of code relating to the loading of data from TDL Holding tables/views into the inventory
+    --   and location database.
+    --
+    -----------------------------------------------------------------------------
+    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+    -----------------------------------------------------------------------------
+    --
+    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.1  $"';
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --
+    -----------------------------------------------------------------------------
+    --
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    PROCEDURE load_data (p_sfs_id IN NUMBER);
+
+
+    PROCEDURE load_data (p_sp_id            IN     NUMBER,
+                         p_sdh_id           IN     NUMBER,
+                         p_sfs_id           IN     NUMBER,
+                         p_rows_processed      OUT NUMBER);
+END;
+/
