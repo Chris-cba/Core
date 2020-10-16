@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.2   Oct 16 2020 23:04:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.3   Oct 16 2020 23:21:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkb  $
-    --       Date into PVCS   : $Date:   Oct 16 2020 23:04:02  $
-    --       Date fetched Out : $Modtime:   Oct 16 2020 23:03:26  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Oct 16 2020 23:21:44  $
+    --       Date fetched Out : $Modtime:   Oct 16 2020 23:21:04  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     --
     FUNCTION get_version
@@ -41,6 +41,20 @@ AS
     END get_body_version;
 
     --
+    PROCEDURE load_data (p_sfs_id IN NUMBER)
+    IS
+        l_rows_processed   NUMBER (38);
+    BEGIN
+        FOR irec IN (SELECT sfs_id, sdh_sp_id, sdh_id
+                       FROM sdl_file_submissions, sdl_destination_header
+                      WHERE sdh_sp_id = sfs_sp_id AND sfs_id = p_sfs_id)
+        LOOP
+            load_data (p_sp_id            => irec.sdh_sp_id,
+                       p_sdh_id           => irec.sdh_id,
+                       p_sfs_id           => p_sfs_id,
+                       p_rows_processed   => l_rows_processed);
+        END LOOP;
+    END;
 
     PROCEDURE load_data (p_sp_id            IN     NUMBER,
                          p_sdh_id           IN     NUMBER,
@@ -392,17 +406,22 @@ AS
                             || ' from '
                             || l_view_name
                             || ' l, nm_elements r, table(lb_get.get_lb_rpt_d_tab(lb_rpt_tab(lb_rpt(r.ne_id, 1, :p_dest_type, iit_ne_id, 1, 1, 1, begin_mp, end_mp, 4  )))) t, '
-                            || '  nm_elements d, '||l_base_theme.nth_feature_table||' s '
+                            || '  nm_elements d, '
+                            || l_base_theme.nth_feature_table
+                            || ' s '
                             || ' where tld_sfs_id = :p_sfs_id '
                             || '  and l.ne_unique = r.ne_unique '
                             || ' and r.ne_nt_type = :p_route_type '
-                            || ' and d.ne_id = refnt '||
-                            ' and d.ne_id = s.'||l_base_theme.nth_feature_pk_column;
-                            
-                            nm_debug.debug(l_sql);
-                            
-                            execute immediate l_sql using l_sdh_row.sdh_destination_type, p_sfs_id, 'RTE';
+                            || ' and d.ne_id = refnt '
+                            || ' and d.ne_id = s.'
+                            || l_base_theme.nth_feature_pk_column;
 
+                        nm_debug.debug (l_sql);
+
+                        EXECUTE IMMEDIATE l_sql
+                            USING l_sdh_row.sdh_destination_type,
+                                  p_sfs_id,
+                                  'RTE';
                     END IF;
 
                     nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'N');
