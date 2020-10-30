@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.27   Jun 16 2020 12:22:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.28   Oct 30 2020 08:58:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Jun 16 2020 12:22:50  $
-    --       Date fetched Out : $Modtime:   Jun 16 2020 12:20:52  $
-    --       PVCS Version     : $Revision:   1.27  $
+    --       Date into PVCS   : $Date:   Oct 30 2020 08:58:00  $
+    --       Date fetched Out : $Modtime:   Oct 30 2020 08:04:26  $
+    --       PVCS Version     : $Revision:   1.28  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -661,7 +661,7 @@ AS
 
         IF l_ne_length_exists = 0
         THEN
-            sql_str := sql_str || l_length_str;
+            sql_str := sql_str || l_length_str||',';
         END IF;
 
         sql_str :=
