@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.4   Oct 24 2019 09:40:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.5   Nov 03 2020 13:13:58   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Oct 24 2019 09:40:22  $
-    --       Date fetched Out : $Modtime:   Oct 24 2019 09:39:22  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Nov 03 2020 13:13:58  $
+    --       Date fetched Out : $Modtime:   Nov 03 2020 13:12:14  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
@@ -111,14 +111,12 @@ AS
                                              AND l.sld_key =
                                                  NVL (p_sld_key, sld_key)
                                              AND e.ne_id = n.ne_id
-                                             AND sdo_relate (
+                                             AND sdo_within_distance (
                                                      geoloc,
-                                                     SDO_GEOM.sdo_buffer (
-                                                         l.sld_working_geometry,
-                                                         p_buffer,
-                                                         p_tolerance,
-                                                         'unit=M'),
-                                                     'mask=anyinteract') =
+                                                     l.sld_working_geometry,
+                                                        'distance = '
+                                                     || p_buffer
+                                                     || ' unit=M') =
                                                  'TRUE'))
                     GROUP BY sld_key, buffer_distance, load_length);
 
@@ -212,14 +210,15 @@ AS
                 nm3ctx.set_context ('SDL_BUFFER', TO_CHAR (p_buffer));
                 nm3ctx.set_context ('SDL_TOLERANCE', TO_CHAR (p_tolerance));
 
-                begin
-                   SELECT pctage_accuracy
-                     INTO l_pct
-                     FROM v_sdl_datum_stats_working;
-                exception
-                   when no_data_found then
-                      l_pct := 0;
-                end;
+                BEGIN
+                    SELECT pctage_accuracy
+                      INTO l_pct
+                      FROM v_sdl_datum_stats_working;
+                EXCEPTION
+                    WHEN NO_DATA_FOUND
+                    THEN
+                        l_pct := 0;
+                END;
 
                 UPDATE sdl_wip_datums
                    SET pct_match = l_pct
@@ -375,9 +374,9 @@ AS
                                         sdl_stats.gen_pline_boxes (
                                             sld_working_geometry,
                                             p_buffer,
-                                            p_tolerance)) t where sld_key = p_sld_key )
-                                                                            --
-                        ,
+                                            p_tolerance)) t
+                              WHERE sld_key = p_sld_key)--
+                                                        ,
                         all_box_relate
                         AS
                             (SELECT /*+ LEADING (n p) */
@@ -461,7 +460,8 @@ AS
                                         sdl_stats.gen_pline_boxes (
                                             sld_working_geometry,
                                             p_buffer,
-                                            p_tolerance)) t where sld_key = p_sld_key)
+                                            p_tolerance)) t
+                              WHERE sld_key = p_sld_key)
                     SELECT box_id, line_geom, 0
                       FROM pline_boxes
                      WHERE NOT EXISTS
@@ -504,8 +504,9 @@ AS
                                         sdl_stats.gen_pline_boxes (
                                             d.geom,
                                             p_buffer,
-                                            p_tolerance)) t where swd_id = p_swd_id )--
-                                                            ,
+                                            p_tolerance)) t
+                              WHERE swd_id = p_swd_id)                      --
+                                                      ,
                         all_box_relate
                         AS
                             (SELECT /*+ LEADING (n p) */
@@ -592,8 +593,12 @@ AS
                                         sdl_stats.gen_pline_boxes (
                                             d.geom,
                                             p_buffer,
-                                            p_tolerance)) t where swd_id = p_swd_id)
-                    SELECT box_id, sld_key, line_geom, 0
+                                            p_tolerance)) t
+                              WHERE swd_id = p_swd_id)
+                    SELECT box_id,
+                           sld_key,
+                           line_geom,
+                           0
                       FROM pline_boxes
                      WHERE NOT EXISTS
                                (SELECT 1
@@ -664,15 +669,14 @@ AS
 
         --
         CURSOR retrieve_nodes IS
-SELECT load_node_id, existing_node_id, dist
-              FROM (
- WITH
+            SELECT load_node_id, existing_node_id, dist
+              FROM (WITH
                         matching_nodes
                         AS
-                            (  
-                            SELECT n.*, no_node_id, min(rn) over (partition by node_id) min_rn
-                               FROM (
-                               SELECT ROW_NUMBER ()
+                            (SELECT n.*,
+                                    no_node_id,
+                                    MIN (rn) OVER (PARTITION BY node_id)    min_rn
+                               FROM (SELECT ROW_NUMBER ()
                                                 OVER (PARTITION BY node_id
                                                       ORDER BY dist)    rn,
                                             node_id,
@@ -681,8 +685,7 @@ SELECT load_node_id, existing_node_id, dist
                                             npl_location,
                                             dist,
                                             min_dist
-                                       FROM (
-                                       SELECT node_id,
+                                       FROM (SELECT node_id,
                                                     node_geom,
                                                     npl_id,
                                                     npl_location,
@@ -690,8 +693,7 @@ SELECT load_node_id, existing_node_id, dist
                                                     MIN (dist)
                                                         OVER (
                                                             PARTITION BY node_id)    min_dist
-                                               FROM (
-                                               SELECT node_id,
+                                               FROM (SELECT node_id,
                                                             node_geom,
                                                             npl_id,
                                                             npl_location,
@@ -702,19 +704,24 @@ SELECT load_node_id, existing_node_id, dist
                                                                 'unit=FOOT')    dist
                                                        FROM sdl_wip_nodes,
                                                             nm_point_locations
-                                                      WHERE     batch_id = p_batch_id
+                                                      WHERE     batch_id =
+                                                                p_batch_id
                                                             AND sdo_within_distance (
                                                                     npl_location,
                                                                     node_geom,
                                                                     l_sdo_param) =
-                                                                'TRUE'                                                                
-                                                                ))) n, nm_nodes where no_np_id = npl_id and dist = min_dist --and rownum = 1                                                                
-                              )  
+                                                                'TRUE'))) n,
+                                    nm_nodes
+                              WHERE no_np_id = npl_id AND dist = min_dist --and rownum = 1
+                                                                         )
                     SELECT node_id        load_node_id,
                            npl_id,
                            no_node_id     existing_node_id,
-                           dist, rn, min_rn
-                      FROM matching_nodes  where rn = min_rn );
+                           dist,
+                           rn,
+                           min_rn
+                      FROM matching_nodes
+                     WHERE rn = min_rn);
     --
     BEGIN
         UPDATE sdl_wip_nodes
@@ -742,61 +749,69 @@ SELECT load_node_id, existing_node_id, dist
          WHERE batch_id = p_batch_id;
     END;
 
-function get_relative_overlap ( p_swd_id in number, p_stop_value in number default NULL, p_rnd in NUMBER default 2 ) return sys_refcursor is
-retval sys_refcursor;
-l_match_tol number;
-l_sdo_tol number;
---
-begin
---
-begin
-select spa_match_tolerance, spa_tolerance
-into l_match_tol, l_sdo_tol
-from sdl_process_audit, sdl_wip_datums
-where swd_id = p_swd_id
-and  spa_sfs_id = batch_id
-and  spa_process = 'TOPO_GENERATION';
-exception
-   when no_data_found then 
-      l_match_tol := 5;
-      l_sdo_tol := 0.005;
-end;      
---
-   open retval for SELECT swd_id,
-       sld_key,
-       pct_match,
-       t.ne_id,
-       ne_descr,
-       ne_pct
-  FROM (SELECT s.ne_id,
-               swd_id,
-               sld_key,
-               ROUND (pct_match, p_rnd)    pct_match,
-               ROUND (
-                     SDO_GEOM.sdo_length (
-                         SDO_LRS.convert_to_std_geom (
-                             SDO_LRS.lrs_intersection (s.geoloc,
-                                                       d_buffer,
-                                                       l_sdo_tol)))
-                   / d_length
-                   * 100,
-                   p_rnd)                  ne_pct
-          FROM v_lb_nlt_geometry2  s,
-               (SELECT swd_id,
-                       sld_key,
-                       pct_match,
-                       SDO_GEOM.sdo_length (d.geom, l_sdo_tol)     d_length,
-                       SDO_GEOM.sdo_buffer (d.geom, 2)         d_buffer
-                  FROM sdl_wip_datums d
-                 WHERE swd_id = p_swd_id) b
-         WHERE sdo_anyinteract (s.geoloc, d_buffer) = 'TRUE') t,
-       nm_elements  e
- WHERE e.ne_id = t.ne_id
- and ne_pct > nvl(p_stop_value, -1)
- order by ne_pct desc;
---
-return retval;
-end;
- 
+    FUNCTION get_relative_overlap (p_swd_id       IN NUMBER,
+                                   p_stop_value   IN NUMBER DEFAULT NULL,
+                                   p_rnd          IN NUMBER DEFAULT 2)
+        RETURN SYS_REFCURSOR
+    IS
+        retval        SYS_REFCURSOR;
+        l_match_tol   NUMBER;
+        l_sdo_tol     NUMBER;
+    --
+    BEGIN
+        --
+        BEGIN
+            SELECT spa_match_tolerance, spa_tolerance
+              INTO l_match_tol, l_sdo_tol
+              FROM sdl_process_audit, sdl_wip_datums
+             WHERE     swd_id = p_swd_id
+                   AND spa_sfs_id = batch_id
+                   AND spa_process = 'TOPO_GENERATION';
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                l_match_tol := 5;
+                l_sdo_tol := 0.005;
+        END;
+
+        --
+        OPEN retval FOR
+              SELECT swd_id,
+                     sld_key,
+                     pct_match,
+                     t.ne_id,
+                     ne_descr,
+                     ne_pct
+                FROM (SELECT s.ne_id,
+                             swd_id,
+                             sld_key,
+                             ROUND (pct_match, p_rnd)    pct_match,
+                             ROUND (
+                                   SDO_GEOM.sdo_length (
+                                       SDO_LRS.convert_to_std_geom (
+                                           SDO_LRS.lrs_intersection (s.geoloc,
+                                                                     d_buffer,
+                                                                     l_sdo_tol)))
+                                 / d_length
+                                 * 100,
+                                 p_rnd)                  ne_pct
+                        FROM v_lb_nlt_geometry2 s,
+                             (SELECT swd_id,
+                                     sld_key,
+                                     pct_match,
+                                     SDO_GEOM.sdo_length (d.geom, l_sdo_tol)
+                                         d_length,
+                                     SDO_GEOM.sdo_buffer (d.geom, 2)
+                                         d_buffer
+                                FROM sdl_wip_datums d
+                               WHERE swd_id = p_swd_id) b
+                       WHERE sdo_anyinteract (s.geoloc, d_buffer) = 'TRUE') t,
+                     nm_elements e
+               WHERE e.ne_id = t.ne_id AND ne_pct > NVL (p_stop_value, -1)
+            ORDER BY ne_pct DESC;
+
+        --
+        RETURN retval;
+    END;
 END sdl_stats;
 /
