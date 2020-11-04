@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.28   Oct 30 2020 08:58:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.29   Nov 04 2020 17:33:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Oct 30 2020 08:58:00  $
-    --       Date fetched Out : $Modtime:   Oct 30 2020 08:04:26  $
-    --       PVCS Version     : $Revision:   1.28  $
+    --       Date into PVCS   : $Date:   Nov 04 2020 17:33:14  $
+    --       Date fetched Out : $Modtime:   Nov 04 2020 17:32:28  $
+    --       PVCS Version     : $Revision:   1.29  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -556,7 +556,7 @@ AS
         l_profile_name       VARCHAR2 (30);
         l_dummy              NUMBER;
         l_datum_nt           VARCHAR2 (4);
-        l_ne_length_exists   NUMBER;
+        l_ne_length_exists   NUMBER(38) := 0;
         l_length_str         VARCHAR2 (1000)
             := 'sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom)';
         qq                   CHAR (1) := CHR (39);
@@ -614,10 +614,16 @@ AS
                            ELSE '''' || sdam_default_value || ''''
                        END,
                        ',')
-                   WITHIN GROUP (ORDER BY sdam_seq_no)        def_list
-              INTO l_col_list, l_def_list
+                   WITHIN GROUP (ORDER BY sdam_seq_no)        def_list,
+                   MAX (
+                       CASE sdam_column_name
+                           WHEN 'NE_LENGTH' THEN 1
+                           ELSE 0
+                       END)                                   
+              INTO l_col_list, l_def_list, l_ne_length_exists
               FROM sdl_datum_attribute_mapping
              WHERE sdam_profile_id = p_profile;
+
         ELSE
             --datum type - use the natural view without need for the datum attribute mapping
 
@@ -648,7 +654,6 @@ AS
             sql_str := sql_str || 'ne_length, ';
         END IF;
 
-
         sql_str :=
                sql_str
             || ' ne_no_start, ne_no_end, ne_type, ne_nt_type'
@@ -661,7 +666,7 @@ AS
 
         IF l_ne_length_exists = 0
         THEN
-            sql_str := sql_str || l_length_str||',';
+            sql_str := sql_str || l_length_str || ',';
         END IF;
 
         sql_str :=
