@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.12   Aug 12 2020 13:56:28   Chris.Baugh  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.13   Nov 05 2020 14:36:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Aug 12 2020 13:56:28  $
-    --       Date fetched Out : $Modtime:   Aug 12 2020 13:54:44  $
-    --       PVCS Version     : $Revision:   1.12  $
+    --       Date into PVCS   : $Date:   Nov 05 2020 14:36:12  $
+    --       Date fetched Out : $Modtime:   Nov 05 2020 14:34:28  $
+    --       PVCS Version     : $Revision:   1.13  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -148,17 +148,17 @@ AS
                AND d.batch_id = p_batch_id
                AND n.start_node = s.hashcode
                AND n.end_node = e.hashcode
---             AND d.status = 'LOAD'
+               AND d.status = 'LOAD'
                AND sfs_id = d.batch_id
-               AND sp_id = sfs_sp_id
-               AND (   EXISTS
-                           (SELECT 1
-                              FROM SDL_SPATIAL_REVIEW_LEVELS
-                             WHERE     ssrl_sp_id = sfs_sp_id
-                                   AND d.PCT_MATCH BETWEEN ssrl_percent_from
-                                                       AND ssrl_percent_to
-                                   AND ssrl_default_action = 'LOAD')
-                    OR d.manual_override = 'Y');
+               AND sp_id = sfs_sp_id;
+--               AND (   EXISTS
+--                           (SELECT 1
+--                              FROM SDL_SPATIAL_REVIEW_LEVELS
+--                             WHERE     ssrl_sp_id = sfs_sp_id
+--                                   AND d.PCT_MATCH BETWEEN ssrl_percent_from
+--                                                       AND ssrl_percent_to
+--                                   AND ssrl_default_action = 'LOAD')
+--                    OR d.manual_override = 'Y');
 
         --nm_debug.debug('Have IDs - count = '||ne_ids.count);
 
