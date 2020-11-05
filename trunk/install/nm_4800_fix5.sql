@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix5.sql-arc   1.0   Oct 09 2020 15:02:06   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix5.sql-arc   1.1   Nov 05 2020 10:00:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix5.sql  $ 
---       Date into PVCS   : $Date:   Oct 09 2020 15:02:06  $
---       Date fetched Out : $Modtime:   Oct 09 2020 14:52:44  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Nov 05 2020 10:00:48  $
+--       Date fetched Out : $Modtime:   Nov 05 2020 09:16:04  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -75,6 +75,18 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start sdl_ddl.sql
+SET FEEDBACK OFF	
+--
+--------------------------------------------------------------------------------
+-- Views
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Creating view v_sdl_datum_stats_working
+SET TERM OFF
+--
+SET FEEDBACK ON
+start v_sdl_datum_stats_working.vw
 SET FEEDBACK OFF	
 --
 --------------------------------------------------------------------------------
@@ -177,6 +189,15 @@ SET TERM OFF
 SET FEEDBACK ON
 start sdl_validate.pkw
 SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Body sdl_stats
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_stats.pkw
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Procedures
@@ -247,7 +268,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4800_fix5.sql'
-				,p_remarks        => 'NET 4800 FIX 5 (Build 1)'
+				,p_remarks        => 'NET 4800 FIX 5 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
