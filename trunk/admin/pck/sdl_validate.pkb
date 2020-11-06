@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.20   Jul 30 2020 08:02:04   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.21   Nov 06 2020 14:22:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Jul 30 2020 08:02:04  $
-    --       Date fetched Out : $Modtime:   Jul 29 2020 21:24:16  $
-    --       PVCS Version     : $Revision:   1.20  $
+    --       Date into PVCS   : $Date:   Nov 06 2020 14:22:30  $
+    --       Date fetched Out : $Modtime:   Nov 06 2020 14:21:44  $
+    --       PVCS Version     : $Revision:   1.21  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -467,7 +467,6 @@ AS
                                    AND column_name = sam_ne_column_name)
                    AND (   column_name NOT IN ('NE_ID', -- assigned in upload to main DB
                                                'NE_NT_TYPE', --defined by the template itself
-                                               'NE_ADMIN_UNIT', --we need to do something with this
                                                'NE_TYPE', -- we are only going to load datums (i.e. NE_TYPE = 'S', hard-coded inside the API
                                                'NE_DATE_CREATED',
                                                'NE_DATE_MODIFIED',
