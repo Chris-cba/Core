@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.21   Nov 06 2020 14:22:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.22   Nov 06 2020 14:31:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Nov 06 2020 14:22:30  $
-    --       Date fetched Out : $Modtime:   Nov 06 2020 14:21:44  $
-    --       PVCS Version     : $Revision:   1.21  $
+    --       Date into PVCS   : $Date:   Nov 06 2020 14:31:02  $
+    --       Date fetched Out : $Modtime:   Nov 06 2020 14:30:16  $
+    --       PVCS Version     : $Revision:   1.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -551,7 +551,7 @@ AS
                                        nm_type_columns
                                  WHERE     sdam_profile_id = p_profile_id
                                        AND sdam_nw_type = ntc_nt_type
-                                       AND ntc_nt_type = 'SEGM'
+                                       AND ntc_nt_type = l_nt_type
                                        AND column_name = sdam_column_name)
                        AND column_name NOT IN ('NE_ID', -- assigned in upload to main DB
                                                'NE_NT_TYPE', --defined by the template itself
@@ -569,7 +569,7 @@ AS
                            CASE column_name
                                WHEN 'NE_UNIQUE'
                                THEN
-                                   user_defined_ne_unique ('SEGM')
+                                   user_defined_ne_unique (l_nt_type)
                                ELSE
                                    '1'
                            END;
