@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.13   Nov 05 2020 14:36:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.14   Nov 06 2020 14:39:18   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Nov 05 2020 14:36:12  $
-    --       Date fetched Out : $Modtime:   Nov 05 2020 14:34:28  $
-    --       PVCS Version     : $Revision:   1.13  $
+    --       Date into PVCS   : $Date:   Nov 06 2020 14:39:18  $
+    --       Date fetched Out : $Modtime:   Nov 06 2020 14:38:18  $
+    --       PVCS Version     : $Revision:   1.14  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -213,7 +213,7 @@ AS
                             (SELECT ptr_id        sam_id,
                                     ptr_value     sam_ne_column_name
                                FROM TABLE (l_attrib_list))
-                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_gty_group_type, ne_admin_unit, '
+                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_gty_group_type, '
                            || LISTAGG (sam_ne_column_name, ',')
                                   WITHIN GROUP (ORDER BY sam_id)
                            || ')'    ins_str
@@ -231,7 +231,7 @@ AS
                            || ''''
                            || 'G'
                            || ''''
-                           || ', :l_group_nt_type, :l_group_type, 1,  '
+                           || ', :l_group_nt_type, :l_group_type,  '
                            || LISTAGG (
                                   CASE
                                       WHEN sam_id < 0 THEN 'NULL'
@@ -373,7 +373,7 @@ AS
                             (SELECT ptr_id        sam_id,
                                     ptr_value     sam_ne_column_name
                                FROM TABLE (l_attrib_list))
-                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_admin_unit, ne_no_start, ne_no_end, '
+                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, '
                            || LISTAGG (sam_ne_column_name, ',')
                                   WITHIN GROUP (ORDER BY sam_id)
                            || ')'    ins_str
@@ -391,7 +391,7 @@ AS
                            || ''''
                            || 'S'
                            || ''''
-                           || ', :l_datum_nt_type, 1, start_node, end_node, '
+                           || ', :l_datum_nt_type, start_node, end_node, '
                            || LISTAGG (
                                   CASE
                                       WHEN sam_id < 0 THEN 'NULL'
