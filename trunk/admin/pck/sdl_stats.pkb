@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.5   Nov 03 2020 13:13:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.6   Nov 09 2020 10:59:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Nov 03 2020 13:13:58  $
-    --       Date fetched Out : $Modtime:   Nov 03 2020 13:12:14  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Nov 09 2020 10:59:22  $
+    --       Date fetched Out : $Modtime:   Nov 09 2020 10:58:38  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,11 +18,13 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
     PROCEDURE remove_batch_datum_stats (p_batch_id IN NUMBER);
+    
+    FUNCTION get_node_type(p_batch_id in NUMBER) return varchar2;
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -655,6 +657,7 @@ AS
                            p_match_tolerance   IN NUMBER,
                            p_tolerance         IN NUMBER)
     IS
+        l_node_type          VARCHAR2(4);
         l_load_node_id       NM3TYPE.tab_number;
         l_existing_node_id   NM3TYPE.tab_number;
         l_dist               NM3TYPE.tab_number;
@@ -668,7 +671,7 @@ AS
                || qq;
 
         --
-        CURSOR retrieve_nodes IS
+        CURSOR retrieve_nodes (c_node_type in varchar2) IS
             SELECT load_node_id, existing_node_id, dist
               FROM (WITH
                         matching_nodes
@@ -712,7 +715,7 @@ AS
                                                                     l_sdo_param) =
                                                                 'TRUE'))) n,
                                     nm_nodes
-                              WHERE no_np_id = npl_id AND dist = min_dist --and rownum = 1
+                              WHERE no_np_id = npl_id AND dist = min_dist and no_node_type = c_node_type --and rownum = 1
                                                                          )
                     SELECT node_id        load_node_id,
                            npl_id,
@@ -724,11 +727,14 @@ AS
                      WHERE rn = min_rn);
     --
     BEGIN
+    
+        l_node_type := get_node_type(p_batch_id);
+        
         UPDATE sdl_wip_nodes
            SET existing_node_id = NULL, distance_from = NULL
          WHERE batch_id = p_batch_id;
 
-        OPEN retrieve_nodes;
+        OPEN retrieve_nodes(l_node_type);
 
         FETCH retrieve_nodes
             BULK COLLECT INTO l_load_node_id, l_existing_node_id, l_dist;
@@ -813,5 +819,30 @@ AS
         --
         RETURN retval;
     END;
+function get_node_type( p_batch_id in number) return varchar2 is
+retval varchar2(4);
+begin
+select node_type into retval
+from (
+select nt_node_type node_type --sp_id, sp_nlt_id, nt_node_type, nlt_nt_type, nlt_gty_type
+from sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types
+where sfs_id = p_batch_id
+and sfs_sp_id = sp_id
+and sp_nlt_id = nlt_id
+and nt_type = nlt_nt_type
+and nlt_gty_type is NULL
+union all
+select nt_node_type --sp_id, sp_nlt_id, nt_node_type, nng_nt_type, nlt_gty_type
+from sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types, nm_nt_groupings
+where sfs_id = p_batch_id
+and sfs_sp_id = sp_id
+and sp_nlt_id = nlt_id
+and nt_type = nng_nt_type
+and nlt_gty_type = nng_group_type )
+group by node_type;
+--
+return retval;
+end;
+    
 END sdl_stats;
 /
