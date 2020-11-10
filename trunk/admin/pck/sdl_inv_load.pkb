@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.3   Oct 16 2020 23:21:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.4   Nov 10 2020 10:32:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkb  $
-    --       Date into PVCS   : $Date:   Oct 16 2020 23:21:44  $
-    --       Date fetched Out : $Modtime:   Oct 16 2020 23:21:04  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Nov 10 2020 10:32:40  $
+    --       Date fetched Out : $Modtime:   Nov 10 2020 10:29:00  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,13 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+
+    FUNCTION is_nt_defined_attribute (p_sdh_id IN NUMBER)
+        RETURN VARCHAR2;
+
+    FUNCTION get_nt_type (p_sdh_id IN NUMBER)
+        RETURN VARCHAR2;
 
     --
     FUNCTION get_version
@@ -137,7 +143,8 @@ AS
 
                 nm_debug.debug (l_sql);
 
-                EXECUTE IMMEDIATE l_sql USING p_sfs_id, p_sfs_id;
+                EXECUTE IMMEDIATE l_sql
+                    USING p_sfs_id, p_sfs_id;
             END IF;
 
             -- Test if we are inserting into a read-only view
@@ -175,8 +182,8 @@ AS
                     column_lists
                     AS
                         (SELECT sam_col_id,
-                                sam_view_column_name view_column,
-                                sam_ne_column_name   destination_column
+                                sam_view_column_name     view_column,
+                                sam_ne_column_name       destination_column
                            FROM attribs)
                 --
                 SELECT LISTAGG (view_column, ',')
@@ -212,7 +219,8 @@ AS
                     invalid_metadata   EXCEPTION;
                     PRAGMA EXCEPTION_INIT (invalid_metadata, -904); --invalid identifier/column issue
                 BEGIN
-                    EXECUTE IMMEDIATE l_sql USING p_sfs_id, p_sp_id, p_sfs_id;
+                    EXECUTE IMMEDIATE l_sql
+                        USING p_sfs_id, p_sp_id, p_sfs_id;
 
                     p_rows_processed := SQL%ROWCOUNT;
                 EXCEPTION
@@ -237,8 +245,7 @@ AS
                                         sam_ne_column_name
                                     ELSE
                                         ita_attrib_name
-                                END
-                                    sam_ne_column_name
+                                END    sam_ne_column_name
                            FROM sdl_attribute_mapping, nm_inv_type_attribs
                           WHERE     sam_sdh_id = p_sdh_id
                                 AND sam_sp_id = p_sp_id
@@ -248,8 +255,8 @@ AS
                     column_lists
                     AS
                         (SELECT sam_col_id,
-                                sam_view_column_name view_column,
-                                sam_ne_column_name   destination_column
+                                sam_view_column_name     view_column,
+                                sam_ne_column_name       destination_column
                            FROM attribs)
                 --
                 SELECT LISTAGG (view_column, ',')
@@ -285,7 +292,8 @@ AS
                     invalid_metadata   EXCEPTION;
                     PRAGMA EXCEPTION_INIT (invalid_metadata, -904); --invalid identifier/column issue
                 BEGIN
-                    EXECUTE IMMEDIATE l_sql USING p_sfs_id, p_sp_id, p_sfs_id;
+                    EXECUTE IMMEDIATE l_sql
+                        USING p_sfs_id, p_sp_id, p_sfs_id;
 
                     p_rows_processed := SQL%ROWCOUNT;
                 EXCEPTION
@@ -309,7 +317,23 @@ AS
                     l_date                 NM3TYPE.tab_date;
                     l_dir                  nm3type.tab_number;
                     l_element_start_date   NM3TYPE.tab_date;
+                    l_nt_type              VARCHAR2 (4) := NULL;
+                    l_nt_type_attribute    VARCHAR2 (5);
                 BEGIN
+                    l_nt_type_attribute := is_nt_defined_attribute (p_sdh_id);
+
+                    IF l_nt_type_attribute = 'FALSE'
+                    THEN
+                        l_nt_type := get_nt_type (p_sdh_id);
+
+                        IF l_nt_type IS NULL
+                        THEN
+                            raise_application_error (
+                                -20001,
+                                'The network type of the location is not defined');
+                        END IF;
+                    END IF;
+
                     l_sql :=
                            'select iit_ne_id, refnt, start_m, nm_start_date, end_m, dir_flag, datum_start_date '
                         || ' from ( select /*+MATERIALIZE*/ iit_ne_id, refnt, start_m, end_m, nm_start_date, dir_flag, d.ne_start_date datum_start_date '
@@ -318,19 +342,42 @@ AS
                         || ' l, nm_elements r, table(lb_get.get_lb_rpt_d_tab(lb_rpt_tab(lb_rpt(r.ne_id, 1, :p_dest_type, iit_ne_id, 1, 1, 1, begin_mp, end_mp, 4  )))) t, '
                         || ' nm_elements d '
                         || ' where tld_sfs_id = :p_sfs_id '
-                        || ' and l.ne_unique = r.ne_unique '
-                        || ' and r.ne_nt_type = :p_route_type '
-                        || ' and d.ne_id = refnt )';
+                        || ' and l.ne_unique = r.ne_unique ';
 
-                    EXECUTE IMMEDIATE l_sql
-                        BULK COLLECT INTO l_iit,
-                             l_of,
-                             l_start,
-                             l_date,
-                             l_end,
-                             l_dir,
-                             l_element_start_date
-                        USING l_sdh_row.sdh_destination_type, p_sfs_id, 'RTE';
+                    IF l_nt_type_attribute = 'TRUE'
+                    THEN
+                        l_sql := l_sql || ' and r.ne_nt_type = v.ne_nt_type ';
+                    ELSE
+                        l_sql :=
+                            l_sql || ' and r.ne_nt_type = :p_route_type ';
+                    END IF;
+
+                    l_sql := l_sql || ' and d.ne_id = refnt )';
+
+                    IF l_nt_type_attribute = 'FALSE'
+                    THEN
+                        EXECUTE IMMEDIATE l_sql
+                            BULK COLLECT INTO l_iit,
+                                 l_of,
+                                 l_start,
+                                 l_date,
+                                 l_end,
+                                 l_dir,
+                                 l_element_start_date
+                            USING l_sdh_row.sdh_destination_type,
+                                  p_sfs_id,
+                                  l_nt_type;
+                    ELSE
+                        EXECUTE IMMEDIATE l_sql
+                            BULK COLLECT INTO l_iit,
+                                 l_of,
+                                 l_start,
+                                 l_date,
+                                 l_end,
+                                 l_dir,
+                                 l_element_start_date
+                            USING l_sdh_row.sdh_destination_type, p_sfs_id;
+                    END IF;
 
                     nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'Y');
 
@@ -346,17 +393,16 @@ AS
                                                 nm_cardinality,
                                                 nm_admin_unit)
                                  VALUES (
-                                            l_iit (idx),
-                                            l_of (idx),
-                                            l_sdh_row.sdh_destination_type,
-                                            'I',
-                                            l_start (idx),
-                                            l_end (idx),
-                                            GREATEST (
-                                                l_date (idx),
-                                                l_element_start_date (idx)),
-                                            l_dir (idx),
-                                            1);
+                                     l_iit (idx),
+                                     l_of (idx),
+                                     l_sdh_row.sdh_destination_type,
+                                     'I',
+                                     l_start (idx),
+                                     l_end (idx),
+                                     GREATEST (l_date (idx),
+                                               l_element_start_date (idx)),
+                                     l_dir (idx),
+                                     1);
 
                     -- grab theme data for the asset-type - check if a derived (dyn-segged) asset type
 
@@ -410,18 +456,38 @@ AS
                             || l_base_theme.nth_feature_table
                             || ' s '
                             || ' where tld_sfs_id = :p_sfs_id '
-                            || '  and l.ne_unique = r.ne_unique '
-                            || ' and r.ne_nt_type = :p_route_type '
+                            || '  and l.ne_unique = r.ne_unique ';
+
+
+                        IF l_nt_type_attribute = 'TRUE'
+                        THEN
+                            l_sql :=
+                                l_sql || ' and r.ne_nt_type = v.ne_nt_type ';
+                        ELSE
+                            l_sql :=
+                                l_sql || ' and r.ne_nt_type = :p_route_type ';
+                        END IF;
+
+
+                        l_sql :=
+                               l_sql
                             || ' and d.ne_id = refnt '
                             || ' and d.ne_id = s.'
                             || l_base_theme.nth_feature_pk_column;
 
                         nm_debug.debug (l_sql);
 
-                        EXECUTE IMMEDIATE l_sql
-                            USING l_sdh_row.sdh_destination_type,
-                                  p_sfs_id,
-                                  'RTE';
+                        IF l_nt_type_attribute = 'FALSE'
+                        THEN
+                            EXECUTE IMMEDIATE l_sql
+                                USING l_sdh_row.sdh_destination_type,
+                                      p_sfs_id,
+                                      l_nt_type;
+                        ELSE
+                            EXECUTE IMMEDIATE l_sql
+                                USING l_sdh_row.sdh_destination_type,
+                                      p_sfs_id;
+                        END IF;
                     END IF;
 
                     nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'N');
@@ -446,6 +512,52 @@ AS
                                        (SELECT 1
                                           FROM nm_inv_items_all
                                          WHERE iit_ne_id = sdl_link_value));
+    END;
+
+    FUNCTION is_nt_defined_attribute (p_sdh_id IN NUMBER)
+        RETURN VARCHAR2
+    IS
+        retval    VARCHAR2 (5) := 'FALSE';
+        l_dummy   CHAR (1);
+    BEGIN
+        BEGIN
+            SELECT '1'
+              INTO l_dummy
+              FROM DUAL
+             WHERE EXISTS
+                       (SELECT 1
+                          FROM sdl_attribute_mapping
+                         WHERE     sam_sdh_id = p_sdh_id
+                               AND sam_ne_column_name = 'NE_NT_TYPE');
+
+            --
+            retval := 'TRUE';
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                retval := 'FALSE';
+        END;
+
+        RETURN retval;
+    END;
+
+    FUNCTION get_nt_type (p_sdh_id IN NUMBER)
+        RETURN VARCHAR2
+    IS
+        retval   VARCHAR2 (4);
+    BEGIN
+        BEGIN
+            SELECT nlt_nt_type
+              INTO retval
+              FROM nm_linear_types, sdl_destination_header
+             WHERE sdh_id = p_sdh_id AND nlt_id = sdh_nlt_id;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                retval := NULL;
+        END;
+
+        RETURN retval;
     END;
 END;
 /
