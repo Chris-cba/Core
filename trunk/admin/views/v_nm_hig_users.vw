@@ -10,6 +10,7 @@ Hus_Agent_Code,
 Hus_End_Date,
 Hus_Username,
 Hus_Admin_Unit,
+Hus_Ack_Tc,
 Default_Tablespace,
 Temporary_Tablespace,
 Password,
@@ -26,16 +27,16 @@ Select    --
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_hig_users.vw-arc   1.2   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_hig_users.vw-arc   1.3   Nov 12 2020 14:06:40   Chris.Baugh  $
           --       Module Name      : $Workfile:   v_nm_hig_users.vw  $
-          --       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
-          --       Date fetched Out : $Modtime:   Apr 13 2018 11:41:12  $
-          --       Version          : $Revision:   1.2  $
+          --       Date into PVCS   : $Date:   Nov 12 2020 14:06:40  $
+          --       Date fetched Out : $Modtime:   Nov 05 2020 14:19:48  $
+          --       Version          : $Revision:   1.3  $
           -------------------------------------------------------------------------
           --
 		  --
 		  --------------------------------------------------------------------------------------------------------------------
-		  --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+		  --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
           --------------------------------------------------------------------------------------------------------------------
           --
           hu.Hus_User_Id,
@@ -48,6 +49,7 @@ Select    --
           hu.Hus_End_Date,
           hu.Hus_Username,
           hu.Hus_Admin_Unit,
+		  hu.Hus_Ack_Tc,
           du.Default_Tablespace,
           du.Temporary_Tablespace,
           To_Char(Null),
