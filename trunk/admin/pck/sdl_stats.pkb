@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.6   Nov 09 2020 10:59:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.7   Nov 12 2020 10:59:46   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Nov 09 2020 10:59:22  $
-    --       Date fetched Out : $Modtime:   Nov 09 2020 10:58:38  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Nov 12 2020 10:59:46  $
+    --       Date fetched Out : $Modtime:   Nov 12 2020 10:58:14  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
@@ -704,7 +704,7 @@ AS
                                                                 npl_location,
                                                                 node_geom,
                                                                 p_tolerance,
-                                                                'unit=FOOT')    dist
+                                                                'unit=METER')    dist
                                                        FROM sdl_wip_nodes,
                                                             nm_point_locations
                                                       WHERE     batch_id =
