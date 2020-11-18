@@ -1,0 +1,42 @@
+CREATE OR REPLACE TYPE t_clob_agg AS OBJECT
+    --
+    -----------------------------------------------------------------------------
+    --
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/t_clob_agg.tyh-arc   1.0   Nov 18 2020 16:09:52   Rob.Coupe  $
+    --       Module Name      : $Workfile:   t_clob_agg.tyh  $
+    --       Date into PVCS   : $Date:   Nov 18 2020 16:09:52  $
+    --       Date fetched Out : $Modtime:   Nov 18 2020 16:08:14  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : Rob Coupe
+    --
+    --   Object type to handle aggregation of strings
+    --
+    -----------------------------------------------------------------------------
+    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+    -----------------------------------------------------------------------------
+    --    
+    --  g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+--
+(
+  g_string  clob,
+
+  STATIC FUNCTION ODCIAggregateInitialize(sctx  IN OUT  t_clob_agg)
+    RETURN NUMBER,
+
+  MEMBER FUNCTION ODCIAggregateIterate(self   IN OUT  t_clob_agg,
+                                       value  IN      VARCHAR2)
+     RETURN NUMBER,
+
+  MEMBER FUNCTION ODCIAggregateTerminate(self         IN   t_clob_agg,
+                                         returnValue  OUT  clob,
+                                         flags        IN   NUMBER)
+    RETURN NUMBER,
+
+  MEMBER FUNCTION ODCIAggregateMerge(self  IN OUT  t_clob_agg,
+                                     ctx2  IN      t_clob_agg)
+    RETURN NUMBER
+);
+/
