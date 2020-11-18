@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.1   Oct 15 2020 11:48:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.2   Nov 18 2020 15:58:04   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_invval.pkb  $
-    --       Date into PVCS   : $Date:   Oct 15 2020 11:48:44  $
-    --       Date fetched Out : $Modtime:   Oct 15 2020 11:47:50  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Nov 18 2020 15:58:04  $
+    --       Date fetched Out : $Modtime:   Nov 18 2020 15:37:50  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : Rob Coupe
     --
@@ -19,7 +19,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_sdh_id                 NUMBER;
     g_source_name            VARCHAR2 (30);
@@ -68,9 +68,12 @@ AS
     IS
         l_sql           VARCHAR2 (32767);
         --
-        l_error_count   NUMBER (38);
+        l_error_count   NUMBER (38) := 0;
     ---
     BEGIN
+    
+        p_error_count := 0;
+        
         init_globals (p_sdh_id);
 
         DELETE FROM SDL_VALIDATION_RESULTS
@@ -97,6 +100,7 @@ AS
 
         p_error_count := p_error_count + l_error_count;
 
+        nm_debug.debug_on;
         --
         l_sql := get_domain_validation_sql (p_sp_id, p_sfs_id, p_sdh_id);
 
@@ -141,8 +145,8 @@ AS
         retval        VARCHAR2 (32767);
         l_ita_type    VARCHAR2 (4);
         l_sql_mand    VARCHAR2 (4000);
-        l_sql_dom     VARCHAR2 (4000);
-        l_sql_attr    VARCHAR2 (4000);
+        l_sql_dom     VARCHAR2 (32767);
+        l_sql_attr    clob;
         l_sql_len     VARCHAR2 (4000);
         l_sql_dp      VARCHAR2 (4000);
         l_sql_range   VARCHAR2 (4000);
@@ -150,8 +154,14 @@ AS
     BEGIN
         --
         --        init_globals (p_sdh_id);
-
-        SELECT LISTAGG (
+        
+        nm3ctx.set_context('STR_DELIMITER',' OR ');
+        
+--        select substr(attrib_str, 1, length(attrib_str)), substr(value_str, 1, length(value_str))
+        select attrib_str, value_str        
+          INTO l_sql_attr, l_sql_dom
+        from (
+        SELECT clob_agg (
                       ' ( case ita_attrib_name '
                    || ' when '
                    || CHR (39)
@@ -169,27 +179,26 @@ AS
                    || CHR (39)
                    || '                               AND ial_value = '
                    || ita_view_attri
-                   || ' ) ) ) ',
-                   ' or ')
-               WITHIN GROUP (ORDER BY ita_disp_seq_no),
-                  ' case ita_attrib_name '
-               || LISTAGG (
+                   || ' ) ) ) ' )  value_str,
+                  ' case ita_attrib_name ' 
+               || listagg (
                          '  when '
                       || CHR (39)
                       || ita_attrib_name
                       || CHR (39)
                       || ' then '
                       || ita_view_attri
-                      || ' ',
-                      '  ')
-                  WITHIN GROUP (ORDER BY ita_disp_seq_no)
-          INTO l_sql_dom, l_sql_attr
+                      || ' ', ' ' ) 
+                  WITHIN GROUP (ORDER BY ita_disp_seq_no) attrib_str
           FROM nm_inv_type_attribs
          WHERE     ita_inv_type = g_inv_type
                AND ita_id_domain IS NOT NULL
-               AND ita_disp_seq_no < 8;
+         order by ita_disp_seq_no );
 
         --
+        
+        nm_debug.debug('sql_dom='||l_sql_dom);
+        
         IF l_sql_dom IS NULL
         THEN
             retval := NULL;
@@ -205,7 +214,7 @@ AS
                 || ' svr_message) '
                 || ' SELECT svr_id_seq.NEXTVAL, '
                 || ' tld_id, '
-                || ' 1, '
+                || ' tld_sfs_id, '
                 || CHR (39)
                 || 'L'
                 || CHR (39)
@@ -238,8 +247,8 @@ AS
                 || '  and sam_sdh_id = '
                 || p_sdh_id
                 || ' ) '
-                || ' SELECT tld_sfs_id, '
-                || '       tld_id, '
+                || ' SELECT tld_id, '
+                || '       tld_sfs_id, '
                 || '       ita_inv_type, '
                 || '       ita_attrib_name, '
                 || '       ita_view_attri, '
