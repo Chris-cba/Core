@@ -1,0 +1,59 @@
+CREATE OR REPLACE TYPE BODY t_clob_agg IS
+    --
+    -----------------------------------------------------------------------------
+    --
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/t_clob_agg.tyb-arc   1.1   Nov 18 2020 16:14:48   Rob.Coupe  $
+    --       Module Name      : $Workfile:   t_clob_agg.tyb  $
+    --       Date into PVCS   : $Date:   Nov 18 2020 16:14:48  $
+    --       Date fetched Out : $Modtime:   Nov 18 2020 16:14:24  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : Rob Coupe
+    --
+    --   Object type to handle aggregation of strings
+    --
+    -----------------------------------------------------------------------------
+    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+    -----------------------------------------------------------------------------
+    --    
+    --  g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+--
+  STATIC FUNCTION ODCIAggregateInitialize(sctx  IN OUT  t_clob_agg)
+    RETURN NUMBER IS
+  BEGIN
+    sctx := t_clob_agg(NULL);
+    RETURN ODCIConst.Success;
+  END;
+
+  MEMBER FUNCTION ODCIAggregateIterate(self   IN OUT  t_clob_agg,
+                                       value  IN      VARCHAR2 )
+    RETURN NUMBER IS
+  BEGIN
+    if SELF.g_string is NULL then
+       SELF.g_string := value;
+    else
+       SELF.g_string := self.g_string || nvl(sys_context('NM3SQL', 'STR_DELIMITER'),',') || value;
+    end if;
+    RETURN ODCIConst.Success;
+  END;
+
+  MEMBER FUNCTION ODCIAggregateTerminate(self         IN   t_clob_agg,
+                                         returnValue  OUT  clob,
+                                         flags        IN   NUMBER)
+    RETURN NUMBER IS
+  BEGIN
+    returnValue := SUBSTR(SELF.g_string, 2);
+    RETURN ODCIConst.Success;
+  END;
+
+  MEMBER FUNCTION ODCIAggregateMerge(self  IN OUT  t_clob_agg,
+                                     ctx2  IN      t_clob_agg)
+    RETURN NUMBER IS
+  BEGIN
+    SELF.g_string := SELF.g_string || ctx2.g_string;
+    RETURN ODCIConst.Success;
+  END;
+END;
+/
