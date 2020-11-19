@@ -1,3 +1,4 @@
+/* Formatted on 18/11/2020 18:25:39 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_invval
 AS
     --
@@ -5,11 +6,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.2   Nov 18 2020 15:58:04   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.3   Nov 19 2020 17:05:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_invval.pkb  $
-    --       Date into PVCS   : $Date:   Nov 18 2020 15:58:04  $
-    --       Date fetched Out : $Modtime:   Nov 18 2020 15:37:50  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Nov 19 2020 17:05:22  $
+    --       Date fetched Out : $Modtime:   Nov 19 2020 17:03:04  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : Rob Coupe
     --
@@ -19,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_sdh_id                 NUMBER;
     g_source_name            VARCHAR2 (30);
@@ -66,14 +67,17 @@ AS
                                  p_sdh_id        IN     NUMBER,
                                  p_error_count      OUT NUMBER)
     IS
-        l_sql           VARCHAR2 (32767);
+        l_sql           CLOB;                              --VARCHAR2 (32767);
+        l_dom_sql       CLOB;
+        l_mand_sql      CLOB;
+        l_length_sql    CLOB;
+        l_ins_sql       CLOB;
         --
         l_error_count   NUMBER (38) := 0;
     ---
     BEGIN
-    
         p_error_count := 0;
-        
+
         init_globals (p_sdh_id);
 
         DELETE FROM SDL_VALIDATION_RESULTS
@@ -84,7 +88,7 @@ AS
                          || ' from '
                          || g_source_name
                          || ' where tld_sfs_id = :p_sfs_id '
-                         || ' and not exists ( select 1 from sdl_row_status where srs_sfs_id = :p_sfs_id and srs_tld_id = tld_id )' 
+                         || ' and not exists ( select 1 from sdl_row_status where srs_sfs_id = :p_sfs_id and srs_tld_id = tld_id )'
             USING p_sfs_id,
                   p_sp_id,
                   'H',
@@ -102,26 +106,76 @@ AS
 
         nm_debug.debug_on;
         --
-        l_sql := get_domain_validation_sql (p_sp_id, p_sfs_id, p_sdh_id);
+        l_ins_sql :=
+               'INSERT INTO sdl_validation_results (svr_id, '
+            || ' svr_sld_key, '
+            || ' svr_sfs_id, '
+            || ' svr_validation_type, '
+            || ' svr_sam_id, '
+            || ' svr_current_value, '
+            || ' svr_status_code, '
+            || ' svr_message) ';
 
-        nm_debug.debug (l_sql);
+        l_dom_sql := get_domain_validation_sql (p_sp_id, p_sfs_id, p_sdh_id);
 
-        IF l_sql IS NOT NULL
+        nm_debug.delete_debug (TRUE);
+
+        --        nm_debug.debug (l_dom_sql);
+
+        IF l_dom_sql IS NOT NULL
         THEN
+            l_sql := l_ins_sql || l_dom_sql;
+
+            nm_debug.debug (l_sql);
+
             EXECUTE IMMEDIATE l_sql
                 USING p_sfs_id;
-
-            --        EXECUTE IMMEDIATE   'insert into sdl_validation_results (svr_id, svr_sld_key, svr_sfs_id, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message )'
-            --                         || l_sql;
 
             --
             l_error_count := SQL%ROWCOUNT;
             p_error_count := p_error_count + l_error_count;
         END IF;
 
-        --      validate_au (p_sfs_id, p_sdh_id, l_error_count);
+        l_mand_sql :=
+            get_mandatory_validation_sql (p_sp_id, p_sfs_id, p_sdh_id);
 
-        --        p_error_count := p_error_count + l_error_count;
+        IF l_mand_sql IS NOT NULL
+        THEN
+            l_sql := l_ins_sql || l_mand_sql;
+
+            nm_debug.debug (l_sql);
+
+            EXECUTE IMMEDIATE l_sql
+                USING p_sp_id, p_sdh_id, p_sfs_id;
+
+            --
+            l_error_count := SQL%ROWCOUNT;
+            p_error_count := p_error_count + l_error_count;
+        END IF;
+
+        l_length_sql :=
+            get_length_validation_sql (p_sp_id, p_sfs_id, p_sdh_id);
+
+        IF l_length_sql IS NOT NULL
+        THEN
+            l_sql := l_ins_sql || l_length_sql;
+
+            nm_debug.debug (l_sql);
+
+            EXECUTE IMMEDIATE l_sql
+                USING p_sp_id, p_sdh_id, p_sfs_id;
+
+            --
+            l_error_count := SQL%ROWCOUNT;
+            p_error_count := p_error_count + l_error_count;
+        END IF;
+
+
+
+
+        --        validate_au (p_sfs_id, p_sdh_id, l_error_count);
+
+        p_error_count := p_error_count + l_error_count;
 
         UPDATE sdl_row_status
            SET srs_status = 'E'
@@ -140,13 +194,13 @@ AS
     FUNCTION get_domain_validation_sql (p_sp_id    IN NUMBER,
                                         p_sfs_id   IN NUMBER,
                                         p_sdh_id   IN NUMBER)
-        RETURN VARCHAR2
+        RETURN CLOB
     IS
-        retval        VARCHAR2 (32767);
+        retval        CLOB;                                --VARCHAR2 (32767);
         l_ita_type    VARCHAR2 (4);
         l_sql_mand    VARCHAR2 (4000);
         l_sql_dom     VARCHAR2 (32767);
-        l_sql_attr    clob;
+        l_sql_attr    CLOB;
         l_sql_len     VARCHAR2 (4000);
         l_sql_dp      VARCHAR2 (4000);
         l_sql_range   VARCHAR2 (4000);
@@ -154,65 +208,57 @@ AS
     BEGIN
         --
         --        init_globals (p_sdh_id);
-        
-        nm3ctx.set_context('STR_DELIMITER',' OR ');
-        
---        select substr(attrib_str, 1, length(attrib_str)), substr(value_str, 1, length(value_str))
-        select attrib_str, value_str        
+
+        nm3ctx.set_context ('STR_DELIMITER', ' OR ');
+
+        --        select substr(attrib_str, 1, length(attrib_str)), substr(value_str, 1, length(value_str))
+        SELECT attrib_str, value_str
           INTO l_sql_attr, l_sql_dom
-        from (
-        SELECT clob_agg (
-                      ' ( case ita_attrib_name '
-                   || ' when '
-                   || CHR (39)
-                   || ita_attrib_name
-                   || CHR (39)
-                   || ' then 1 else 0 end '
-                   || '   = ( select 1 from dual where '
-                   || ita_view_attri
-                   || ' is not null '
-                   || ' and not exists ( SELECT 1 '
-                   || '                          FROM nm_inv_attri_lookup '
-                   || '                         WHERE     ial_domain = '
-                   || CHR (39)
-                   || ita_id_domain
-                   || CHR (39)
-                   || '                               AND ial_value = '
-                   || ita_view_attri
-                   || ' ) ) ) ' )  value_str,
-                  ' case ita_attrib_name ' 
-               || listagg (
-                         '  when '
-                      || CHR (39)
-                      || ita_attrib_name
-                      || CHR (39)
-                      || ' then '
-                      || ita_view_attri
-                      || ' ', ' ' ) 
-                  WITHIN GROUP (ORDER BY ita_disp_seq_no) attrib_str
-          FROM nm_inv_type_attribs
-         WHERE     ita_inv_type = g_inv_type
-               AND ita_id_domain IS NOT NULL
-         order by ita_disp_seq_no );
+          FROM (  SELECT clob_agg (
+                                ' ( case ita_attrib_name '
+                             || ' when '
+                             || CHR (39)
+                             || ita_attrib_name
+                             || CHR (39)
+                             || ' then 1 else 0 end '
+                             || '   = ( select 1 from dual where '
+                             || ita_view_attri
+                             || ' is not null '
+                             || ' and not exists ( SELECT 1 '
+                             || '                          FROM nm_inv_attri_lookup '
+                             || '                         WHERE     ial_domain = '
+                             || CHR (39)
+                             || ita_id_domain
+                             || CHR (39)
+                             || '                               AND ial_value = '
+                             || ita_view_attri
+                             || ' ) ) ) ')                             value_str,
+                            ' case ita_attrib_name '
+                         || LISTAGG (
+                                   '  when '
+                                || CHR (39)
+                                || ita_attrib_name
+                                || CHR (39)
+                                || ' then '
+                                || ita_view_attri
+                                || ' ',
+                                ' ')
+                            WITHIN GROUP (ORDER BY ita_disp_seq_no)    attrib_str
+                    FROM nm_inv_type_attribs
+                   WHERE     ita_inv_type = g_inv_type
+                         AND ita_id_domain IS NOT NULL
+                ORDER BY ita_disp_seq_no);
 
         --
-        
-        nm_debug.debug('sql_dom='||l_sql_dom);
-        
+
+        nm_debug.debug ('sql_dom=' || l_sql_dom);
+
         IF l_sql_dom IS NULL
         THEN
             retval := NULL;
         ELSE
             retval :=
-                   'INSERT INTO sdl_validation_results (svr_id, '
-                || ' svr_sld_key, '
-                || ' svr_sfs_id, '
-                || ' svr_validation_type, '
-                || ' svr_sam_id, '
-                || ' svr_current_value, '
-                || ' svr_status_code, '
-                || ' svr_message) '
-                || ' SELECT svr_id_seq.NEXTVAL, '
+                   ' SELECT svr_id_seq.NEXTVAL, '
                 || ' tld_id, '
                 || ' tld_sfs_id, '
                 || CHR (39)
@@ -271,92 +317,296 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION get_validation_sql (p_sp_id    IN NUMBER,
-                                 p_sfs_id   IN NUMBER,
-                                 p_sdh_id   IN NUMBER)
-        RETURN VARCHAR2
-    IS
-        retval        VARCHAR2 (32767);
-        l_ita_type    VARCHAR2 (4);
-        l_sql_mand    VARCHAR2 (4000);
-        l_sql_dom     VARCHAR2 (4000);
-        l_sql_len     VARCHAR2 (4000);
-        l_sql_dp      VARCHAR2 (4000);
-        l_sql_range   VARCHAR2 (4000);
-        l_sql_qry     VARCHAR2 (4000);
+FUNCTION get_mandatory_validation_sql (
+    p_sp_id    IN NUMBER,
+    p_sfs_id   IN NUMBER,
+    p_sdh_id   IN NUMBER)
+    RETURN CLOB
+IS
+    retval       CLOB;
+    l_ita_type   VARCHAR2 (4);
+    l_sql_mand   CLOB;
+    qq           CHAR (1) := CHR (39);
+BEGIN
+    --
     BEGIN
-          --
-          --        init_globals (p_sdh_id);
-
-          SELECT ita_inv_type,
-                 LISTAGG (ita_view_attri || ' is NULL', ' OR ')
-                     WITHIN GROUP (ORDER BY ita_disp_seq_no)
-            INTO l_ita_type, l_sql_mand
-            FROM sdl_attribute_mapping,
-                 sdl_profile_file_columns,
-                 nm_inv_type_attribs,
-                 sdl_destination_header
-           WHERE     sdh_sp_id = spfc_sp_id
-                 AND ita_attrib_name = sam_view_column_name
-                 AND sdh_sp_id = p_sp_id
-                 AND spfc_col_name = sam_file_attribute_name
-                 AND sam_sp_id = sdh_sp_id
-                 AND sdh_id = p_sdh_id
-                 AND sdh_destination_type = ita_inv_type
-                 AND ita_mandatory_yn = 'Y'
-        GROUP BY ita_inv_type;
-
-          --
-          SELECT ita_inv_type,
-                 LISTAGG (
-                        ita_view_attri
-                     || ' not in ( select ial_value from nm_inv_attri_lookup where ial_domain = '
-                     || ''''
-                     || ita_id_domain
-                     || ''''
-                     || ') ',
-                     'or ')
-                 WITHIN GROUP (ORDER BY ita_disp_seq_no)
-            INTO l_ita_type, l_sql_dom
-            --select sdh_id, sdh_sp_id, spfc_id, sam_id, sam_sp_id, sam_view_column_name, ita_id_domain, ita_disp_seq_no
-            FROM sdl_attribute_mapping,
-                 sdl_profile_file_columns,
-                 nm_inv_type_attribs,
-                 sdl_destination_header
-           WHERE     sdh_sp_id = spfc_sp_id
-                 AND ita_attrib_name = sam_view_column_name
-                 AND sam_sp_id = sdh_sp_id
-                 AND ita_id_domain IS NOT NULL
-                 AND spfc_col_name = sam_file_attribute_name
-                 AND sam_sp_id = sdh_sp_id
-                 AND sdh_destination_type = ita_inv_type
-        GROUP BY ita_inv_type;
-
-        --
-        retval :=
-               'select tld_sfs_id, tld_id, '
-            || ''''
-            || 'Mandatory Column missing'
-            || ''''
-            || ' from NM_LD_'
-            || l_ita_type
-            || '_LOADER_TMP where tld_sfs_id = '
-            || p_sfs_id
-            || ' and '
-            || l_sql_mand
-            || ' union all '
-            || 'select tld_sfs_id, tld_id, '
-            || ''''
-            || 'Value not in domain'
-            || ''''
-            || ' from NM_LD_'
-            || l_ita_type
-            || '_LOADER_TMP where tld_sfs_id = '
-            || p_sfs_id
-            || ' and '
-            || l_sql_dom;
-        RETURN retval;
+        WITH
+            attribs
+            AS
+                (SELECT ita_inv_type,
+                        ita_attrib_name,
+                        ita_view_attri,
+                        ita_disp_seq_no
+                   FROM sdl_attribute_mapping,
+                        nm_inv_type_attribs,
+                        sdl_destination_header
+                  WHERE     ita_view_attri = sam_view_column_name
+                        AND sdh_sp_id = p_sp_id
+                        AND sam_sp_id = sdh_sp_id
+                        AND sdh_id = p_sdh_id
+                        AND sdh_destination_type = ita_inv_type
+                        AND ita_mandatory_yn = 'Y')
+        SELECT LISTAGG (
+                      '(  case ita_attrib_name when '
+                   || ''''
+                   || ita_attrib_name
+                   || ''''
+                   || ' then 1 else 0  end = case when '
+                   || ita_view_attri
+                   || ' is NULL then 0 else 2 end )',
+                   ' OR ')
+               WITHIN GROUP (ORDER BY ita_disp_seq_no)
+          INTO l_sql_mand
+          FROM attribs;
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            l_sql_mand := NULL;
     END;
+
+    IF l_sql_mand IS NOT NULL 
+    THEN
+        retval :=
+            TO_CLOB (
+                   'select svr_id_seq.nextval, tld_id, tld_sfs_id, '
+                || qq
+                || 'M'
+                || qq
+                || ', sam_id, NULL, -20750, '
+                || qq
+                || 'Mandatory Column missing'||qq
+                || ' from ( '
+                || ' with attribs as (SELECT sam_id, ita_inv_type, ita_attrib_name, ita_view_attri '
+                || '            FROM sdl_attribute_mapping, '
+                || '                 nm_inv_type_attribs, '
+                || '                 sdl_destination_header '
+                || '           WHERE     ita_view_attri = sam_view_column_name '
+                || '                 AND sdh_sp_id = :p_sp_id '
+                || '                 AND sam_sp_id = sdh_sp_id '
+                || '                 AND sdh_id = :p_sdh_id '
+                || '                 AND sdh_destination_type = ita_inv_type '
+                || '                 AND ita_mandatory_yn = '
+                || qq
+                || 'Y'
+                || qq
+                || ') '
+                || '  select * from attribs, '||g_source_name
+                || ' where tld_sfs_id = :p_sfs_id and ('
+                || l_sql_mand
+                || '))');
+    END IF;
+
+    RETURN retval;
+END;
+
+
+FUNCTION get_length_validation_sql (
+    p_sp_id    IN NUMBER,
+    p_sfs_id   IN NUMBER,
+    p_sdh_id   IN NUMBER)
+    RETURN CLOB
+IS
+    retval          CLOB;
+    l_ita_type      VARCHAR2 (4);
+    l_attrib_list   CLOB;
+    l_sql_length    CLOB;
+    qq              CHAR (1) := CHR (39);
+BEGIN
+    --
+    BEGIN
+        --we need two quueries of the attributes - one for the list of attributes which will deliver the value into the validation results and the other for the complex set of where-clauses
+        -- first the attrib names for the values
+        WITH
+            attribs
+            AS
+                (SELECT ita_inv_type,
+                        ita_attrib_name,
+                        ita_view_attri,
+                        ita_disp_seq_no,
+                        ita_format,
+                        ita_fld_length,
+                        ita_dec_places,
+                        ita_case,
+                        ita_min,
+                        ita_max
+                   FROM sdl_attribute_mapping,
+                        nm_inv_type_attribs  a1,
+                        sdl_destination_header
+                  WHERE     ita_view_attri = sam_view_column_name
+                        AND sdh_sp_id = p_sp_id
+                        AND sam_sp_id = sdh_sp_id
+                        AND sdh_id = p_sdh_id
+                        AND sdh_destination_type = ita_inv_type
+                        AND ita_id_domain IS NULL)
+        SELECT    'case ita_attrib_name '
+               || LISTAGG (
+                         ' when '
+                      || ''''
+                      || ita_attrib_name
+                      || ''''
+                      || ' then '
+                      || CASE ita_format
+                             WHEN 'NUMBER'
+                             THEN
+                                 'to_char(' || ita_view_attri || ')'
+                             WHEN 'DATE'
+                             THEN
+                                    'to_char('
+                                 || ita_view_attri
+                                 || ', '
+                                 || ''''
+                                 || 'DD-MON-YYYY'
+                                 || ''''
+                                 || ')'
+                             ELSE
+                                 ita_view_attri
+                         END,
+                      ' ')
+                  WITHIN GROUP (ORDER BY ita_disp_seq_no)
+               || ' end'
+          INTO l_attrib_list
+          FROM attribs;
+
+        --now the where clauses
+
+        WITH
+            attribs
+            AS
+                (SELECT ita_inv_type,
+                        ita_attrib_name,
+                        ita_view_attri,
+                        ita_disp_seq_no,
+                        ita_format,
+                        ita_fld_length,
+                        ita_dec_places,
+                        ita_case,
+                        ita_min,
+                        ita_max
+                   FROM sdl_attribute_mapping,
+                        nm_inv_type_attribs  a1,
+                        sdl_destination_header
+                  WHERE     ita_view_attri = sam_view_column_name
+                        AND sdh_sp_id = p_sp_id
+                        AND sam_sp_id = sdh_sp_id
+                        AND sdh_id = p_sdh_id
+                        AND sdh_destination_type = ita_inv_type
+                        AND ita_id_domain IS NULL)
+        SELECT LISTAGG (attrib_condition, ' OR ')
+                   WITHIN GROUP (ORDER BY ita_disp_seq_no)
+          INTO l_sql_length
+          FROM (SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when length( '
+                       || ita_view_attri
+                       || ') > '
+                       || ita_fld_length
+                       || ' then 1 else 2 end )'    attrib_condition
+                  FROM attribs
+                 WHERE ita_format = 'VARCHAR2'
+                UNION ALL
+                SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when '
+                       || ita_view_attri
+                       || '> '
+                       || ita_max
+                       || ' then 1 else 2 end )'
+                  FROM attribs
+                 WHERE ita_format = 'NUMBER' AND ita_max IS NOT NULL
+                UNION ALL
+                SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when '
+                       || ita_view_attri
+                       || ' < '
+                       || ita_min
+                       || ' then 1 else 2 end )'
+                  FROM attribs
+                 WHERE ita_format = 'NUMBER' AND ita_min IS NOT NULL
+                UNION ALL
+                SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when '
+                       || ita_view_attri
+                       || '-trunc('
+                       || ita_view_attri
+                       || ') > 0 then 1 else 2 end )'
+                  FROM attribs
+                 WHERE ita_format = 'NUMBER' AND ita_dec_places IS NULL
+                UNION ALL
+                SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when length(to_char(trunc('
+                       || ita_view_attri
+                       || '))) > '
+                       || ita_fld_length
+                       || ' then 1 else 2 end )'
+                  FROM attribs
+                 WHERE ita_format = 'NUMBER');
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            l_sql_length := NULL;
+    END;
+
+    IF l_sql_length IS NOT NULL
+    THEN
+        retval :=
+            TO_CLOB (
+                   'select svr_id_seq.nextval, tld_id, tld_sfs_id, '
+                || qq
+                || 'M'
+                || qq
+                || ', sam_id, '
+                || l_attrib_list
+                || ' , -20750, '
+                || qq
+                || 'Length of field, range or decimal places violation '
+                || qq
+                || ' from ( '
+                || ' with attribs as (SELECT sam_id, ita_inv_type, ita_attrib_name, ita_view_attri '
+                || '            FROM sdl_attribute_mapping, '
+                || '                 nm_inv_type_attribs, '
+                || '                 sdl_destination_header '
+                || '           WHERE     ita_view_attri = sam_view_column_name '
+                || '                 AND sdh_sp_id = :p_sp_id '
+                || '                 AND sam_sp_id = sdh_sp_id '
+                || '                 AND sdh_id = :p_sdh_id '
+                || '                 AND sdh_destination_type = ita_inv_type '
+                || '                 AND ita_mandatory_yn = '
+                || qq
+                || 'Y'
+                || qq
+                || ') '
+                || '  select * from attribs, V_TDL_7_10_STAL_LD '
+                || ' where tld_sfs_id = :p_sfs_id and ('
+                || l_sql_length
+                || '))');
+    END IF;
+
+    RETURN retval;
+END;
+
 
     PROCEDURE validate_au (p_sfs_id        IN     NUMBER,
                            p_sdh_id        IN     NUMBER,
@@ -401,7 +651,7 @@ AS
         ELSE
             --            init_globals (p_sdh_id);
             l_sql :=
-                   'insert into sdl_validation_failures_test (tld_sfs_id, tld_id, error_no, error_message ) '
+                   'insert into sdl_validation_results (tld_sfs_id, tld_id, error_no, error_message ) '
                 || ' select tld_sfs_id, tld_id, 241, '
                 || qq
                 || 'NET-241: You may not create data with admin unit = '
