@@ -6,11 +6,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.3   Nov 19 2020 17:05:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.4   Nov 20 2020 12:29:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_invval.pkb  $
-    --       Date into PVCS   : $Date:   Nov 19 2020 17:05:22  $
-    --       Date fetched Out : $Modtime:   Nov 19 2020 17:03:04  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Nov 20 2020 12:29:54  $
+    --       Date fetched Out : $Modtime:   Nov 20 2020 12:28:46  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_sdh_id                 NUMBER;
     g_source_name            VARCHAR2 (30);
@@ -562,7 +562,20 @@ BEGIN
                        || ita_fld_length
                        || ' then 1 else 2 end )'
                   FROM attribs
-                 WHERE ita_format = 'NUMBER');
+                 WHERE ita_format = 'NUMBER'
+                UNION ALL
+                SELECT ita_view_attri,
+                       ita_disp_seq_no,
+                          ' ( case ita_attrib_name when '
+                       || qq
+                       || ita_attrib_name
+                       || qq
+                       || ' then 1 else 0 end = case when nm3flx.str_is_numeric('
+                       || ita_view_attri
+                       || ') = '||''''||'FALSE'||''''
+                       || ' then 1 else 2 end )'
+                  FROM attribs
+                 WHERE ita_format = 'NUMBER' );
     EXCEPTION
         WHEN NO_DATA_FOUND
         THEN
@@ -598,7 +611,7 @@ BEGIN
                 || 'Y'
                 || qq
                 || ') '
-                || '  select * from attribs, V_TDL_7_10_STAL_LD '
+                || '  select * from attribs, '||g_source_name
                 || ' where tld_sfs_id = :p_sfs_id and ('
                 || l_sql_length
                 || '))');
