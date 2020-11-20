@@ -2,16 +2,16 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.17   Apr 16 2018 09:22:26   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.18   Nov 20 2020 12:17:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:26  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Nov 20 2020 12:17:22  $
+--       Date fetched Out : $Modtime:   Nov 20 2020 12:16:32  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.47
 ------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.17  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.18  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -164,6 +164,31 @@ END is_numeric;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION str_is_numeric(pi_string IN varchar2) RETURN varchar2 is
+--
+   l_retval varchar2(5);
+--
+BEGIN
+--
+   DECLARE
+      l_number number;
+   BEGIN
+      l_number := pi_string;
+      l_retval := 'TRUE';
+   EXCEPTION
+      WHEN others
+       THEN
+         l_retval := 'FALSE';
+   END;
+--
+   RETURN l_retval;
+--
+END str_is_numeric;
+--
+-----------------------------------------------------------------------------
+--
+
+
 FUNCTION is_valid_numeric_char(pi_char IN char) RETURN boolean IS
 BEGIN
 --
