@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.11   Apr 16 2018 09:22:26   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.12   Nov 20 2020 12:18:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:26  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:13:16  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Nov 20 2020 12:18:16  $
+--       Date fetched Out : $Modtime:   Nov 20 2020 12:16:36  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.30
 ------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -112,6 +112,13 @@ FUNCTION string_after_character (pi_string   IN varchar2
 --<PROC NAME="is_numeric">
 -- This function returns TRUE if the pi_string is wholly numeric
 FUNCTION is_numeric(pi_string IN varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="str_is_numeric">
+-- This function returns 'TRUE' if the pi_string is wholly numeric (returns VARCHAR2 and not Boolean)
+FUNCTION str_is_numeric(pi_string IN varchar2) RETURN varchar2;
 --</PROC>
 --
 -----------------------------------------------------------------------------
