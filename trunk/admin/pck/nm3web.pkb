@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.8   Jun 26 2020 11:21:14   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.9   Dec 11 2020 10:32:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2020 11:21:14  $
---       Date fetched Out : $Modtime:   Jun 26 2020 11:19:50  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Dec 11 2020 10:32:48  $
+--       Date fetched Out : $Modtime:   Dec 11 2020 10:18:06  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on         : 1.55
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
@@ -1571,7 +1571,7 @@ END download_file_to_client;
 FUNCTION get_download_url( pi_name varchar2 ) RETURN varchar2 IS
 BEGIN
    RETURN nm3flx.i_t_e (g_web_doc_path IS NOT NULL
-                       ,g_web_doc_path||'/'
+                       ,g_web_doc_path
                        ,g_package_name||'.process_download?pi_name='
                        )||string_to_url(pi_name);
 END get_download_url;
