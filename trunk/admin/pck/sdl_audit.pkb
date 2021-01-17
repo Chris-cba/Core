@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.3   Mar 12 2020 17:32:54   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.4   Jan 17 2021 09:54:22   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_audit.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 17:32:54  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 07:11:52  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Jan 17 2021 09:54:22  $
+    --       Date fetched Out : $Modtime:   Jan 16 2021 10:33:10  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_AUDIT';
 
@@ -63,6 +63,7 @@ AS
         l_status         VARCHAR2 (30);
         l_started        TIMESTAMP;
         l_ended          TIMESTAMP;
+        lv_sdh_type      sdl_destination_header.sdh_type%TYPE;
     --    pragma autonomous_transaction;
     BEGIN
         IF p_op = c_start
@@ -179,7 +180,20 @@ AS
                 END IF;
             ELSIF l_status = 'LOAD_VALIDATION'
             THEN
-                IF p_process NOT IN ('ADJUST', 'LOAD_VALIDATION', 'TOPO_GENERATION')
+               --
+                SELECT sdh.sdh_type
+                  INTO lv_sdh_type
+                  FROM sdl_destination_header sdh
+                      ,sdl_file_submissions sfs
+                 WHERE sdh.sdh_sp_id = sfs.sfs_sp_id
+                   AND sdh.sdh_id = sfs.sfs_sdh_id
+                   AND sfs.sfs_id = p_batch_id;
+                --
+                IF (p_process NOT IN ('ADJUST', 'LOAD_VALIDATION', 'TOPO_GENERATION')
+                  AND lv_sdh_type != 'A') -- Network data
+                  OR
+                 (p_process NOT IN ('ADJUST', 'LOAD_VALIDATION', 'TRANSFER')
+                  AND lv_sdh_type = 'A') -- Asset data
                 THEN
                     raise_application_error (
                         -20004,
