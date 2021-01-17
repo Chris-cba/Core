@@ -20,11 +20,11 @@ AS
     SELECT /*
            --   PVCS Identifiers :-
            --
-           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_profile_nw_types.vw-arc   1.2   Jan 20 2020 10:34:54   Rob.Coupe  $
+           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_profile_nw_types.vw-arc   1.3   Jan 17 2021 10:03:22   Vikas.Mhetre  $
            --       Module Name      : $Workfile:   v_sdl_profile_nw_types.vw  $
-           --       Date into PVCS   : $Date:   Jan 20 2020 10:34:54  $
-           --       Date fetched Out : $Modtime:   Jan 20 2020 10:34:28  $
-           --       PVCS Version     : $Revision:   1.2  $
+           --       Date into PVCS   : $Date:   Jan 17 2021 10:03:22  $
+           --       Date fetched Out : $Modtime:   Jan 12 2021 04:29:38  $
+           --       PVCS Version     : $Revision:   1.3  $
            --
            --   Author : R.A. Coupe
            --
@@ -37,7 +37,7 @@ AS
           */
            sp_id,
            sp_name,
-           sp_nlt_id,
+           sdh_nlt_id,
            g.nlt_g_i_d,
            g.nlt_nt_type                profile_nt_type,
            g.nlt_gty_type               profile_group_type,
@@ -50,6 +50,7 @@ AS
            nth_feature_pk_column        spatial_pk_column,
            nth_feature_shape_column     geometry_column
       FROM sdl_profiles,
+           sdl_destination_header,
            nm_linear_types  g,
            nm_nt_groupings,
            nm_types,
@@ -57,7 +58,9 @@ AS
            nm_nw_themes,
            nm_linear_types  d,
            nm_units
-     WHERE     sp_nlt_id = g.nlt_id
+     WHERE sp_id = sdh_sp_id
+           AND sdh_nlt_id = g.nlt_id
+           AND sdh_destination_location = 'N'
            AND g.nlt_gty_type = nng_group_type
            AND nt_type = nng_nt_type
            AND nth_theme_id = nnth_nth_theme_id
@@ -69,7 +72,7 @@ AS
     UNION ALL
     SELECT sp_id,
            sp_name,
-           sp_nlt_id,
+           sdh_nlt_id,
            nlt_g_i_d,
            nlt_nt_type,
            nlt_gty_type,
@@ -82,12 +85,15 @@ AS
            nth_feature_pk_column,
            nth_feature_shape_column
       FROM sdl_profiles,
+           sdl_destination_header,
            nm_linear_types,
            nm_types,
            nm_themes_all,
            nm_nw_themes,
            nm_units
-     WHERE     sp_nlt_id = nlt_id
+     WHERE sp_id = sdh_sp_id
+           AND sdh_nlt_id = nlt_id
+           AND sdh_destination_location = 'N'
            AND nlt_gty_type IS NULL
            AND nlt_nt_type = nt_type
            AND nth_theme_id = nnth_nth_theme_id
