@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.29   Nov 04 2020 17:33:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.30   Jan 17 2021 09:43:38   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Nov 04 2020 17:33:14  $
-    --       Date fetched Out : $Modtime:   Nov 04 2020 17:32:28  $
-    --       PVCS Version     : $Revision:   1.29  $
+    --       Date into PVCS   : $Date:   Jan 17 2021 09:43:38  $
+    --       Date fetched Out : $Modtime:   Jan 16 2021 10:35:58  $
+    --       PVCS Version     : $Revision:   1.30  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -269,15 +269,21 @@ AS
                          sam_col_id,
                          sam_sp_id,
                          '1'     attrib_used_flag,
-                         sam_ne_column_name
-                    FROM sdl_attribute_mapping
-                   WHERE sam_sp_id = p_profile_id
+                         sam_ne_column_name,
+                         sam_sdh_id
+                    FROM sdl_attribute_mapping,
+                         sdl_destination_header
+                   WHERE sam_sp_id = sdh_sp_id
+                     AND sam_sdh_id = sdh_id
+                     AND sdh_destination_location = 'N'
+                     AND sam_sp_id = p_profile_id
                   UNION ALL
                   SELECT ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          p_profile_id,
                          '0',
-                         column_name
+                         column_name,
+                         -1
                     FROM dba_tab_columns
                    WHERE     owner =
                              SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
@@ -288,18 +294,26 @@ AS
                                              'NE_END_DATE')
                          AND NOT EXISTS
                                  (SELECT 1
-                                    FROM sdl_attribute_mapping
-                                   WHERE     sam_sp_id = p_profile_id
-                                         AND sam_ne_column_name = column_name)),
+                                    FROM sdl_attribute_mapping,
+                                         sdl_destination_header
+                                   WHERE sam_sp_id = sdh_sp_id
+                                     AND sam_sdh_id = sdh_id
+                                     AND sdh_destination_location = 'N'
+                                     AND sam_sp_id = p_profile_id
+                                     AND sam_ne_column_name = column_name)),
                  sdl_profiles,
+                 sdl_destination_header,
                  v_nm_nw_columns,
                  nm_linear_types
-           WHERE     sam_sp_id = sp_id
-                 AND sp_id = p_profile_id
-                 AND column_name = sam_ne_column_name
-                 AND nlt_id = sp_nlt_id
-                 AND NVL (nlt_gty_type, '$%^&') = NVL (group_type, '$%^&')
-                 AND nlt_nt_type = network_type
+           WHERE sam_sp_id = sp_id
+             AND sam_sp_id = sdh_sp_id
+             AND (sam_sdh_id = sdh_id OR sam_sdh_id = -1)
+             AND sdh_destination_location = 'N'
+             AND sp_id = p_profile_id
+             AND column_name = sam_ne_column_name
+             AND nlt_id = sdh_nlt_id
+             AND NVL (nlt_gty_type, '$%^&') = NVL (group_type, '$%^&')
+             AND nlt_nt_type = network_type
         GROUP BY sp_name;
 
 
@@ -472,9 +486,10 @@ AS
     BEGIN
         SELECT REPLACE (sp_name, ' ', '_'), nlt_nt_type
           INTO l_profile_name, l_nt_type
-          FROM sdl_profiles, nm_linear_types
-         WHERE sp_id = p_profile_id AND sp_nlt_id = nlt_id;
-
+          FROM sdl_profiles, sdl_destination_header, nm_linear_types
+         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N' 
+           AND sp_id = p_profile_id AND sdh_nlt_id = nlt_id;
+	   
         --
 
         p_view_sql :=
@@ -519,8 +534,9 @@ AS
     BEGIN
         SELECT REPLACE (sp_name, ' ', '_'), nlt_nt_type
           INTO l_profile_name, l_nt_type
-          FROM sdl_profiles, nm_linear_types
-         WHERE sp_id = p_profile_id AND sp_nlt_id = nlt_id;
+          FROM sdl_profiles, sdl_destination_header, nm_linear_types
+         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N' 
+           AND sp_id = p_profile_id AND sdh_nlt_id = nlt_id;
 
         p_view_sql :=
                'create or replace view v_sdl_'
@@ -572,8 +588,9 @@ AS
                    l_is_group_type,
                    l_nt_type,
                    l_gty_type
-              FROM sdl_profiles, nm_linear_types
-             WHERE sp_id = p_profile AND sp_nlt_id = nlt_id;
+          FROM sdl_profiles, sdl_destination_header, nm_linear_types
+         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N' 
+           AND sp_id = p_profile AND sdh_nlt_id = nlt_id;
 
             SELECT 1
               INTO l_dummy
