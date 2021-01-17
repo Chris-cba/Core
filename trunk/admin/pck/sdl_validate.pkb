@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.22   Nov 06 2020 14:31:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.23   Jan 17 2021 09:49:20   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Nov 06 2020 14:31:02  $
-    --       Date fetched Out : $Modtime:   Nov 06 2020 14:30:16  $
-    --       PVCS Version     : $Revision:   1.22  $
+    --       Date into PVCS   : $Date:   Jan 17 2021 09:49:20  $
+    --       Date fetched Out : $Modtime:   Jan 16 2021 18:18:26  $
+    --       PVCS Version     : $Revision:   1.23  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -87,6 +87,7 @@ AS
         CURSOR c_update IS
               SELECT 'SLD_COL_' || sam.sam_col_id     load_column_name,
                      sam.sam_id,
+                     saar.saar_source_value,
                      saar.saar_adjust_to_value
                 FROM sdl_attribute_mapping         sam,
                      sdl_attribute_adjustment_rules saar,
@@ -95,11 +96,16 @@ AS
                          saar.saar_target_attribute_name
                      AND sam.sam_sp_id = saar.saar_sp_id
                      AND sam.sam_sp_id = sfs.sfs_sp_id
+                     AND sfs.sfs_sdh_id = saar.saar_sdh_id
+                     AND sam.sam_sdh_id = saar.saar_sdh_id
+                     AND (saar.saar_user_id = SYS_CONTEXT('NM3CORE', 'USER_ID')
+                            OR saar.saar_user_id = -1)
                      AND EXISTS
                              (SELECT 1
                                 FROM sdl_attribute_adjustment_audit saaa
-                               WHERE     saaa.saaa_sam_id = sam.sam_id
-                                     AND saaa.saaa_sfs_id = sfs.sfs_id)
+                               WHERE saaa.saaa_sam_id = sam.sam_id
+                                 AND saaa.saaa_saar_id = saar.saar_id
+                                 AND saaa.saaa_sfs_id = sfs.sfs_id)
                      AND sfs.sfs_id = p_batch_id
             ORDER BY saar.saar_id;
 
@@ -120,6 +126,12 @@ AS
                 || '''Y'''
                 || ' WHERE sld_key IN (SELECT saaa.saaa_sld_key FROM sdl_attribute_adjustment_audit saaa WHERE saaa.saaa_sfs_id = '
                 || p_batch_id
+                || ' AND '
+                || r_update.load_column_name
+                || ' = '
+                || ''''
+                || r_update.saar_source_value
+                || ''''
                 || ' AND saaa.saaa_sam_id = '
                 || r_update.sam_id
                 || ')'
@@ -213,10 +225,15 @@ AS
                                 sdl_attribute_mapping,
                                 sdl_profiles,
                                 sdl_file_submissions,
-                                nm_linear_types
+                                nm_linear_types,
+                                sdl_destination_header
                           WHERE     sfs_id = p_batch_id
                                 AND sfs_sp_id = sp_id
-                                AND nlt_id = sp_nlt_id
+                                AND sdh_sp_id = sp_id
+                                AND sam_sdh_id = sdh_id
+                                AND sdh_id = sfs_sdh_id
+                                AND nlt_id = sdh_nlt_id
+                                AND sdh_destination_location = 'N'
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
@@ -294,10 +311,15 @@ AS
                                 sdl_attribute_mapping,
                                 sdl_profiles,
                                 sdl_file_submissions,
-                                nm_linear_types
+                                nm_linear_types,
+                                sdl_destination_header
                           WHERE     sfs_id = p_batch_id
                                 AND sfs_sp_id = sp_id
-                                AND nlt_id = sp_nlt_id
+                                AND sdh_sp_id = sp_id
+                                AND sam_sdh_id = sdh_id
+                                AND sdh_id = sfs_sdh_id
+                                AND nlt_id = sdh_nlt_id
+                                AND sdh_destination_location = 'N'
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
@@ -379,8 +401,12 @@ AS
                             WHERE     sfs.sfs_id = p_batch_id
                                   AND sam.sam_sp_id = sfs.sfs_sp_id
                                   AND sam.sam_sp_id = saar.saar_sp_id
+                                  AND sfs.sfs_sdh_id = saar.saar_sdh_id
+                                  AND sam.sam_sdh_id = saar.saar_sdh_id
                                   AND sam.sam_view_column_name =
                                       saar.saar_target_attribute_name
+                                  AND (saar.saar_user_id = SYS_CONTEXT('NM3CORE', 'USER_ID')
+                                      OR saar.saar_user_id = -1)
                          ORDER BY saar.saar_id))
         SELECT MAX (sam_id),
                   'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
@@ -1196,7 +1222,7 @@ AS
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
           INTO max_id, sql_str
-          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+          FROM sdl_datum_attribute_mapping a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
                AND sdam_column_name = n.column_name
@@ -1255,7 +1281,7 @@ AS
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
           INTO max_id, sql_str
-          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+          FROM sdl_datum_attribute_mapping a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
                AND sdam_column_name = n.column_name
@@ -1319,7 +1345,7 @@ AS
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
           INTO max_id, sql_str
-          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+          FROM sdl_datum_attribute_mapping a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
                AND sdam_column_name = n.column_name
