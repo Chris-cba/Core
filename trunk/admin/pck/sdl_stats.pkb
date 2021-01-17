@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.7   Nov 12 2020 10:59:46   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.8   Jan 17 2021 09:35:36   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Nov 12 2020 10:59:46  $
-    --       Date fetched Out : $Modtime:   Nov 12 2020 10:58:14  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   Jan 17 2021 09:35:36  $
+    --       Date fetched Out : $Modtime:   Jan 16 2021 10:58:04  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
@@ -819,30 +819,37 @@ AS
         --
         RETURN retval;
     END;
-function get_node_type( p_batch_id in number) return varchar2 is
-retval varchar2(4);
-begin
-select node_type into retval
-from (
-select nt_node_type node_type --sp_id, sp_nlt_id, nt_node_type, nlt_nt_type, nlt_gty_type
-from sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types
-where sfs_id = p_batch_id
-and sfs_sp_id = sp_id
-and sp_nlt_id = nlt_id
-and nt_type = nlt_nt_type
-and nlt_gty_type is NULL
-union all
-select nt_node_type --sp_id, sp_nlt_id, nt_node_type, nng_nt_type, nlt_gty_type
-from sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types, nm_nt_groupings
-where sfs_id = p_batch_id
-and sfs_sp_id = sp_id
-and sp_nlt_id = nlt_id
-and nt_type = nng_nt_type
-and nlt_gty_type = nng_group_type )
-group by node_type;
---
-return retval;
-end;
+	
+    FUNCTION get_node_type( p_batch_id IN NUMBER) RETURN VARCHAR2 IS
+      retval VARCHAR2(4);
+    BEGIN
+      SELECT node_type INTO retval
+        FROM (
+             SELECT nt_node_type node_type --sp_id, sp_nlt_id, nt_node_type, nlt_nt_type, nlt_gty_type
+               FROM sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types, sdl_destination_header
+              WHERE sfs_id = p_batch_id
+                AND sfs_sp_id = sp_id
+                AND sfs_sdh_id = sdh_id
+                AND sdh_sp_id = sp_id
+                AND sdh_nlt_id = nlt_id
+                AND sdh_destination_location = 'N'
+                AND nt_type = nlt_nt_type
+                AND nlt_gty_type IS NULL
+           UNION ALL
+             SELECT nt_node_type --sp_id, sp_nlt_id, nt_node_type, nng_nt_type, nlt_gty_type
+               FROM sdl_profiles, sdl_file_submissions, nm_linear_types, nm_types, nm_nt_groupings, sdl_destination_header
+              WHERE sfs_id = p_batch_id
+                AND sfs_sp_id = sp_id
+                AND sfs_sdh_id = sdh_id
+                AND sdh_sp_id = sp_id
+                AND sdh_nlt_id = nlt_id
+                AND sdh_destination_location = 'N'
+                AND nt_type = nng_nt_type
+                AND nlt_gty_type = nng_group_type )
+           GROUP BY node_type;
+      --
+      RETURN retval;
+    END;
     
 END sdl_stats;
 /
