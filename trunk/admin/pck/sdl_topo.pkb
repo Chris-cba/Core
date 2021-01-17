@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.13   Apr 21 2020 16:31:20   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.14   Jan 17 2021 09:40:18   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 21 2020 16:31:20  $
-    --       Date fetched Out : $Modtime:   Apr 21 2020 16:30:32  $
-    --       PVCS Version     : $Revision:   1.13  $
+    --       Date into PVCS   : $Date:   Jan 17 2021 09:40:18  $
+    --       Date fetched Out : $Modtime:   Jan 16 2021 10:48:58  $
+    --       PVCS Version     : $Revision:   1.14  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -88,8 +88,14 @@ AS
           FROM sdl_profiles,
                sdl_file_submissions,
                nm_linear_types,
-               nm_units
-         WHERE     nlt_id = sp_nlt_id
+               nm_units,
+               sdl_destination_header
+         WHERE nlt_id = sdh_nlt_id
+               AND sp_id = sdh_sp_id
+	       AND sdh_id = sfs_sdh_id
+               AND sdh_destination_location = 'N'
+               -- can have multiple destination type for a container so need to restrict the destination type for which we are generating topo
+               -- in case of have multiple destination types.
                AND sfs_id = p_batch_id
                AND sfs_sp_id = sp_id
                AND nlt_units = un_unit_id;
