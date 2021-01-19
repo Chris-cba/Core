@@ -18,11 +18,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.1   Mar 12 2020 08:41:36   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.2   Jan 19 2021 14:02:10   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   v_sdl_attrib_validation_result.vw  $
---       Date into PVCS   : $Date:   Mar 12 2020 08:41:36  $
---       Date fetched Out : $Modtime:   Mar 12 2020 08:39:24  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 19 2021 14:02:10  $
+--       Date fetched Out : $Modtime:   Jan 19 2021 10:42:20  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Vikas Mhetre
 --
@@ -139,8 +139,11 @@ SELECT saaa.saaa_id val_id
       ,'Attribute Adjustment Rule ' || saaa.saaa_saar_id || ' applied' message
   FROM sdl_attribute_adjustment_audit saaa
       ,sdl_attribute_mapping sam
+      ,sdl_destination_header sdh
       ,sdl_load_data sld
  WHERE saaa.saaa_sam_id = sam.sam_id
    AND saaa.saaa_sld_key = sld.sld_key
+   AND sam.sam_sdh_id = sdh.sdh_id
+   AND sdh.sdh_destination_location = 'N'
    AND sld.sld_adjustment_rule_applied = 'Y'
 /
