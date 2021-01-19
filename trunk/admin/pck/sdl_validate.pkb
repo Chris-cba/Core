@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.23   Jan 17 2021 09:49:20   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.24   Jan 19 2021 13:59:30   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Jan 17 2021 09:49:20  $
-    --       Date fetched Out : $Modtime:   Jan 16 2021 18:18:26  $
-    --       PVCS Version     : $Revision:   1.23  $
+    --       Date into PVCS   : $Date:   Jan 19 2021 13:59:30  $
+    --       Date fetched Out : $Modtime:   Jan 19 2021 13:30:46  $
+    --       PVCS Version     : $Revision:   1.24  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -128,10 +128,10 @@ AS
                 || p_batch_id
                 || ' AND '
                 || r_update.load_column_name
-                || ' = '
-                || ''''
-                || r_update.saar_source_value
-                || ''''
+                || CASE
+                      WHEN r_update.saar_source_value IS NULL THEN ' IS NULL '
+                      ELSE ' = ''' || r_update.saar_source_value || ''''
+                   END
                 || ' AND saaa.saaa_sam_id = '
                 || r_update.sam_id
                 || ')'
