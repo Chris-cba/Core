@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.1   Jan 19 2021 15:08:48   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.2   Jan 20 2021 11:46:40   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix7.sql  $ 
---       Date into PVCS   : $Date:   Jan 19 2021 15:08:48  $
---       Date fetched Out : $Modtime:   Jan 19 2021 14:23:12  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 20 2021 11:46:40  $
+--       Date fetched Out : $Modtime:   Jan 20 2021 11:45:50  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -60,6 +60,32 @@ BEGIN
                                 ,p_VERSION        => '4.8.0.0'
                                 );
 
+END;
+/
+
+--
+-- Check that TDL has not already been installed and existing SDL tables do not hold any data 
+--
+DECLARE
+  ln_tdl_exists NUMBER(1);
+  ln_sdl_cnt    NUMBER;
+BEGIN
+  BEGIN
+    SELECT 1 
+      INTO ln_tdl_exists
+      FROM user_tables 
+     WHERE table_name = 'SDL_PROFILE_FILE_COLUMNS';
+    -- continue
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      SELECT COUNT(*) 
+        INTO ln_sdl_cnt
+        FROM sdl_profiles ;
+      --
+      IF ln_sdl_cnt >=1 THEN -- SDL system has been already configured
+        RAISE_APPLICATION_ERROR(-20000,'SDL has already been configured and used on the database. Execute SDL clean up script before installing TDL.'); 
+      END IF;   
+  END;
 END;
 /
 
