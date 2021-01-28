@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.30   Jan 17 2021 09:43:38   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.31   Jan 28 2021 09:41:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Jan 17 2021 09:43:38  $
-    --       Date fetched Out : $Modtime:   Jan 16 2021 10:35:58  $
-    --       PVCS Version     : $Revision:   1.30  $
+    --       Date into PVCS   : $Date:   Jan 28 2021 09:41:44  $
+    --       Date fetched Out : $Modtime:   Jan 28 2021 09:26:06  $
+    --       PVCS Version     : $Revision:   1.31  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -227,7 +227,7 @@ AS
                                         || sam_col_id
                                         || ','
                                         || ''''
-                                        || 'YYYY/MM/DD'
+                                        || spfc_date_format
                                         || ''''
                                         || ')'
                                     ELSE
@@ -270,20 +270,25 @@ AS
                          sam_sp_id,
                          '1'     attrib_used_flag,
                          sam_ne_column_name,
-                         sam_sdh_id
+                         sam_sdh_id,
+                         spfc_date_format
                     FROM sdl_attribute_mapping,
-                         sdl_destination_header
+                         sdl_destination_header,
+                         sdl_profile_file_columns
                    WHERE sam_sp_id = sdh_sp_id
                      AND sam_sdh_id = sdh_id
                      AND sdh_destination_location = 'N'
                      AND sam_sp_id = p_profile_id
+                     and spfc_sp_id = sdh_sp_id
+                     and spfc_col_name = sam_file_attribute_name
                   UNION ALL
                   SELECT ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          p_profile_id,
                          '0',
                          column_name,
-                         -1
+                         -1,
+                         NULL
                     FROM dba_tab_columns
                    WHERE     owner =
                              SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
