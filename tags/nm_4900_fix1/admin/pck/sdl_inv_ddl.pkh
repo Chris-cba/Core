@@ -1,0 +1,49 @@
+CREATE OR REPLACE PACKAGE sdl_inv_ddl
+AS
+    --
+    -----------------------------------------------------------------------------
+    --
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkh-arc   1.2   Jan 29 2021 17:13:04   Vikas.Mhetre  $
+    --       Module Name      : $Workfile:   sdl_inv_ddl.pkh  $
+    --       Date into PVCS   : $Date:   Jan 29 2021 17:13:04  $
+    --       Date fetched Out : $Modtime:   Jan 28 2021 17:54:04  $
+    --       PVCS Version     : $Revision:   1.2  $
+    --
+    --   Author : Rob Coupe
+    --
+    --   <Package responsible for creating tables and views used in the Spatial/Transportation Data Loader
+    --
+    -----------------------------------------------------------------------------
+    --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+    -----------------------------------------------------------------------------
+    --
+
+    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.2  $"';
+
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --
+    -----------------------------------------------------------------------------
+    --
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+
+    PROCEDURE create_tdl_profile_tables (p_sp_id IN NUMBER);
+
+    PROCEDURE create_tdl_container_table (p_sp_name     IN VARCHAR2,
+                                          p_container   IN   VARCHAR2,
+                                          p_rowcount    IN NUMBER );
+
+    PROCEDURE create_tdl_profile_views (p_sp_id IN NUMBER);
+
+    PROCEDURE create_tdl_destination_view (p_sp_id    IN NUMBER,
+                                           p_sdh_id   IN NUMBER);
+                                           
+    PROCEDURE drop_tdl_table(p_table_name     IN VARCHAR2);
+END;
+/
