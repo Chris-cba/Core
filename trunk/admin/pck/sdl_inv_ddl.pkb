@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.3   Oct 15 2020 21:06:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_ddl.pkb-arc   1.4   Jan 29 2021 17:15:48   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_inv_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Oct 15 2020 21:06:26  $
-    --       Date fetched Out : $Modtime:   Oct 15 2020 21:05:24  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Jan 29 2021 17:15:48  $
+    --       Date fetched Out : $Modtime:   Jan 28 2021 17:59:46  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     --
     FUNCTION get_version
@@ -86,6 +86,9 @@ AS
         PRAGMA EXCEPTION_INIT (already_exists, -955); -- name is already used by an existing objec
     --
     BEGIN
+          --
+          drop_tdl_table(l_table_name);
+          --
           SELECT    'create table '
                  || l_owner
                  || '.'
@@ -349,6 +352,47 @@ nm_debug.debug(l_sql);
         END;
 
         EXECUTE IMMEDIATE l_sql;
+    END;
+    
+    PROCEDURE drop_tdl_table(p_table_name     IN VARCHAR2) IS
+        l_sql            VARCHAR2 (32767);
+        l_owner          VARCHAR2 (30)
+                             := SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
+                             
+        already_exists   EXCEPTION;
+        PRAGMA EXCEPTION_INIT (already_exists, -942); -- name is already used by an existing objec               
+        seq_already_exists   EXCEPTION;
+        PRAGMA EXCEPTION_INIT (seq_already_exists, -2289);                    
+    BEGIN
+
+        l_sql :=
+               'DROP TABLE '
+            || l_owner
+            || '.'
+            || p_table_name;
+
+        BEGIN
+            EXECUTE IMMEDIATE l_sql;
+        EXCEPTION
+            WHEN already_exists
+            THEN
+                NULL;
+        END;
+        
+        l_sql :=
+               'DROP SEQUENCE '
+            || l_owner
+            || '.'
+            || p_table_name
+            || '_SEQ';
+
+        BEGIN
+            EXECUTE IMMEDIATE l_sql;
+        EXCEPTION
+            WHEN seq_already_exists
+            THEN
+                NULL;
+        END;
     END;
 END;
 /
