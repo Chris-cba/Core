@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.24   Jan 19 2021 13:59:30   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.25   Feb 08 2021 11:03:04   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Jan 19 2021 13:59:30  $
-    --       Date fetched Out : $Modtime:   Jan 19 2021 13:30:46  $
-    --       PVCS Version     : $Revision:   1.24  $
+    --       Date into PVCS   : $Date:   Feb 08 2021 11:03:04  $
+    --       Date fetched Out : $Modtime:   Feb 08 2021 11:00:00  $
+    --       PVCS Version     : $Revision:   1.25  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -779,6 +779,25 @@ AS
         END;
 
         nm_debug.debug ('Update working geometry complete');
+        
+--      Test the geometry - they should now be a 3302/3306 geomrty type either from a 2D scaled with a known measure attribute
+--      or through interpretation from a standard 3002/3006. If it is still not a 3D geometry, then fail it.
+        
+        INSERT INTO sdl_validation_results (svr_sfs_id,
+                                            svr_validation_type,
+                                            svr_sld_key,
+                                            svr_column_name,
+                                            svr_status_code,
+                                            svr_message)
+            SELECT p_batch_id,
+                   'S',
+                   sld_key,
+                   'SLD_LOAD_GEOMETRY',
+                   -96,
+                   'Geometry and attribute format does not support measures'
+              FROM sdl_load_data g
+             WHERE     g.sld_sfs_id = p_batch_id
+                   AND round(g.sld_working_geometry.sdo_gtype/1000,0) != 3;        
 
 
         INSERT INTO sdl_validation_results (svr_sfs_id,
@@ -866,7 +885,7 @@ AS
 
         UPDATE sdl_file_submissions
            SET sfs_mbr_geometry =
-                   (SELECT sdo_aggr_mbr (sld_working_geometry)
+                   (SELECT sdo_aggr_mbr (sdo_lrs.convert_to_std_geom(sld_working_geometry))
                       FROM sdl_load_data
                      WHERE sld_sfs_id = p_batch_id)
          WHERE sfs_id = p_batch_id;
@@ -876,7 +895,7 @@ AS
     --
     -----------------------------------------------------------------------------
     --
-    FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
+FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         RETURN NUMBER
     IS
         retval   NUMBER;
@@ -898,9 +917,24 @@ AS
                                 GROUP BY sld_key)));
 
         IF l_mod2 = 0 AND l_mod3 = 0
-        THEN
-            --difficult to know!
-            retval := NULL;
+        THEN --difficult to know!
+            declare
+               measures_ascending varchar2(5);
+            begin
+            select ascending_measures
+            into measures_ascending
+            from (
+            select sdo_lrs.is_measure_increasing(sld_working_geometry) ascending_measures
+            from sdl_load_data
+            where sld_sfs_id = p_batch_id )
+            group by ascending_measures;
+
+            retval := 3306;
+            exception
+               when too_many_rows then
+                  retval := NULL;
+            end;
+            
         ELSIF l_mod2 = 0 AND l_mod3 > 0
         THEN
             -- Its not 3D so guess we should translate to LRS
