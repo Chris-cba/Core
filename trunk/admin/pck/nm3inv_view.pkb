@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.17   Jul 17 2012 14:31:30   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.18   Feb 16 2021 23:23:16   Rob.Coupe  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Jul 17 2012 14:31:30  $
---       Date fetched Out 	: $Modtime:   Jul 17 2012 14:29:40  $
---       PVCS Version     	: $Revision:   2.17  $
+--       Date into PVCS   	: $Date:   Feb 16 2021 23:23:16  $
+--       Date fetched Out 	: $Modtime:   Feb 16 2021 23:22:00  $
+--       PVCS Version     	: $Revision:   2.18  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.17     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.18     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1279,7 +1279,7 @@ BEGIN
    add_data ('NE_ID',NULL);
    add_data ('NE_ID','NE_FT_PK_COL');
    add_data ('NE_UNIQUE',NULL);
-   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('cast(0 as number(10.3)','NE_BEGIN_MP');
    add_data ('NE_LENGTH',NULL);
    --
    IF l_rec_ngt.ngt_group_type IS NULL
@@ -1524,7 +1524,7 @@ BEGIN
    add_data ('a.NE_ID',NULL);
    add_data ('a.NE_ID','NE_FT_PK_COL');
    add_data ('a.NE_UNIQUE',NULL);
-   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('cast(0 as number(10,3)','NE_BEGIN_MP');
    add_data ('a.NE_LENGTH',NULL);
    add_data ('a.NE_NO_START','START_NODE_ID');
    add_data ('a.NE_NO_END','END_NODE_ID');
@@ -1846,7 +1846,7 @@ BEGIN
    add_data ('a.NE_ID',NULL);
    add_data ('a.NE_ID','NE_FT_PK_COL');
    add_data ('a.NE_UNIQUE',NULL);
-   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('cast(0 as number(10,3))','NE_BEGIN_MP');
    add_data ('a.NE_LENGTH',NULL);
    add_data ('a.NE_DESCR',NULL);
    add_data ('a.NE_START_DATE',NULL);
