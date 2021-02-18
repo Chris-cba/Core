@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.21   Apr 16 2018 09:21:52   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.22   Feb 18 2021 14:59:14   Barbara.Odriscoll  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:21:52  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
---       Version          : $Revision:   3.21  $
+--       Date into PVCS   : $Date:   Feb 18 2021 14:59:14  $
+--       Date fetched Out : $Modtime:   Feb 18 2021 14:41:28  $
+--       Version          : $Revision:   3.22  $
 --       Based on SCCS version : 
 -----------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2021 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.21  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.22  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -2762,6 +2762,49 @@ END get_next_run_date;
         FORALL i IN 1..lr_hal.COUNT
             DELETE  FROM    HIG_ALERTS  WHERE HAL_HALT_ID = lr_hal(i).hal_halt_id;
       END;
+      
+  --
+  -----------------------------------------------------------------------------
+  -- Function used in HIG_ALERT_TYPE_CONDITIONS policy to determine if user is allowed Insert, Update or Delete
+  --
+  FUNCTION hig_alert_type_conds_admin(schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2 
+  IS
+    --
+    lv_return  VARCHAR2(2000);
+    --
+  BEGIN
+    --
+    lv_return := 'EXISTS (SELECT 1
+                            FROM hig_user_roles
+                           WHERE hur_role IN (''HIG_ADMIN'', ''ALERT_ADMIN'')
+                             AND hur_username IN (Sys_Context(''NM3_SECURITY_CTX'',''USERNAME''),Sys_Context(''NM3_SECURITY_CTX'',''ACTUAL_USERNAME'')))';
+    --
+    RETURN lv_return;
+    
+  END hig_alert_type_conds_admin;  
+    
+  --
+  -----------------------------------------------------------------------------
+  -- Function used in HIG_QUERY_TYPE_ATTRIBUTES policy to determine if user is allowed Insert, Update or Delete
+  --
+  FUNCTION hig_query_type_attribs_admin(schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2 
+  IS
+    --
+    lv_return  VARCHAR2(2000);
+    --
+  BEGIN
+    --
+    lv_return := 'EXISTS (SELECT 1
+                            FROM hig_user_roles
+                           WHERE hur_role IN (''HIG_ADMIN'', ''ALERT_ADMIN'')
+                             AND hur_username IN (Sys_Context(''NM3_SECURITY_CTX'',''USERNAME''),Sys_Context(''NM3_SECURITY_CTX'',''ACTUAL_USERNAME'')))';
+    --
+    RETURN lv_return;
+    
+  END hig_query_type_attribs_admin;   
+
 --
 END hig_alert;
 /
