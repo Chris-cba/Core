@@ -4,14 +4,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.9   Apr 16 2018 09:21:52   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.10   Feb 18 2021 14:59:16   Barbara.Odriscoll  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:21:52  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:09:50  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Feb 18 2021 14:59:16  $
+--       Date fetched Out : $Modtime:   Feb 18 2021 14:41:30  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2021 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -234,6 +234,16 @@ PROCEDURE send_batch_single_mail(pi_halt_id  IN hig_alert_types.halt_id%TYPE
  PROCEDURE HIG_ALERT_LOG_DELETE(p_halt_id NUMBER);
 --
 -----------------------------------------------------------------------------
+-- Function used in HIG_ALERT_TYPE_CONDITIONS policy to determine if user is allowed Insert, Update or Delete
 --
+ FUNCTION hig_alert_type_conds_admin(schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+-- Function used in HIG_QUERY_TYPE_ATTRIBUTES policy to determine if user is allowed Insert, Update or Delete
+--
+ FUNCTION hig_query_type_attribs_admin(schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2;  
+    
 End hig_alert;
 /
