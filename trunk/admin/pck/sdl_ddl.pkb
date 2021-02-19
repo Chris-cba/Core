@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.33   Feb 19 2021 16:30:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.34   Feb 19 2021 19:22:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Feb 19 2021 16:30:06  $
-    --       Date fetched Out : $Modtime:   Feb 19 2021 16:22:16  $
-    --       PVCS Version     : $Revision:   1.33  $
+    --       Date into PVCS   : $Date:   Feb 19 2021 19:22:00  $
+    --       Date fetched Out : $Modtime:   Feb 19 2021 19:13:58  $
+    --       PVCS Version     : $Revision:   1.34  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.34  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -1249,5 +1249,47 @@ AS
 --
 ----------------------------------------------------------------------------
 --
+FUNCTION get_substrings_regexp (p_instring IN VARCHAR2)
+    RETURN substring_tab
+IS
+    retval       substring_tab := substring_tab (substring (NULL, NULL, NULL));
+    str          VARCHAR2 (4000) := p_instring;
+    loop_count   INTEGER := 0;
+    start_c      INTEGER := 1;
+    end_c        INTEGER;
+BEGIN
+    WHILE REGEXP_INSTR (p_instring,
+                        '\/|\,|\.|\+|-|\ |\(|\)|\|',
+                        start_c,
+                        1) > 0
+    LOOP
+        end_c :=
+            REGEXP_INSTR (p_instring,
+                          '\/|\,|\.|\+|-|\ |\(|\)|\|',
+                          start_c,
+                          1);
+        loop_count := loop_count + 1;
+        --      retval(loop_count) := substring(start_c, end_c -1, nvl(substr(p_instring, start_c, (end_c - start_c)), 'NULL'));
+        retval (loop_count) :=
+            substring (start_c,
+                       end_c - 1,
+                       SUBSTR (p_instring, start_c, (end_c - start_c)));
+        retval.EXTEND;
+        start_c := end_c + 1;
+
+        IF loop_count > 100
+        THEN
+            EXIT;
+        END IF;
+    END LOOP;
+
+    retval (retval.LAST) :=
+        substring (
+            end_c + 1,
+            LENGTH (p_instring),
+            SUBSTR (p_instring, end_c + 1, LENGTH (p_instring) - end_c + 1));
+    RETURN retval;
+END get_substrings_regexp;
+
 END sdl_ddl;
 /
