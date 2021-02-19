@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.32   Feb 12 2021 16:02:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.33   Feb 19 2021 16:30:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Feb 12 2021 16:02:26  $
-    --       Date fetched Out : $Modtime:   Feb 12 2021 16:01:22  $
-    --       PVCS Version     : $Revision:   1.32  $
+    --       Date into PVCS   : $Date:   Feb 19 2021 16:30:06  $
+    --       Date fetched Out : $Modtime:   Feb 19 2021 16:22:16  $
+    --       PVCS Version     : $Revision:   1.33  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -203,7 +203,7 @@ AS
     BEGIN
           SELECT    'create or replace view V_SDL_'
                  || REPLACE (sp_name, ' ', '_')
-                 || '_NE'
+                 || '_NE_RC'
                  || ' ( batch_id, record_id, sld_key, '
                  || LISTAGG (sam_ne_column_name, ',')
                         WITHIN GROUP (ORDER BY sam_id)
@@ -215,7 +215,7 @@ AS
                             WHEN 'VARCHAR2'
                             THEN
                                 CASE attrib_used_flag
-                                    WHEN '1' THEN 'sld_col_' || sam_col_id
+                                    WHEN '1' THEN selected_value
                                     ELSE 'NULL'
                                 END
                             WHEN 'DATE'
@@ -223,13 +223,19 @@ AS
                                 CASE attrib_used_flag
                                     WHEN '1'
                                     THEN
-                                           'to_date(sld_col_'
-                                        || sam_col_id
-                                        || ','
-                                        || ''''
-                                        || spfc_date_format
-                                        || ''''
-                                        || ')'
+                                        CASE
+                                            WHEN spfc_date_format IS NULL
+                                            THEN
+                                                selected_value
+                                            ELSE
+                                                   'to_date('
+                                                || selected_value
+                                                || ','
+                                                || ''''
+                                                || spfc_date_format
+                                                || ''''
+                                                || ')'
+                                        END
                                     ELSE
                                         'NULL'
                                 END
@@ -238,8 +244,8 @@ AS
                                 CASE attrib_used_flag
                                     WHEN '1'
                                     THEN
-                                           'cast (sld_col_'
-                                        || sam_col_id
+                                           'cast ('
+                                        || selected_value
                                         || ' as number )'
                                     ELSE
                                         'NULL'
@@ -271,16 +277,48 @@ AS
                          '1'     attrib_used_flag,
                          sam_ne_column_name,
                          sam_sdh_id,
-                         spfc_date_format
-                    FROM sdl_attribute_mapping,
+                         spfc_date_format,
+                         selected_value
+                    FROM (SELECT sam_id,
+                                 sam_sp_id,
+                                 sam_sdh_id,
+                                 sam_col_id,
+                                 sam_file_attribute_name,
+                                 sam_view_column_name,
+                                 sam_ne_column_name,
+                                 CASE
+                                     WHEN adjusted_default IS NULL
+                                     THEN
+                                         CASE
+                                             WHEN sam_default_value IS NULL
+                                             THEN
+                                                 'SLD_COL_' || sam_col_id
+                                             ELSE
+                                                 sam_default_value
+                                         END
+                                     ELSE
+                                         adjusted_default
+                                 END    selected_value
+                            FROM (SELECT sam_id,
+                                         sam_sp_id,
+                                         sam_sdh_id,
+                                         sam_col_id,
+                                         sam_file_attribute_name,
+                                         sam_view_column_name,
+                                         sam_ne_column_name,
+                                         sam_default_value,
+                                         swap_attrib_names (sam_sp_id,
+                                                            sam_col_id)    adjusted_default
+                                    FROM sdl_attribute_mapping
+                                   WHERE sam_sp_id = p_profile_id)),
                          sdl_destination_header,
                          sdl_profile_file_columns
-                   WHERE sam_sp_id = sdh_sp_id
-                     AND sam_sdh_id = sdh_id
-                     AND sdh_destination_location = 'N'
-                     AND sam_sp_id = p_profile_id
-                     and spfc_sp_id (+) = sdh_sp_id
-                     and spfc_col_name (+) = sam_file_attribute_name
+                   WHERE     sam_sp_id = sdh_sp_id
+                         AND sam_sdh_id = sdh_id
+                         AND sdh_destination_location = 'N'
+                         AND sam_sp_id = p_profile_id
+                         AND spfc_sp_id(+) = sdh_sp_id
+                         AND spfc_col_name(+) = sam_file_attribute_name
                   UNION ALL
                   SELECT ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          ROW_NUMBER () OVER (ORDER BY column_name) * -1,
@@ -288,6 +326,7 @@ AS
                          '0',
                          column_name,
                          -1,
+                         NULL,
                          NULL
                     FROM dba_tab_columns
                    WHERE     owner =
@@ -301,29 +340,29 @@ AS
                                  (SELECT 1
                                     FROM sdl_attribute_mapping,
                                          sdl_destination_header
-                                   WHERE sam_sp_id = sdh_sp_id
-                                     AND sam_sdh_id = sdh_id
-                                     AND sdh_destination_location = 'N'
-                                     AND sam_sp_id = p_profile_id
-                                     AND sam_ne_column_name = column_name)),
+                                   WHERE     sam_sp_id = sdh_sp_id
+                                         AND sam_sdh_id = sdh_id
+                                         AND sdh_destination_location = 'N'
+                                         AND sam_sp_id = p_profile_id
+                                         AND sam_ne_column_name = column_name)),
                  sdl_profiles,
                  sdl_destination_header,
                  v_nm_nw_columns,
                  nm_linear_types
-           WHERE sam_sp_id = sp_id
-             AND sam_sp_id = sdh_sp_id
-             AND (sam_sdh_id = sdh_id OR sam_sdh_id = -1)
-             AND sdh_destination_location = 'N'
-             AND sp_id = p_profile_id
-             AND column_name = sam_ne_column_name
-             AND nlt_id = sdh_nlt_id
-             AND NVL (nlt_gty_type, '$%^&') = NVL (group_type, '$%^&')
-             AND nlt_nt_type = network_type
+           WHERE     sam_sp_id = sp_id
+                 AND sam_sp_id = sdh_sp_id
+                 AND (sam_sdh_id = sdh_id OR sam_sdh_id = -1)
+                 AND sdh_destination_location = 'N'
+                 AND sp_id = p_profile_id
+                 AND column_name = sam_ne_column_name
+                 AND nlt_id = sdh_nlt_id
+                 AND NVL (nlt_gty_type, '$%^&') = NVL (group_type, '$%^&')
+                 AND nlt_nt_type = network_type
         GROUP BY sp_name;
 
 
         --        nm_debug.debug_on;
-        --        nm_debug.debug (p_view_sql);
+        nm_debug.debug (p_view_sql);
 
         EXECUTE IMMEDIATE p_view_sql;
     END gen_profile_ne_view;
@@ -492,8 +531,10 @@ AS
         SELECT REPLACE (sp_name, ' ', '_'), nlt_nt_type
           INTO l_profile_name, l_nt_type
           FROM sdl_profiles, sdl_destination_header, nm_linear_types
-         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N'
-           AND sp_id = p_profile_id AND sdh_nlt_id = nlt_id;
+         WHERE     sp_id = sdh_sp_id
+               AND sdh_destination_location = 'N'
+               AND sp_id = p_profile_id
+               AND sdh_nlt_id = nlt_id;
 
         --
 
@@ -540,8 +581,10 @@ AS
         SELECT REPLACE (sp_name, ' ', '_'), nlt_nt_type
           INTO l_profile_name, l_nt_type
           FROM sdl_profiles, sdl_destination_header, nm_linear_types
-         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N'
-           AND sp_id = p_profile_id AND sdh_nlt_id = nlt_id;
+         WHERE     sp_id = sdh_sp_id
+               AND sdh_destination_location = 'N'
+               AND sp_id = p_profile_id
+               AND sdh_nlt_id = nlt_id;
 
         p_view_sql :=
                'create or replace view v_sdl_'
@@ -577,8 +620,8 @@ AS
         l_profile_name       VARCHAR2 (30);
         l_dummy              NUMBER;
         l_datum_nt           VARCHAR2 (4);
-        l_ne_length_exists   NUMBER(38) := 0;
-        l_nt_type_exists     NUMBER(38) := 0;
+        l_ne_length_exists   NUMBER (38) := 0;
+        l_nt_type_exists     NUMBER (38) := 0;
         l_length_str         VARCHAR2 (1000)
             := 'sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom)';
         qq                   CHAR (1) := CHR (39);
@@ -594,9 +637,11 @@ AS
                    l_is_group_type,
                    l_nt_type,
                    l_gty_type
-          FROM sdl_profiles, sdl_destination_header, nm_linear_types
-         WHERE sp_id = sdh_sp_id AND sdh_destination_location = 'N'
-           AND sp_id = p_profile AND sdh_nlt_id = nlt_id;
+              FROM sdl_profiles, sdl_destination_header, nm_linear_types
+             WHERE     sp_id = sdh_sp_id
+                   AND sdh_destination_location = 'N'
+                   AND sp_id = p_profile
+                   AND sdh_nlt_id = nlt_id;
 
             SELECT 1
               INTO l_dummy
@@ -630,14 +675,16 @@ AS
             END;
 
             SELECT LISTAGG (sdam_column_name, ',')
-                       WITHIN GROUP (ORDER BY sdam_seq_no)    col_list,
+                       WITHIN GROUP (ORDER BY sdam_seq_no)
+                       col_list,
                    LISTAGG (
                        CASE
                            WHEN sdam_default_value IS NULL THEN sdam_formula
                            ELSE '''' || sdam_default_value || ''''
                        END,
                        ',')
-                   WITHIN GROUP (ORDER BY sdam_seq_no)        def_list,
+                   WITHIN GROUP (ORDER BY sdam_seq_no)
+                       def_list,
                    MAX (
                        CASE sdam_column_name
                            WHEN 'NE_LENGTH' THEN 1
@@ -646,7 +693,6 @@ AS
               INTO l_col_list, l_def_list, l_ne_length_exists
               FROM sdl_datum_attribute_mapping
              WHERE sdam_profile_id = p_profile;
-
         ELSE
             --datum type - use the natural view without need for the datum attribute mapping
 
@@ -666,7 +712,10 @@ AS
                            WHEN 'NE_NT_TYPE' THEN 1
                            ELSE 0
                        END)
-              INTO l_col_list, l_def_list, l_ne_length_exists, l_nt_type_exists
+              INTO l_col_list,
+                   l_def_list,
+                   l_ne_length_exists,
+                   l_nt_type_exists
               FROM sdl_attribute_mapping
              WHERE sam_sp_id = p_profile;
         END IF;
@@ -681,12 +730,12 @@ AS
         THEN
             sql_str := sql_str || 'ne_length, ';
         END IF;
-        
+
         IF l_nt_type_exists = 0
         THEN
             sql_str := sql_str || 'ne_nt_type, ';
         END IF;
-                
+
         sql_str :=
                sql_str
             || ' ne_no_start, ne_no_end, ne_type '
@@ -701,10 +750,11 @@ AS
         THEN
             sql_str := sql_str || l_length_str || ',';
         END IF;
-        
-        if l_nt_type_exists = 0 then
-           sql_str := sql_str || l_datum_nt||',';
-        end if;
+
+        IF l_nt_type_exists = 0
+        THEN
+            sql_str := sql_str || '''' || l_datum_nt || ''',';
+        END IF;
 
         sql_str :=
                sql_str
