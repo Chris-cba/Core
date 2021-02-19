@@ -16,11 +16,11 @@ AS
     SELECT /*
         --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_default_value_components.vw-arc   1.0   Feb 19 2021 19:09:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_default_value_components.vw-arc   1.1   Feb 19 2021 19:22:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   v_sdl_default_value_components.vw  $
-    --       Date into PVCS   : $Date:   Feb 19 2021 19:09:00  $
-    --       Date fetched Out : $Modtime:   Feb 19 2021 16:36:48  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Feb 19 2021 19:22:54  $
+    --       Date fetched Out : $Modtime:   Feb 19 2021 19:14:08  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -51,7 +51,7 @@ AS
                    upper(m1.sam_default_value) sam_default_value ,
                    t.*
               FROM sdl_attribute_mapping                                  m1,
-                   TABLE (xrc_get_substrings_regexp (sam_default_value))  t,
+                   TABLE (sdl_ddl.get_substrings_regexp (sam_default_value))  t,
                    sdl_attribute_mapping                                  m2
              WHERE     m1.sam_sp_id = m2.sam_sp_id
                    AND str IS NOT NULL
