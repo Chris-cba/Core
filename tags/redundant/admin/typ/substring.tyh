@@ -1,0 +1,20 @@
+CREATE OR REPLACE TYPE SUBSTRING AS
+/*
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/substring.tyh-arc   1.0   Feb 19 2021 19:31:22   Rob.Coupe  $
+    --       Module Name      : $Workfile:   substring.tyh  $
+    --       Date into PVCS   : $Date:   Feb 19 2021 19:31:22  $
+    --       Date fetched Out : $Modtime:   Feb 19 2021 19:26:42  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+*/
+OBJECT( C_START NUMBER, C_END NUMBER, STR VARCHAR2(4000));
+/
+
