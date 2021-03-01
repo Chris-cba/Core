@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.14   Nov 06 2020 14:39:18   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.15   Mar 01 2021 12:56:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Nov 06 2020 14:39:18  $
-    --       Date fetched Out : $Modtime:   Nov 06 2020 14:38:18  $
-    --       PVCS Version     : $Revision:   1.14  $
+    --       Date into PVCS   : $Date:   Mar 01 2021 12:56:00  $
+    --       Date fetched Out : $Modtime:   Mar 01 2021 12:31:14  $
+    --       PVCS Version     : $Revision:   1.15  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -50,6 +50,18 @@ AS
     --
     FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
         RETURN sdl_ne_tab;
+
+    PROCEDURE log_failures (p_batch_id   IN NUMBER,
+                            p_ne_ids        ptr_num_array_type);
+
+    PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER);
+
+    PROCEDURE create_group_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_group_nt_type   IN VARCHAR2);
+
+    PROCEDURE create_datum_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_datum_nt_type   IN VARCHAR2,
+                                            p_group_nt_type   IN VARCHAR2);
 
     --
     ----------------------------------------------------------------------------
@@ -129,6 +141,8 @@ AS
                     'There is a problem with the profile name and/or the profile datum view or the theme metadata ');
         END;
 
+        SAVEPOINT BEFORE_TRANSFER;
+
         --nm_debug.debug_on;
         --nm_debug.delete_debug;
         --delete from ne_id_sav;
@@ -151,14 +165,15 @@ AS
                AND d.status = 'LOAD'
                AND sfs_id = d.batch_id
                AND sp_id = sfs_sp_id;
---               AND (   EXISTS
---                           (SELECT 1
---                              FROM SDL_SPATIAL_REVIEW_LEVELS
---                             WHERE     ssrl_sp_id = sfs_sp_id
---                                   AND d.PCT_MATCH BETWEEN ssrl_percent_from
---                                                       AND ssrl_percent_to
---                                   AND ssrl_default_action = 'LOAD')
---                    OR d.manual_override = 'Y');
+
+        --               AND (   EXISTS
+        --                           (SELECT 1
+        --                              FROM SDL_SPATIAL_REVIEW_LEVELS
+        --                             WHERE     ssrl_sp_id = sfs_sp_id
+        --                                   AND d.PCT_MATCH BETWEEN ssrl_percent_from
+        --                                                       AND ssrl_percent_to
+        --                                   AND ssrl_default_action = 'LOAD')
+        --                    OR d.manual_override = 'Y');
 
         --nm_debug.debug('Have IDs - count = '||ne_ids.count);
 
@@ -261,12 +276,22 @@ AS
 
             --raise_application_error(-20001, 'Stop');
 
-            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
+            EXECUTE IMMEDIATE   l_ins_str
+                             || ' '
+                             || l_sel_str
+                             || ' ) LOG ERRORS INTO err$_nm_elements_all '
+                             || ' (''INSERT'') REJECT LIMIT UNLIMITED'
                 USING l_group_nt_type,
                       l_group_type,
                       p_batch_id,
                       ne_ids,
                       l_group_nt_type;
+
+            log_failures (p_batch_id, ne_ids);
+
+            --create any auto-inclusions linked to the parent route
+
+            create_group_auto_inclusions (ne_ids, l_group_nt_type);
         END IF;
 
         --consider re-setting the matching node-ids
@@ -312,12 +337,13 @@ AS
             END LOOP;
         END;
 
-        COMMIT;
-
         --we now have all the nodes we need
 
         IF l_group_type IS NOT NULL
-        THEN
+                THEN
+                
+--      the profile is a group type, get the datum attribution from that derived from the route attributes.          
+                
             SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, ne_length, '
                    || LISTAGG (sdam_column_name, ',')
                           WITHIN GROUP (ORDER BY sdam_seq_no)
@@ -359,12 +385,17 @@ AS
                   FROM TABLE (ne_ids) t;*/
 
 
-            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
+            EXECUTE IMMEDIATE   l_ins_str
+                             || ' '
+                             || l_sel_str
+                             || ' ) LOG ERRORS INTO err$_nm_elements_all '
+                             || ' (''INSERT'') REJECT LIMIT UNLIMITED'
                 USING p_batch_id, ne_ids, p_batch_id;
+
+            log_failures (p_batch_id, ne_ids);
         ELSE
-        
-        --we are dealing with a datum-based batch
-        
+            --we are dealing with a datum-based batch, the attributes are on the profile itself
+
             SELECT ins_str
               INTO l_ins_str
               FROM (WITH
@@ -400,33 +431,33 @@ AS
                                   ',')
                               WITHIN GROUP (ORDER BY sam_id)
                            || ' from '
-                           ||' (select d.*, s.existing_node_id start_node, e.existing_node_id end_node, '
-                   || ' ( select last_date from (select max(no_start_date) over (partition by dn.swd_id order by node_type rows between unbounded preceding and unbounded following) last_date '
-                   || ' from sdl_wip_nodes n, sdl_wip_datum_nodes dn, nm_nodes nn '
-                   || ' where n.hashcode=dn.hashcode and n.existing_node_id = nn.no_node_id and dn.SWD_ID = d.swd_id ) where rownum = 1 ) last_date '
-                   || 'from '
-                   || l_datum_view
-                   || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
-                   || 'where d.swd_id = n.swd_id '
-                   || 'and d.batch_id = :batch_id '
-                   || 'and n.start_node = s.hashcode '
-                   || 'and n.end_node = e.hashcode '
-                   || ') , '
-                   || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id' sel_str
---
---
---                           || l_profile_view
---                           || ' ln '
---                           || ' where batch_id = :p_batch_id '
---                           || ' and status = '
---                           || ''''
---                           || 'LOAD'
---                           || ''''
---                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
---                           || ''''
---                           || 'VALID'
---                           || ''''
---                           || '  and d.sld_key = ln.sld_key )'    sel_str
+                           || ' (select d.*, s.existing_node_id start_node, e.existing_node_id end_node, '
+                           || ' ( select last_date from (select max(no_start_date) over (partition by dn.swd_id order by node_type rows between unbounded preceding and unbounded following) last_date '
+                           || ' from sdl_wip_nodes n, sdl_wip_datum_nodes dn, nm_nodes nn '
+                           || ' where n.hashcode=dn.hashcode and n.existing_node_id = nn.no_node_id and dn.SWD_ID = d.swd_id ) where rownum = 1 ) last_date '
+                           || 'from '
+                           || l_datum_view
+                           || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
+                           || 'where d.swd_id = n.swd_id '
+                           || 'and d.batch_id = :batch_id '
+                           || 'and n.start_node = s.hashcode '
+                           || 'and n.end_node = e.hashcode '
+                           || ') , '
+                           || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'    sel_str
+                      --
+                      --
+                      --                           || l_profile_view
+                      --                           || ' ln '
+                      --                           || ' where batch_id = :p_batch_id '
+                      --                           || ' and status = '
+                      --                           || ''''
+                      --                           || 'LOAD'
+                      --                           || ''''
+                      --                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
+                      --                           || ''''
+                      --                           || 'VALID'
+                      --                           || ''''
+                      --                           || '  and d.sld_key = ln.sld_key )'    sel_str
                       FROM attribs);
 
             nm_debug.debug (l_ins_str);
@@ -435,14 +466,20 @@ AS
 
             --raise_application_error(-20001, 'Stop');
 
-            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
-                USING l_datum_nt_type, p_batch_id, ne_ids, p_batch_id;
+            log_failures (p_batch_id, ne_ids);
+
+            remove_unwanted_nodes (p_batch_id);
         END IF;
 
         --        nm_debug.debug_on;
         --        nm_debug.debug ('RC> INS' || l_ins_str || ' ' || l_sel_str);
 
-        COMMIT;
+        --   Make sure that all the datums which have been created are members of an auto-inclusion group.
+        --   If the profile consists of an auto-inclusion route/datum pairing, we dont want to auto-include.
+        
+        create_datum_auto_inclusions (ne_ids          => ne_ids,
+                                      p_datum_nt_type => l_datum_nt_type,
+                                      p_group_nt_type => l_group_nt_type );         
 
         l_ins_str :=
                'INSERT INTO '
@@ -464,10 +501,10 @@ AS
             || ' ), TABLE (:ne_ids) t '
             || ' WHERE t.ptr_id = swd_id ';
 
-                nm_debug.debug_on;
-                nm_debug.debug (l_ins_str);
+        nm_debug.debug_on;
+        nm_debug.debug (l_ins_str);
         --
-        --nm_debug.debug('Just nserted the spatial data');
+        --nm_debug.debug('Just inserted the spatial data');
 
         l_sdl_ne_tab := get_ne_data (p_batch_id, l_profile_view);
 
@@ -475,8 +512,6 @@ AS
 
         EXECUTE IMMEDIATE l_ins_str
             USING p_batch_id, ne_ids;
-
-
 
         IF l_group_type IS NOT NULL
         THEN
@@ -581,8 +616,6 @@ AS
                                           NULL,
                                           irec.rescale_history,
                                           NULL);
-
-                    COMMIT;
                 --if we trap the problem of circular routes will need to find starting element and re-submit
                 --if we trap the problem of an attempt to rescale with history which is not allowed due to member dates
                 --then resubmit without history
@@ -641,6 +674,131 @@ AS
 
         RETURN retval;
     END get_ne_data;
+
+    PROCEDURE log_failures (p_batch_id   IN NUMBER,
+                            p_ne_ids        ptr_num_array_type)
+    IS
+    BEGIN
+        INSERT INTO sdl_validation_results (svr_sld_key,
+                                            svr_sfs_id,
+                                            svr_swd_id,
+                                            svr_validation_type,
+                                            svr_status_code,
+                                            svr_message)
+            SELECT d.sld_key,
+                   p_batch_id,
+                   t.ptr_id,
+                   'T',
+                   ora_err_number$,
+                   ora_err_mesg$
+              FROM err$_nm_elements_all  e,
+                   TABLE (p_ne_ids)      t,
+                   sdl_wip_datums        d
+             WHERE t.ptr_id = d.swd_id AND e.ne_id = t.ptr_value;
+
+        UPDATE sdl_load_data
+           SET sld_status = 'INVALID'
+         WHERE EXISTS
+                   (SELECT 1
+                      FROM sdl_validation_results
+                     WHERE     svr_sfs_id = p_batch_id
+                           AND svr_sld_key = sld_key
+                           AND svr_validation_type = 'T');
+    END;
+
+    PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER)
+    IS
+        np_ids   ptr_num_array_type;
+    BEGIN
+        SELECT ptr_num (no_np_id, no_node_id)
+          BULK COLLECT INTO np_ids
+          FROM nm_nodes_all n, sdl_wip_nodes
+         WHERE     batch_id = p_batch_id
+               AND existing_node_id = no_node_id
+               AND NOT EXISTS
+                       (SELECT 1
+                          FROM nm_node_usages_all
+                         WHERE nnu_no_node_id = n.no_node_id);
+
+        DELETE FROM nm_point_locations
+              WHERE npl_id IN (SELECT ptr_id FROM TABLE (np_ids));
+
+        DELETE FROM nm_nodes_all
+              WHERE no_node_id IN (SELECT ptr_value FROM TABLE (np_ids));
+
+        DELETE FROM nm_points
+              WHERE np_id IN (SELECT ptr_id FROM TABLE (np_ids));
+    END;
+
+    PROCEDURE create_group_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_group_nt_type   IN VARCHAR2)
+    IS
+        CURSOR get_inclusion_data (c_nt_type IN VARCHAR2)
+        IS
+            SELECT nti_nw_parent_type,
+                   nti_nw_child_type,
+                   nti_parent_column,
+                   nti_child_column
+              FROM nm_type_inclusion
+             WHERE nti_nw_child_type = c_nt_type;
+
+        --
+        l_sql   VARCHAR2 (32767);
+    BEGIN
+        FOR irec IN get_inclusion_data (p_group_nt_type)
+        LOOP
+            l_sql :=
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
+                || ' where c.ne_id = t.ptr_value '
+                || ' and c.'
+                || irec.nti_child_column
+                || ' = p.'
+                || irec.nti_parent_column
+                || ' and p.ne_nt_type = :parent_nt_type '
+                || ' and c.ne_nt_type = :child_nt_type ';
+
+            EXECUTE IMMEDIATE l_sql
+                USING ne_ids, irec.nti_nw_parent_type, irec.nti_nw_child_type;
+        END LOOP;
+    END;
+
+    PROCEDURE create_datum_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_datum_nt_type   IN VARCHAR2,
+                                            p_group_nt_type   IN VARCHAR2)
+    IS
+        CURSOR get_inclusion_data (c_nt_type         IN VARCHAR2,
+                                   c_group_nt_type   IN VARCHAR2)
+        IS
+            SELECT nti_nw_parent_type,
+                   nti_nw_child_type,
+                   nti_parent_column,
+                   nti_child_column
+              FROM nm_type_inclusion
+             WHERE     nti_nw_child_type = c_nt_type
+                   AND nti_nw_parent_type <> c_group_nt_type;
+
+        l_sql   VARCHAR2 (32767);
+    BEGIN
+        FOR irec IN get_inclusion_data (p_datum_nt_type, p_group_nt_type)
+        LOOP
+            l_sql :=
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
+                || ' where c.ne_id = t.ptr_value '
+                || ' and c.'
+                || irec.nti_child_column
+                || ' = p.'
+                || irec.nti_parent_column
+                || ' and p.ne_nt_type = :parent_nt_type '
+                || ' and c.ne_nt_type = :child_nt_type ';
+
+            EXECUTE IMMEDIATE l_sql
+                USING ne_ids, irec.nti_nw_parent_type, irec.nti_nw_child_type;
+        END LOOP;
+    END;
 --
 ----------------------------------------------------------------------------
 --
