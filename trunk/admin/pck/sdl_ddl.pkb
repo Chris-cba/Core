@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.34   Feb 19 2021 19:22:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.35   Mar 01 2021 15:00:08   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Feb 19 2021 19:22:00  $
-    --       Date fetched Out : $Modtime:   Feb 19 2021 19:13:58  $
-    --       PVCS Version     : $Revision:   1.34  $
+    --       Date into PVCS   : $Date:   Mar 01 2021 15:00:08  $
+    --       Date fetched Out : $Modtime:   Mar 01 2021 14:19:12  $
+    --       PVCS Version     : $Revision:   1.35  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.34  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.35  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -80,6 +80,12 @@ AS
     --
     PROCEDURE gen_profile_ne_stats_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
+
+    --
+    ----------------------------------------------------------------------------
+    --
+    FUNCTION get_unique (p_nt_type IN VARCHAR2)
+        RETURN VARCHAR2;
 
     --
     ----------------------------------------------------------------------------
@@ -201,9 +207,14 @@ AS
                                    p_view_sql        OUT VARCHAR2)
     IS
     BEGIN
+    
+          begin
+             sdl_validate.validate_profile(p_profile_id);
+          end;
+          
           SELECT    'create or replace view V_SDL_'
                  || REPLACE (sp_name, ' ', '_')
-                 || '_NE_RC'
+                 || '_NE'
                  || ' ( batch_id, record_id, sld_key, '
                  || LISTAGG (sam_ne_column_name, ',')
                         WITHIN GROUP (ORDER BY sam_id)
@@ -1246,50 +1257,79 @@ AS
                              WHERE     ntg_theme_id = nth_theme_id
                                    AND ntg_gtype = p_gtype);
     END insert_theme;
---
-----------------------------------------------------------------------------
---
-FUNCTION get_substrings_regexp (p_instring IN VARCHAR2)
-    RETURN substring_tab
-IS
-    retval       substring_tab := substring_tab (substring (NULL, NULL, NULL));
-    str          VARCHAR2 (4000) := p_instring;
-    loop_count   INTEGER := 0;
-    start_c      INTEGER := 1;
-    end_c        INTEGER;
-BEGIN
-    WHILE REGEXP_INSTR (p_instring,
-                        '\/|\,|\.|\+|-|\ |\(|\)|\|',
-                        start_c,
-                        1) > 0
-    LOOP
-        end_c :=
-            REGEXP_INSTR (p_instring,
-                          '\/|\,|\.|\+|-|\ |\(|\)|\|',
-                          start_c,
-                          1);
-        loop_count := loop_count + 1;
-        --      retval(loop_count) := substring(start_c, end_c -1, nvl(substr(p_instring, start_c, (end_c - start_c)), 'NULL'));
-        retval (loop_count) :=
-            substring (start_c,
-                       end_c - 1,
-                       SUBSTR (p_instring, start_c, (end_c - start_c)));
-        retval.EXTEND;
-        start_c := end_c + 1;
 
-        IF loop_count > 100
+    --
+    ----------------------------------------------------------------------------
+    --
+    FUNCTION get_substrings_regexp (p_instring IN VARCHAR2)
+        RETURN substring_tab
+    IS
+        retval       substring_tab
+                         := substring_tab (substring (NULL, NULL, NULL));
+        str          VARCHAR2 (4000) := p_instring;
+        loop_count   INTEGER := 0;
+        start_c      INTEGER := 1;
+        end_c        INTEGER;
+    BEGIN
+        WHILE REGEXP_INSTR (p_instring,
+                            '\/|\,|\.|\+|-|\ |\(|\)|\|',
+                            start_c,
+                            1) > 0
+        LOOP
+            end_c :=
+                REGEXP_INSTR (p_instring,
+                              '\/|\,|\.|\+|-|\ |\(|\)|\|',
+                              start_c,
+                              1);
+            loop_count := loop_count + 1;
+            --      retval(loop_count) := substring(start_c, end_c -1, nvl(substr(p_instring, start_c, (end_c - start_c)), 'NULL'));
+            retval (loop_count) :=
+                substring (start_c,
+                           end_c - 1,
+                           SUBSTR (p_instring, start_c, (end_c - start_c)));
+            retval.EXTEND;
+            start_c := end_c + 1;
+
+            IF loop_count > 100
+            THEN
+                EXIT;
+            END IF;
+        END LOOP;
+
+        retval (retval.LAST) :=
+            substring (
+                end_c + 1,
+                LENGTH (p_instring),
+                SUBSTR (p_instring,
+                        end_c + 1,
+                        LENGTH (p_instring) - end_c + 1));
+        RETURN retval;
+    END get_substrings_regexp;
+
+    FUNCTION get_unique (p_nt_type IN VARCHAR2)
+        RETURN VARCHAR2
+    IS
+        l_pop_unique   VARCHAR2 (1);
+        retval         VARCHAR2 (2000);
+    BEGIN
+        SELECT nt_pop_unique
+          INTO l_pop_unique
+          FROM nm_types
+         WHERE nt_type = p_nt_type;
+
+        IF l_pop_unique = 'N'
         THEN
-            EXIT;
+            retval := 'NE_UNIQUE';
+        ELSE
+            SELECT LISTAGG (ntc_column_name || ntc_separator, '||')
+                       WITHIN GROUP (ORDER BY ntc_unique_seq)
+              INTO retval
+              FROM nm_type_columns
+             WHERE ntc_nt_type = p_nt_type AND ntc_unique_seq IS NOT NULL;
+        --
         END IF;
-    END LOOP;
 
-    retval (retval.LAST) :=
-        substring (
-            end_c + 1,
-            LENGTH (p_instring),
-            SUBSTR (p_instring, end_c + 1, LENGTH (p_instring) - end_c + 1));
-    RETURN retval;
-END get_substrings_regexp;
-
+        RETURN retval;
+    END;
 END sdl_ddl;
 /
