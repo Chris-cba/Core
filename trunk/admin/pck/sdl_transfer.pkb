@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.15   Mar 01 2021 12:56:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.16   Mar 01 2021 13:02:42   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 01 2021 12:56:00  $
-    --       Date fetched Out : $Modtime:   Mar 01 2021 12:31:14  $
-    --       PVCS Version     : $Revision:   1.15  $
+    --       Date into PVCS   : $Date:   Mar 01 2021 13:02:42  $
+    --       Date fetched Out : $Modtime:   Mar 01 2021 13:02:04  $
+    --       PVCS Version     : $Revision:   1.16  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -55,13 +55,6 @@ AS
                             p_ne_ids        ptr_num_array_type);
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER);
-
-    PROCEDURE create_group_auto_inclusions (ne_ids            IN ptr_num_array_type,
-                                            p_group_nt_type   IN VARCHAR2);
-
-    PROCEDURE create_datum_auto_inclusions (ne_ids            IN ptr_num_array_type,
-                                            p_datum_nt_type   IN VARCHAR2,
-                                            p_group_nt_type   IN VARCHAR2);
 
     --
     ----------------------------------------------------------------------------
@@ -291,7 +284,8 @@ AS
 
             --create any auto-inclusions linked to the parent route
 
-            create_group_auto_inclusions (ne_ids, l_group_nt_type);
+            sdl_inclusion.create_group_auto_inclusions (ne_ids,
+                                                        l_group_nt_type);
         END IF;
 
         --consider re-setting the matching node-ids
@@ -340,10 +334,9 @@ AS
         --we now have all the nodes we need
 
         IF l_group_type IS NOT NULL
-                THEN
-                
---      the profile is a group type, get the datum attribution from that derived from the route attributes.          
-                
+        THEN
+            --      the profile is a group type, get the datum attribution from that derived from the route attributes.
+
             SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, ne_length, '
                    || LISTAGG (sdam_column_name, ',')
                           WITHIN GROUP (ORDER BY sdam_seq_no)
@@ -476,10 +469,11 @@ AS
 
         --   Make sure that all the datums which have been created are members of an auto-inclusion group.
         --   If the profile consists of an auto-inclusion route/datum pairing, we dont want to auto-include.
-        
-        create_datum_auto_inclusions (ne_ids          => ne_ids,
-                                      p_datum_nt_type => l_datum_nt_type,
-                                      p_group_nt_type => l_group_nt_type );         
+
+        sdl_inclusion.create_datum_auto_inclusions (
+            ne_ids            => ne_ids,
+            p_datum_nt_type   => l_datum_nt_type,
+            p_group_nt_type   => l_group_nt_type);
 
         l_ins_str :=
                'INSERT INTO '
