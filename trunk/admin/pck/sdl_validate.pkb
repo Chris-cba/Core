@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.25   Feb 08 2021 11:03:04   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.26   Mar 01 2021 15:04:50   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Feb 08 2021 11:03:04  $
-    --       Date fetched Out : $Modtime:   Feb 08 2021 11:00:00  $
-    --       PVCS Version     : $Revision:   1.25  $
+    --       Date into PVCS   : $Date:   Mar 01 2021 15:04:50  $
+    --       Date fetched Out : $Modtime:   Feb 26 2021 23:59:00  $
+    --       PVCS Version     : $Revision:   1.26  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -57,6 +57,10 @@ AS
     -- This procedure generates and executes a SQL insert string to log all load records in a batch which have mandatory columns without a value
     --
     PROCEDURE validate_mandatory_columns (p_batch_id IN NUMBER);
+
+    PROCEDURE validate_unique(p_batch_id       IN NUMBER,
+                                       p_profile_id     IN NUMBER,
+                                       p_profile_view   IN VARCHAR2);
 
     --
     -----------------------------------------------------------------------------
@@ -184,7 +188,11 @@ AS
         validate_domain_columns (p_batch_id);
 
         validate_mandatory_columns (p_batch_id);
+        
+        sdl_inclusion.validate_sdl_inclusion_data(p_batch_id);
 
+        --No need to test uniqueness as only those route records which dont exist will be transferred
+                
         --The following procedure will try and make sense of the gtype of the geometry, set the type to a 3302/3306 and
         --will register any spatial related problems in the geometry such as measures not being incremental and having
         --duplicate vertices.
@@ -454,6 +462,12 @@ AS
         END IF;
     END validate_adjustment_rules;
 
+    PROCEDURE validate_unique(p_batch_id       IN NUMBER,
+                                       p_profile_id     IN NUMBER,
+                                       p_profile_view   IN VARCHAR2) is
+    begin
+       null;
+    end;
     --
     -----------------------------------------------------------------------------
     --
@@ -1200,8 +1214,14 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         validate_dtm_column_len (p_batch_id       => p_batch_id,
                                  p_profile_id     => meta_row.sp_id,
                                  p_profile_view   => l_view_name);
+                                 
+        validate_unique(p_batch_id       => p_batch_id,
+                                 p_profile_id     => meta_row.sp_id,
+                                 p_profile_view   => l_view_name);
+                                 
 
         set_datum_status (p_batch_id);
+
     END validate_datums_in_batch;
 
     --
