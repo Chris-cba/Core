@@ -1,0 +1,54 @@
+CREATE OR REPLACE PACKAGE sdl_inclusion
+AS
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inclusion.pkh-arc   1.0   Mar 01 2021 13:04:16   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_inclusion.pkh  $
+    --       Date into PVCS   : $Date:   Mar 01 2021 13:04:16  $
+    --       Date fetched Out : $Modtime:   Mar 01 2021 13:03:28  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling the auto-inclusion tests for SDL network data
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    -- The main purpose of this package is to handle the auto-inclusion rules and the means of validating
+    -- the SDL load data to ensure the attribute values match the inclusion rules.
+
+    PROCEDURE validate_sdl_inclusion_data (p_batch_id IN NUMBER);
+
+    FUNCTION get_batch_inclusion_string (p_sp_id           IN NUMBER,
+                                         p_sp_name         IN VARCHAR2,
+                                         p_batch_id        IN NUMBER,
+                                         p_parent_column   IN VARCHAR2,
+                                         p_child_column    IN VARCHAR2)
+        RETURN VARCHAR2;
+
+    FUNCTION get_prof_db_inclusion_string (p_sp_id           IN NUMBER,
+                                           p_sp_name         IN VARCHAR2,
+                                           p_batch_id        IN NUMBER,
+                                           p_parent_type     IN VARCHAR2,
+                                           p_parent_column   IN VARCHAR2,
+                                           p_child_column    IN VARCHAR2)
+        RETURN VARCHAR2;
+
+    FUNCTION get_datum_db_inclusion_string (p_sp_id           IN NUMBER,
+                                            p_sp_name         IN VARCHAR2,
+                                            p_batch_id        IN NUMBER,
+                                            p_parent_type     IN VARCHAR2,
+                                            p_parent_column   IN VARCHAR2,
+                                            p_child_column    IN VARCHAR2)
+        RETURN VARCHAR2;
+
+    PROCEDURE create_group_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_group_nt_type   IN VARCHAR2);
+
+    PROCEDURE create_datum_auto_inclusions (ne_ids            IN ptr_num_array_type,
+                                            p_datum_nt_type   IN VARCHAR2,
+                                            p_group_nt_type   IN VARCHAR2);
+END;
+/
