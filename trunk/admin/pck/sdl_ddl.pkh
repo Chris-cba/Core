@@ -1,14 +1,13 @@
-/* Formatted on 19/02/2021 19:16:12 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE sdl_ddl
 AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.3   Feb 19 2021 19:21:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.4   Mar 02 2021 17:25:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkh  $
-    --       Date into PVCS   : $Date:   Feb 19 2021 19:21:30  $
-    --       Date fetched Out : $Modtime:   Feb 19 2021 19:16:30  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Mar 02 2021 17:25:12  $
+    --       Date fetched Out : $Modtime:   Mar 02 2021 17:11:58  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +20,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     --
     -----------------------------------------------------------------------------
@@ -105,7 +104,5 @@ AS
     --
     -----------------------------------------------------------------------------
     --
-    FUNCTION get_substrings_regexp (p_instring IN VARCHAR2)
-        RETURN substring_tab;
 END sdl_ddl;
 /
