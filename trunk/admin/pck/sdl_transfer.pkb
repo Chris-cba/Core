@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.16   Mar 01 2021 13:02:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.17   Mar 02 2021 17:44:34   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 01 2021 13:02:42  $
-    --       Date fetched Out : $Modtime:   Mar 01 2021 13:02:04  $
-    --       PVCS Version     : $Revision:   1.16  $
+    --       Date into PVCS   : $Date:   Mar 02 2021 17:44:34  $
+    --       Date fetched Out : $Modtime:   Mar 02 2021 17:41:54  $
+    --       PVCS Version     : $Revision:   1.17  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -650,6 +650,9 @@ AS
                                       FROM sdl_wip_datums s
                                      WHERE     s.batch_id = swd.batch_id
                                            AND s.sld_key = swd.sld_key));
+										   
+        COMMIT;
+		
     END transfer_datums;
 
     --
