@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.35   Mar 01 2021 15:00:08   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.36   Mar 02 2021 17:28:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Mar 01 2021 15:00:08  $
-    --       Date fetched Out : $Modtime:   Mar 01 2021 14:19:12  $
-    --       PVCS Version     : $Revision:   1.35  $
+    --       Date into PVCS   : $Date:   Mar 02 2021 17:28:00  $
+    --       Date fetched Out : $Modtime:   Mar 02 2021 17:24:30  $
+    --       PVCS Version     : $Revision:   1.36  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.35  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.36  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -167,11 +167,11 @@ AS
                  || ' ( batch_id, record_id, sld_key, '
                  || LISTAGG (sam_view_column_name, ',')
                         WITHIN GROUP (ORDER BY sam_id)
-                 || ', geom '
+                 || ', status, geom '
                  || ' ) as select sld_sfs_id, sld_id, sld_key, '
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
-                 || ', sld_load_geometry '
+                 || ', sld_status, sld_load_geometry '
                  || ' FROM sdl_load_data '
                  || ' WHERE sld_sfs_id IN (SELECT sfs_id
                             FROM sdl_file_submissions
@@ -220,7 +220,7 @@ AS
                         WITHIN GROUP (ORDER BY sam_id)
                  || ', status '
                  || ', geom '
-                 || ' ) as select sld_sfs_id, sld_id, sld_key, '
+                 || ' ) as select batch_id, record_id, sld_key, '
                  || LISTAGG (
                         CASE field_type
                             WHEN 'VARCHAR2'
@@ -264,15 +264,15 @@ AS
                         END,
                         ',')
                     WITHIN GROUP (ORDER BY sam_id)
-                 || ', sld_status '
-                 || ', sld_working_geometry '
-                 || ' FROM sdl_load_data '
-                 || ' WHERE sld_sfs_id IN (SELECT sfs_id
+                 || ', status '
+                 || ', geom '
+                 || ' FROM v_sdl_'||REPLACE (sp_name, ' ', '_')||'_LD'
+                 || ' WHERE batch_id IN (SELECT sfs_id
                             FROM sdl_file_submissions
                            WHERE sfs_sp_id = '
                  || p_profile_id
                  || ') '
-                 || 'and sld_sfs_id = nvl(to_number(sys_context('
+                 || 'and batch_id = nvl(to_number(sys_context('
                  || ''''
                  || 'NM3SQL'
                  || ''''
@@ -280,7 +280,7 @@ AS
                  || ''''
                  || 'SDLCTX_SFS_ID'
                  || ''''
-                 || ')),sld_sfs_id) '
+                 || ')),batch_id) '
             INTO p_view_sql
             FROM (SELECT sam_id,
                          sam_col_id,
@@ -298,17 +298,11 @@ AS
                                  sam_view_column_name,
                                  sam_ne_column_name,
                                  CASE
-                                     WHEN adjusted_default IS NULL
-                                     THEN
-                                         CASE
                                              WHEN sam_default_value IS NULL
                                              THEN
-                                                 'SLD_COL_' || sam_col_id
+                                                 sam_view_column_name
                                              ELSE
                                                  sam_default_value
-                                         END
-                                     ELSE
-                                         adjusted_default
                                  END    selected_value
                             FROM (SELECT sam_id,
                                          sam_sp_id,
@@ -317,9 +311,7 @@ AS
                                          sam_file_attribute_name,
                                          sam_view_column_name,
                                          sam_ne_column_name,
-                                         sam_default_value,
-                                         swap_attrib_names (sam_sp_id,
-                                                            sam_col_id)    adjusted_default
+                                         sam_default_value
                                     FROM sdl_attribute_mapping
                                    WHERE sam_sp_id = p_profile_id)),
                          sdl_destination_header,
@@ -1261,51 +1253,6 @@ AS
     --
     ----------------------------------------------------------------------------
     --
-    FUNCTION get_substrings_regexp (p_instring IN VARCHAR2)
-        RETURN substring_tab
-    IS
-        retval       substring_tab
-                         := substring_tab (substring (NULL, NULL, NULL));
-        str          VARCHAR2 (4000) := p_instring;
-        loop_count   INTEGER := 0;
-        start_c      INTEGER := 1;
-        end_c        INTEGER;
-    BEGIN
-        WHILE REGEXP_INSTR (p_instring,
-                            '\/|\,|\.|\+|-|\ |\(|\)|\|',
-                            start_c,
-                            1) > 0
-        LOOP
-            end_c :=
-                REGEXP_INSTR (p_instring,
-                              '\/|\,|\.|\+|-|\ |\(|\)|\|',
-                              start_c,
-                              1);
-            loop_count := loop_count + 1;
-            --      retval(loop_count) := substring(start_c, end_c -1, nvl(substr(p_instring, start_c, (end_c - start_c)), 'NULL'));
-            retval (loop_count) :=
-                substring (start_c,
-                           end_c - 1,
-                           SUBSTR (p_instring, start_c, (end_c - start_c)));
-            retval.EXTEND;
-            start_c := end_c + 1;
-
-            IF loop_count > 100
-            THEN
-                EXIT;
-            END IF;
-        END LOOP;
-
-        retval (retval.LAST) :=
-            substring (
-                end_c + 1,
-                LENGTH (p_instring),
-                SUBSTR (p_instring,
-                        end_c + 1,
-                        LENGTH (p_instring) - end_c + 1));
-        RETURN retval;
-    END get_substrings_regexp;
-
     FUNCTION get_unique (p_nt_type IN VARCHAR2)
         RETURN VARCHAR2
     IS
