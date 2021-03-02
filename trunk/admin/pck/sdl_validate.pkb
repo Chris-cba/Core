@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.26   Mar 01 2021 15:04:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.27   Mar 02 2021 10:26:38   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 01 2021 15:04:50  $
-    --       Date fetched Out : $Modtime:   Feb 26 2021 23:59:00  $
-    --       PVCS Version     : $Revision:   1.26  $
+    --       Date into PVCS   : $Date:   Mar 02 2021 10:26:38  $
+    --       Date fetched Out : $Modtime:   Mar 02 2021 10:24:36  $
+    --       PVCS Version     : $Revision:   1.27  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -1199,7 +1199,7 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
 
-        l_view_name := 'V_SDL_WIP_' || meta_row.sp_name || '_DATUMS';
+		l_view_name := 'V_SDL_WIP_' || REPLACE (meta_row.sp_name, ' ', '_') || '_DATUMS';
 
         validate_datum_geometry (p_batch_id => p_batch_id);
 
