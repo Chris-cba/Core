@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.17   Mar 02 2021 17:44:34   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.18   Mar 03 2021 16:38:34   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 02 2021 17:44:34  $
-    --       Date fetched Out : $Modtime:   Mar 02 2021 17:41:54  $
-    --       PVCS Version     : $Revision:   1.17  $
+    --       Date into PVCS   : $Date:   Mar 03 2021 16:38:34  $
+    --       Date fetched Out : $Modtime:   Mar 03 2021 16:37:26  $
+    --       PVCS Version     : $Revision:   1.18  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -53,6 +53,9 @@ AS
 
     PROCEDURE log_failures (p_batch_id   IN NUMBER,
                             p_ne_ids        ptr_num_array_type);
+
+    PROCEDURE clear_validation_results (p_batch_id IN NUMBER);
+
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER);
 
@@ -88,6 +91,11 @@ AS
         l_sdl_ne_tab      sdl_ne_tab;
         l_attrib_list     ptr_vc_array_type;
     BEGIN
+    
+    -- cear out any errors that have been raised during earlier transfers (if still there)
+    
+        clear_validation_results (p_batch_id => p_batch_id);
+        
         BEGIN
             SELECT sp_id,
                    'V_SDL_' || UPPER (sp_name) || '_NE',
@@ -263,16 +271,23 @@ AS
                            || ' and not exists ( select 1 from  nm_elements e where ln.ne_unique = e.ne_unique and e.NE_NT_TYPE = :l_group_nt_type ) '    sel_str
                       FROM attribs);
 
-            nm_debug.debug (l_ins_str);
-
-            nm_debug.debug (l_sel_str);
+            --            nm_debug.debug (l_ins_str);
+            --
+            --            nm_debug.debug (l_sel_str);
 
             --raise_application_error(-20001, 'Stop');
+
+            nm_debug.debug (
+                   l_ins_str
+                || ' '
+                || l_sel_str
+                || '  LOG ERRORS INTO err$_nm_elements_all '
+                || ' (''INSERT'') REJECT LIMIT UNLIMITED');
 
             EXECUTE IMMEDIATE   l_ins_str
                              || ' '
                              || l_sel_str
-                             || ' ) LOG ERRORS INTO err$_nm_elements_all '
+                             || ' LOG ERRORS INTO err$_nm_elements_all '
                              || ' (''INSERT'') REJECT LIMIT UNLIMITED'
                 USING l_group_nt_type,
                       l_group_type,
@@ -381,7 +396,7 @@ AS
             EXECUTE IMMEDIATE   l_ins_str
                              || ' '
                              || l_sel_str
-                             || ' ) LOG ERRORS INTO err$_nm_elements_all '
+                             || ' LOG ERRORS INTO err$_nm_elements_all '
                              || ' (''INSERT'') REJECT LIMIT UNLIMITED'
                 USING p_batch_id, ne_ids, p_batch_id;
 
@@ -650,9 +665,8 @@ AS
                                       FROM sdl_wip_datums s
                                      WHERE     s.batch_id = swd.batch_id
                                            AND s.sld_key = swd.sld_key));
-										   
+
         COMMIT;
-		
     END transfer_datums;
 
     --
@@ -701,6 +715,10 @@ AS
                      WHERE     svr_sfs_id = p_batch_id
                            AND svr_sld_key = sld_key
                            AND svr_validation_type = 'T');
+
+        DELETE FROM err$_nm_elements_all
+              WHERE ne_id IN (SELECT t.ptr_value
+                                FROM TABLE (p_ne_ids) t);
     END;
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER)
@@ -796,8 +814,15 @@ AS
                 USING ne_ids, irec.nti_nw_parent_type, irec.nti_nw_child_type;
         END LOOP;
     END;
---
-----------------------------------------------------------------------------
---
+
+    --
+    ----------------------------------------------------------------------------
+    --
+    PROCEDURE clear_validation_results (p_batch_id IN NUMBER)
+    IS
+    BEGIN
+        DELETE FROM sdl_validation_results
+              WHERE svr_validation_type = 'T' AND svr_sfs_id = p_batch_id;
+    END;
 END;
 /
