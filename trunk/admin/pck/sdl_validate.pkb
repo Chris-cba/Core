@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.27   Mar 02 2021 10:26:38   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.28   Mar 04 2021 15:52:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 02 2021 10:26:38  $
-    --       Date fetched Out : $Modtime:   Mar 02 2021 10:24:36  $
-    --       PVCS Version     : $Revision:   1.27  $
+    --       Date into PVCS   : $Date:   Mar 04 2021 15:52:12  $
+    --       Date fetched Out : $Modtime:   Mar 04 2021 15:50:06  $
+    --       PVCS Version     : $Revision:   1.28  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -277,6 +277,7 @@ AS
                       || ''''
                       || ' from sdl_load_data where sld_sfs_id = '
                       || TO_CHAR (p_batch_id)
+                      || ' and '||load_column_name||' is not NULL '
                       || ' and not exists ( select 1 from hig_codes where hco_domain = '
                       || ''''
                       || domain
