@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.4   Nov 10 2020 10:32:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.5   Mar 05 2021 16:39:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkb  $
-    --       Date into PVCS   : $Date:   Nov 10 2020 10:32:40  $
-    --       Date fetched Out : $Modtime:   Nov 10 2020 10:29:00  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Mar 05 2021 16:39:44  $
+    --       Date fetched Out : $Modtime:   Mar 05 2021 16:36:52  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     FUNCTION is_nt_defined_attribute (p_sdh_id IN NUMBER)
         RETURN VARCHAR2;
@@ -336,23 +336,49 @@ AS
 
                     l_sql :=
                            'select iit_ne_id, refnt, start_m, nm_start_date, end_m, dir_flag, datum_start_date '
-                        || ' from ( select /*+MATERIALIZE*/ iit_ne_id, refnt, start_m, end_m, nm_start_date, dir_flag, d.ne_start_date datum_start_date '
+                        || ' from ( '
+                        || ' select /*+MATERIALIZE*/ iit_ne_id, refnt, cast(start_m as number) start_m, cast(end_m as number) end_m, nm_start_date, dir_flag, d.ne_start_date datum_start_date '
                         || ' from '
                         || l_view_name
-                        || ' l, nm_elements r, table(lb_get.get_lb_rpt_d_tab(lb_rpt_tab(lb_rpt(r.ne_id, 1, :p_dest_type, iit_ne_id, 1, 1, 1, begin_mp, end_mp, 4  )))) t, '
+                        || ' l, nm_elements r, nm_linear_types, '
+                        || ' table( lb_get.get_lb_rpt_d_tab(lb_rpt_tab(lb_rpt(r.ne_id, nlt_id, :p_dest_type, iit_ne_id, 1, 1, 1, begin_mp, end_mp, nlt_units  )))) t, '
                         || ' nm_elements d '
                         || ' where tld_sfs_id = :p_sfs_id '
-                        || ' and l.ne_unique = r.ne_unique ';
+                        || ' and r.ne_nt_type = nlt_nt_type '
+                        || ' and nlt_gty_type is not null '
+                        || ' and not exists ( select 1 from sdl_validation_results where svr_sfs_id = :p_sfs_id and svr_sld_key = l.tld_id ) ';
 
                     IF l_nt_type_attribute = 'TRUE'
                     THEN
-                        l_sql := l_sql || ' and r.ne_nt_type = v.ne_nt_type ';
+                        l_sql := l_sql || ' and r.ne_nt_type = l.ne_nt_type ';
                     ELSE
                         l_sql :=
                             l_sql || ' and r.ne_nt_type = :p_route_type ';
                     END IF;
 
-                    l_sql := l_sql || ' and d.ne_id = refnt )';
+                    l_sql :=
+                           l_sql
+                        || ' and l.ne_unique = r.ne_unique '
+                        || ' and d.ne_id = t.refnt '
+                        || ' union all'
+                        || ' select iit_ne_id, ne_id, cast(begin_mp as number), cast(end_mp as number), nm_start_date, 1, d.ne_start_date datum_start_date '
+                        || ' from '
+                        || l_view_name
+                        || ' l, nm_elements d, nm_linear_types '
+                        || ' where tld_sfs_id = :p_sfs_id '
+                        || ' and nlt_gty_type is null '
+                        || ' and l.ne_unique = d.ne_unique '
+                        || ' and not exists ( select 1 from sdl_validation_results where svr_sfs_id = :p_sfs_id and svr_sld_key = l.tld_id ) ';
+
+                    IF l_nt_type_attribute = 'TRUE'
+                    THEN
+                        l_sql := l_sql || ' and d.ne_nt_type = l.ne_nt_type ';
+                    ELSE
+                        l_sql :=
+                            l_sql || ' and d.ne_nt_type = :p_route_type ';
+                    END IF;
+
+                    l_sql := l_sql || ')';
 
                     IF l_nt_type_attribute = 'FALSE'
                     THEN
@@ -366,7 +392,11 @@ AS
                                  l_element_start_date
                             USING l_sdh_row.sdh_destination_type,
                                   p_sfs_id,
-                                  l_nt_type;
+                                  l_nt_type,
+                                  p_sfs_id,
+                                  p_sfs_id,
+                                  l_nt_type,
+                                  p_sfs_id;
                     ELSE
                         EXECUTE IMMEDIATE l_sql
                             BULK COLLECT INTO l_iit,
@@ -376,7 +406,7 @@ AS
                                  l_end,
                                  l_dir,
                                  l_element_start_date
-                            USING l_sdh_row.sdh_destination_type, p_sfs_id;
+                            USING l_sdh_row.sdh_destination_type, p_sfs_id, p_sfs_id;
                     END IF;
 
                     nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'Y');
