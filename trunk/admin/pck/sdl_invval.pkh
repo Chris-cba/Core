@@ -1,4 +1,3 @@
-/* Formatted on 19/11/2020 16:54:34 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE sdl_invval
 AS
     --
@@ -6,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkh-arc   1.1   Nov 19 2020 17:04:20   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkh-arc   1.2   Mar 09 2021 15:49:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_invval.pkh  $
-    --       Date into PVCS   : $Date:   Nov 19 2020 17:04:20  $
-    --       Date fetched Out : $Modtime:   Nov 19 2020 17:03:10  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Mar 09 2021 15:49:22  $
+    --       Date fetched Out : $Modtime:   Mar 09 2021 15:47:38  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : Rob Coupe
     --
@@ -21,7 +20,7 @@ AS
     -----------------------------------------------------------------------------
     --
 
-    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.1  $"';
+    g_sccsid   CONSTANT VARCHAR2 (80) := '"$Revision:   1.2  $"';
 
     FUNCTION get_version
         RETURN VARCHAR2;
@@ -67,5 +66,10 @@ AS
 
     PROCEDURE make_tdl_attribute_adjustments (p_sp_id    IN NUMBER,
                                               p_sfs_id   IN NUMBER);
+
+    FUNCTION check_route_measures (p_ne_id     IN NUMBER,
+                                   p_start_m   IN NUMBER,
+                                   p_end_m     IN NUMBER)
+        RETURN VARCHAR2;
 END;
 /
