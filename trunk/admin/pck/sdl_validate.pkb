@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.28   Mar 04 2021 15:52:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.29   Mar 10 2021 18:06:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 04 2021 15:52:12  $
-    --       Date fetched Out : $Modtime:   Mar 04 2021 15:50:06  $
-    --       PVCS Version     : $Revision:   1.28  $
+    --       Date into PVCS   : $Date:   Mar 10 2021 18:06:06  $
+    --       Date fetched Out : $Modtime:   Mar 10 2021 18:05:20  $
+    --       PVCS Version     : $Revision:   1.29  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -586,6 +586,7 @@ AS
                            SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
                        AND table_name = 'NM_ELEMENTS_ALL'
                        AND nullable = 'N'
+					   AND ROWNUM = 1
                        AND NOT EXISTS
                                (SELECT 1
                                   FROM sdl_datum_attribute_mapping,
