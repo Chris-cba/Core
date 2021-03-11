@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.18   Mar 03 2021 16:38:34   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.19   Mar 11 2021 19:17:52   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 03 2021 16:38:34  $
-    --       Date fetched Out : $Modtime:   Mar 03 2021 16:37:26  $
-    --       PVCS Version     : $Revision:   1.18  $
+    --       Date into PVCS   : $Date:   Mar 11 2021 19:17:52  $
+    --       Date fetched Out : $Modtime:   Mar 11 2021 19:11:38  $
+    --       PVCS Version     : $Revision:   1.19  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -701,7 +701,7 @@ AS
                    t.ptr_id,
                    'T',
                    ora_err_number$,
-                   ora_err_mesg$
+                   SUBSTR(ora_err_mesg$,1,254)
               FROM err$_nm_elements_all  e,
                    TABLE (p_ne_ids)      t,
                    sdl_wip_datums        d
