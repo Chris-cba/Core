@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.36   Mar 02 2021 17:28:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.37   Mar 11 2021 19:24:28   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Mar 02 2021 17:28:00  $
-    --       Date fetched Out : $Modtime:   Mar 02 2021 17:24:30  $
-    --       PVCS Version     : $Revision:   1.36  $
+    --       Date into PVCS   : $Date:   Mar 11 2021 19:24:28  $
+    --       Date fetched Out : $Modtime:   Mar 11 2021 19:08:44  $
+    --       PVCS Version     : $Revision:   1.37  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.36  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.37  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -167,7 +167,7 @@ AS
                  || ' ( batch_id, record_id, sld_key, '
                  || LISTAGG (sam_view_column_name, ',')
                         WITHIN GROUP (ORDER BY sam_id)
-                 || ', status, geom '
+                 || ', sld_status, geom '
                  || ' ) as select sld_sfs_id, sld_id, sld_key, '
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
@@ -264,7 +264,7 @@ AS
                         END,
                         ',')
                     WITHIN GROUP (ORDER BY sam_id)
-                 || ', status '
+                 || ', sld_status '
                  || ', geom '
                  || ' FROM v_sdl_'||REPLACE (sp_name, ' ', '_')||'_LD'
                  || ' WHERE batch_id IN (SELECT sfs_id
@@ -683,7 +683,8 @@ AS
                    LISTAGG (
                        CASE
                            WHEN sdam_default_value IS NULL THEN sdam_formula
-                           ELSE '''' || sdam_default_value || ''''
+                        --   ELSE '''' || sdam_default_value || ''''
+                           ELSE sdam_default_value
                        END,
                        ',')
                    WITHIN GROUP (ORDER BY sdam_seq_no)
