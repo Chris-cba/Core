@@ -18,11 +18,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.2   Jan 19 2021 14:02:10   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.3   Mar 11 2021 19:36:14   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   v_sdl_attrib_validation_result.vw  $
---       Date into PVCS   : $Date:   Jan 19 2021 14:02:10  $
---       Date fetched Out : $Modtime:   Jan 19 2021 10:42:20  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Mar 11 2021 19:36:14  $
+--       Date fetched Out : $Modtime:   Mar 11 2021 19:34:44  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : Vikas Mhetre
 --
@@ -46,6 +46,8 @@ SELECT svr.svr_id val_id
             THEN 'Mandatory'
             WHEN svr.svr_validation_type = 'L'
             THEN 'Datum Mapping'
+            WHEN svr.svr_validation_type = 'T'
+            THEN 'Transfer'
             ELSE 'Unknown'
         END validation_type
       ,svr.svr_sam_id sam_id
@@ -58,7 +60,7 @@ SELECT svr.svr_id val_id
   FROM sdl_validation_results svr
       ,sdl_load_data sld
  WHERE svr.svr_sld_key = sld.sld_key
-   AND svr_validation_type IN ('D','M','L')
+   AND svr_validation_type IN ('D','M','L','T')
    AND sld.sld_status = 'INVALID'
 UNION ALL
 -- Rejected Validation failed records
