@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.20   Feb 19 2021 19:37:38   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.21   Mar 11 2021 10:45:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Feb 19 2021 19:37:38  $
---       Date fetched Out : $Modtime:   Feb 19 2021 19:36:22  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Mar 11 2021 10:45:20  $
+--       Date fetched Out : $Modtime:   Mar 11 2021 10:44:40  $
+--       Version          : $Revision:   2.21  $
 --
 --   Product upgrade script
 --
@@ -268,8 +268,6 @@ BEGIN
   drop_type('TOPO_NW_GEOM_ID_TAB');
   drop_type('SDL_NE_DATA');
   drop_type('SDL_NE_TAB');
-  drop_type('SUBSTRING_TAB');
-  drop_type('SUBSTRING');
   --
 END;
 /
@@ -2322,30 +2320,6 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 
-set term on
-prompt substring type header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'substring.tyh' run_file
-from dual
-/
-start '&&run_file'
---
---------------------------------------------------------------------------------------------
---
-
-set term on
-prompt substring table 
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'substring_tab.tyh' run_file
-from dual
-/
-start '&&run_file'
 
 --
 --------------------------------------------------------------------------------------------
