@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.29   Mar 10 2021 18:06:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.30   Mar 11 2021 21:50:42   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 10 2021 18:06:06  $
-    --       Date fetched Out : $Modtime:   Mar 10 2021 18:05:20  $
-    --       PVCS Version     : $Revision:   1.29  $
+    --       Date into PVCS   : $Date:   Mar 11 2021 21:50:42  $
+    --       Date fetched Out : $Modtime:   Mar 11 2021 21:49:04  $
+    --       PVCS Version     : $Revision:   1.30  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -86,6 +86,12 @@ AS
     --
     -----------------------------------------------------------------------------
     --
+FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
+                           geom_length     IN NUMBER DEFAULT NULL,
+                           start_measure   IN NUMBER DEFAULT 0,
+                           dp in number)
+        RETURN SDO_GEOMETRY;
+    
     PROCEDURE update_batch_for_adjustment (p_batch_id IN INTEGER)
     IS
         CURSOR c_update IS
@@ -784,7 +790,6 @@ AS
                 || ', '
                 || p_batch_id);
 
-
             EXECUTE IMMEDIATE l_sql
                 USING l_gtype,
                       p_unit_factor,
@@ -994,12 +999,12 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
 
                 IF p_length IS NOT NULL
                 THEN
-                    retval :=
-                        SDO_LRS.scale_geom_segment (retval,
+                   retval := SDO_LRS.scale_geom_segment (retval,
                                                     0,
                                                     p_length,
                                                     0,
                                                     p_sdo_tol);
+--                    retval := scale_geom_l (retval, p_length, 0, NULL ); --pass the DP in as an option or by changing the argument list.
                 END IF;
             ELSIF p_gtype IN (2002, 2206)
             THEN
@@ -1499,5 +1504,25 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
 
         RETURN retval;
     END;
+
+--This function scales the geometry measures according to the length of the polyline segment.
+--It originates from the nm_sdo package which underpins the Oracle SDO_LRS replacement - but has a slight change to 
+-- allow decimal places to be configured.
+--The function is copied into this package because there is no need for the SDO_LRS replacement
+--after the change in license costs from Oracle and the full package may be deprecated at some stage.It also allows the 
+--coding of a rounding parameter on the measures. 
+
+FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
+                           geom_length     IN NUMBER DEFAULT NULL,
+                           start_measure   IN NUMBER DEFAULT 0,
+                           dp in number)
+        RETURN SDO_GEOMETRY
+    IS
+        retval   SDO_GEOMETRY := geom;
+begin
+   sdo_lrs.redefine_geom_segment( retval, start_measure, geom_length );
+   return retval;
+end;
+  
 END sdl_validate;
 /
