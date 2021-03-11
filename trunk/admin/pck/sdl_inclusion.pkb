@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_inclusion
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inclusion.pkb-arc   1.0   Mar 01 2021 13:07:28   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inclusion.pkb-arc   1.1   Mar 11 2021 19:25:52   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_inclusion.pkb  $
-    --       Date into PVCS   : $Date:   Mar 01 2021 13:07:28  $
-    --       Date fetched Out : $Modtime:   Mar 01 2021 13:05:58  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Mar 11 2021 19:25:52  $
+    --       Date fetched Out : $Modtime:   Mar 11 2021 19:10:22  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -114,7 +114,7 @@ AS
                     nm_debug.debug (l_inclusion_sql);
 
                     EXECUTE IMMEDIATE l_inclusion_sql
-                        USING p_batch_id, p_batch_id;
+                        USING p_batch_id, p_batch_id, irec.nti_nw_parent_type;
                 ELSIF     irec.profile_group_type IS NOT NULL
                       AND irec.datum_nt_type = irec.nti_nw_child_type
                 THEN
@@ -133,7 +133,7 @@ AS
                     nm_debug.debug (l_inclusion_sql);
 
                     EXECUTE IMMEDIATE l_inclusion_sql
-                        USING p_batch_id, p_batch_id;
+                        USING p_batch_id, p_batch_id, irec.nti_nw_parent_type;
                 END IF;
             END IF;
         END LOOP;
@@ -217,7 +217,7 @@ AS
             || ' where '
             || p_parent_column
             || ' = c.child_key'
-            || ' and ne_nt_type = p_parent_type';
+            || ' and ne_nt_type = :p_parent_type))';
         --
         RETURN retval;
     END;
@@ -248,15 +248,15 @@ AS
             || ' ( select sld_key, swd_id, '
             || p_child_column
             || ' child_key '
-            || ' from v_sdl_'
+            || ' from v_sdl_wip_'
             || p_sp_name
-            || '_wip_datums where batch_id = :batch_id ) '
-            || ' select c.sld_key from child_data c '
+            || '_datums where batch_id = :batch_id ) '
+            || ' select c.sld_key, c.swd_id from child_data c '
             || ' where not exists ( select 1 from nm_elements p '
             || ' where '
             || p_parent_column
             || ' = c.child_key'
-            || ' and ne_nt_type = p_parent_type';
+            || ' and ne_nt_type = :p_parent_type))';
         --
         RETURN retval;
     END;
@@ -342,7 +342,7 @@ AS
         FOR irec IN get_inclusion_data (p_datum_nt_type, p_group_nt_type)
         LOOP
             l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date) '
                 || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
                 || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
                 || ' where c.ne_id = t.ptr_value '
@@ -358,3 +358,4 @@ AS
         END LOOP;
     END;
 END;
+/
