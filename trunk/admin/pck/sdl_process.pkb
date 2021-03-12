@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.6   Mar 12 2020 18:18:06   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.7   Mar 12 2021 15:06:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 18:18:06  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 18:08:58  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Mar 12 2021 15:06:24  $
+    --       Date fetched Out : $Modtime:   Mar 12 2021 15:05:32  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,19 +22,24 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
     --p_batch_id => p_batch_id, p_tol_load => 5, p_tol_nw => 5, p_tol_unit_id => 7, p_stop_count => 5);
     ----------------------------------------------------------------------------
     --
+
+    FUNCTION is_profile_nw_datum_or_route (p_sfs_id IN NUMBER)
+        RETURN VARCHAR2;
+
     FUNCTION get_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_sccsid;
     END get_version;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -44,6 +49,7 @@ AS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -52,6 +58,7 @@ AS
                                       p_tol_nw           OUT NUMBER,
                                       p_tol_unit_id      OUT NUMBER,
                                       p_stop_count       OUT NUMBER);
+
     --
     ----------------------------------------------------------------------------
     --
@@ -84,32 +91,35 @@ AS
         SDL_VALIDATE.VALIDATE_BATCH (p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'LOAD_VALIDATION');
     END load_validate;
-    --
-    ----------------------------------------------------------------------------
-    --
-    PROCEDURE reverse_geoms(p_batch_id IN NUMBER, p_sld_keys IN int_array_type) IS
-    BEGIN
-       FOR i IN 1..p_sld_keys.COUNT LOOP
-       SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
-                                     'REVERSE',
-                                     NULL,
-                                     NULL,
-                                     NULL,
-                                     p_sld_keys(i));
-       END LOOP;                 
-       
-       sdl_edit.reverse_datum_geometries(p_sld_keys);
-                           
-       FOR i IN 1..p_sld_keys.COUNT LOOP
-       SDL_AUDIT.LOG_PROCESS_END (p_batch_id,
-                                     'REVERSE',
-                                     p_sld_keys(i));
-       END LOOP;
 
-    END reverse_geoms;
     --
     ----------------------------------------------------------------------------
-    --	
+    --
+    PROCEDURE reverse_geoms (p_batch_id   IN NUMBER,
+                             p_sld_keys   IN int_array_type)
+    IS
+    BEGIN
+        FOR i IN 1 .. p_sld_keys.COUNT
+        LOOP
+            SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                         'REVERSE',
+                                         NULL,
+                                         NULL,
+                                         NULL,
+                                         p_sld_keys (i));
+        END LOOP;
+
+        sdl_edit.reverse_datum_geometries (p_sld_keys);
+
+        FOR i IN 1 .. p_sld_keys.COUNT
+        LOOP
+            SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'REVERSE', p_sld_keys (i));
+        END LOOP;
+    END reverse_geoms;
+
+    --
+    ----------------------------------------------------------------------------
+    --
     PROCEDURE topo_generation (p_batch_id IN NUMBER)
     IS
         l_tol_load      NUMBER;
@@ -122,19 +132,32 @@ AS
                                 l_tol_nw,
                                 l_tol_unit_id,
                                 l_stop_count);
-        SDL_VALIDATE.reset_load_status(p_batch_id);
+        SDL_VALIDATE.reset_load_status (p_batch_id);
         SDL_AUDIT.LOG_PROCESS_START (p_batch_id          => p_batch_id,
                                      p_process           => 'TOPO_GENERATION',
                                      p_buffer            => l_tol_nw,
                                      p_match_tolerance   => l_tol_load,
                                      p_tolerance         => g_sdo_tol);
-        SDL_TOPO.generate_wip_topo_nw (p_batch_id      => p_batch_id,
-                                       p_tol_load      => l_tol_load,
-                                       p_tol_nw        => l_tol_nw,
-                                       p_tol_unit_id   => l_tol_unit_id,
-                                       p_stop_count    => l_stop_count);
+
+        IF is_profile_nw_datum_or_route (p_batch_id) = 'ROUTE'
+        THEN
+            SDL_TOPO.generate_wip_topo_nw (p_batch_id      => p_batch_id,
+                                           p_tol_load      => l_tol_load,
+                                           p_tol_nw        => l_tol_nw,
+                                           p_tol_unit_id   => l_tol_unit_id,
+                                           p_stop_count    => l_stop_count);
+        ELSE
+            sdl_topo.generate_wip_nw (p_batch_id      => p_batch_id,
+                                      p_tol_load      => l_tol_load,
+                                      p_tol_nw        => l_tol_nw,
+                                      p_tol_unit_id   => l_tol_unit_id,
+                                      p_stop_count    => l_stop_count);
+        END IF;
+
+        --
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'TOPO_GENERATION');
     END topo_generation;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -164,9 +187,10 @@ AS
         SDL_STATS.GENERATE_STATISTICS_ON_SLD (p_batch_id    => p_batch_id,
                                               p_buffer      => l_tol_nw,
                                               p_tolerance   => g_sdo_tol);
-        sdl_validate.update_load_datum_status(p_batch_id);
+        sdl_validate.update_load_datum_status (p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'DATUM_VALIDATION');
     END datum_validation;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -192,6 +216,7 @@ AS
         NULL;                     -- further analysis such as pline-stats etc.
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'ANALYSIS');
     END analysis;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -216,6 +241,7 @@ AS
         SDL_TRANSFER.TRANSFER_DATUMS (p_batch_id => p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'TRANSFER');
     END transfer;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -230,6 +256,7 @@ AS
         NULL;                                             -- set reject status
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'REJECT');
     END reject;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -251,10 +278,32 @@ AS
           FROM sdl_profiles, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sfs_sp_id = sp_id;
     END set_working_parameters;
-    --
-    ----------------------------------------------------------------------------
-    --
---main segment to instantiate the default parameters	
+
+    FUNCTION is_profile_nw_datum_or_route (p_sfs_id IN NUMBER)
+        RETURN VARCHAR2
+    IS
+        retval   VARCHAR2 (10);
+    BEGIN
+        BEGIN
+            SELECT CASE nlt_g_i_d
+                       WHEN 'D' THEN 'DATUM'
+                       WHEN 'G' THEN 'ROUTE'
+                   END
+              INTO retval
+              FROM V_SDL_PROFILE_NW_TYPES, sdl_file_submissions
+             WHERE sp_id = sfs_sp_id AND sfs_id = p_sfs_id;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                retval := NULL;
+        END;
+
+        RETURN retval;
+    END;
+--
+----------------------------------------------------------------------------
+--
+--main segment to instantiate the default parameters
 BEGIN
     DECLARE
         l_diminfo   sdo_dim_array;
