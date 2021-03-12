@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.14   Jan 17 2021 09:40:18   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.15   Mar 12 2021 14:32:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 17 2021 09:40:18  $
-    --       Date fetched Out : $Modtime:   Jan 16 2021 10:48:58  $
-    --       PVCS Version     : $Revision:   1.14  $
+    --       Date into PVCS   : $Date:   Mar 12 2021 14:32:24  $
+    --       Date fetched Out : $Modtime:   Mar 12 2021 14:31:16  $
+    --       PVCS Version     : $Revision:   1.15  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -184,9 +184,9 @@ AS
                                                       g_sdo_tol))) t
              WHERE     a.sld_key < b.sld_key
                    AND a.sld_sfs_id = p_batch_id
-                   AND b.sld_sfs_id = p_batch_id
-                   AND sdo_relate (a.sld_working_geometry,
-                                   b.sld_working_geometry,
+                   AND b.sld_sfs_id+0 = p_batch_id
+                   AND sdo_relate (B.sld_working_geometry,
+                                   A.sld_working_geometry,
                                    'mask=ANYINTERACT') =
                        'TRUE';
 
@@ -223,8 +223,8 @@ AS
                       FROM sdl_load_data
                      WHERE sld_sfs_id = p_batch_id) terms
              WHERE NOT EXISTS
-                       (SELECT 1
-                          FROM sdl_load_data s2
+                       (SELECT /*+INDEX(S2 SDL_LOAD_DATA_SPIDX) */ 1
+                          FROM sdl_load_data S2
                          WHERE     sld_sfs_id = p_batch_id
                                AND sdo_relate (s2.sld_working_geometry,
                                                geom,
@@ -387,7 +387,6 @@ AS
         --
         --Now find all load geometry which almost touch the existing network
         --
-
         INSERT INTO sdl_wip_intsct_geom (batch_id,
                                          r_id,
                                          sld_key1,
@@ -484,8 +483,9 @@ AS
                                     'TRUE')
                     SELECT /*+LEADING( X E) INDEX(E NE_PK) */
                            x.*, e.ne_nt_type
-                      FROM intscts x, nm_elements e
+                      FROM intscts x, nm_elements_all e
                      WHERE     e.ne_id = x.ne_id
+                     and e.ne_end_date is null
                            AND dist > 0.1
                            AND NOT EXISTS
                                    (SELECT 1
@@ -512,16 +512,17 @@ AS
                            dist,
                            ne_nt_type
                       FROM nodes           X,
-                           nm_elements     E,
+                           nm_elements_all     E,
                            nm_node_usages  NU,
                            nm_nodes        N
                      WHERE     e.ne_id = nnu_ne_id
+                     and e.ne_end_date is null
                            AND x.npl_id = n.no_np_id
                            AND nu.nnu_no_node_id = n.no_node_id
                            AND dist > 0.1);
-
-        COMMIT;
-
+--
+       COMMIT;
+--
         --Now build the relationships - only include the point data
 
         INSERT INTO sdl_wip_pt_geom (batch_id,
@@ -545,7 +546,7 @@ AS
                    ia,
                    ORA_HASH (ia)     hashcode,
                    CASE WHEN pt_type = 'E' THEN 'Y' ELSE 'N' END
-              FROM (  SELECT /* +LEADING(A B) INDEX(B SDL_WIP_PT_GEOM_SPIDX ) */
+              FROM (  SELECT /* +LEADING(B A) INDEX(A SDL_WIP_PT_GEOM_SPIDX ) */
                              a.id,
                              CAST (
                                  COLLECT (b.id ORDER BY b.id) AS int_array_type)
@@ -553,7 +554,7 @@ AS
                              MIN (SUBSTR (b.pt_type, 1, 1))
                                  pt_type
                         FROM sdl_wip_pt_geom a, sdl_wip_pt_geom b
-                       WHERE     a.batch_id = p_batch_id
+                       WHERE     a.batch_id+0 = p_batch_id
                              AND b.batch_id = p_batch_id
                              AND sdo_within_distance (
                                      a.GEOM,
@@ -727,7 +728,19 @@ AS
     -- Self-intersections will be ignored for now
     -- It assumes that the nodes are taking into account the connectivity with other networks such as state roads
     --
+    l_diminfo sdo_dim_array;
+    
     BEGIN
+    
+        SELECT m.sdo_diminfo
+          INTO l_diminfo
+          FROM mdsys.sdo_geom_metadata_table m
+         WHERE     sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+               AND sdo_table_name = 'SDL_LOAD_DATA'
+               AND sdo_column_name = 'SLD_WORKING_GEOMETRY';
+
+        g_sdo_tol := l_diminfo (1).sdo_tolerance;
+    
         delete_stats_for_batch (p_batch_id);
 
         COMMIT;
@@ -788,12 +801,12 @@ AS
                                        ia,
                                        hashcode,
                                        existing_nw)
-            SELECT /*+index(a SDL_WIP_PT_GEOM_IDX) */
+            SELECT 
                    p_batch_id,
                    ia,
                    ORA_HASH (ia)     hashcode,
                    CASE WHEN pt_type = 'E' THEN 'Y' ELSE 'N' END
-              FROM (  SELECT a.id,
+              FROM (  SELECT /*+LEAD(B A) INDEX(A SDL_WIP_PT_GEOM_SPIDX) */a.id,
                              CAST (
                                  COLLECT (b.id ORDER BY b.id) AS int_array_type)
                                  ia,
@@ -813,7 +826,7 @@ AS
                     GROUP BY a.id);
 
         COMMIT;
-
+        
         INSERT INTO sdl_wip_nodes (batch_id, node_geom, hashcode)
               SELECT p_batch_id,
                      sdo_aggr_centroid (
@@ -886,12 +899,12 @@ AS
                                          hashcode,
                                          node_type,
                                          node_measure)
-            SELECT swd_id,
+            SELECT /*+LEADING(D N) INDEX(N SDL_WIP_NODES_SPIDX) */ swd_id,
                    p_batch_id,
                    hashcode,
                    'S',
                    0
-              FROM sdl_wip_datums d, sdl_wip_nodes n
+              FROM sdl_wip_datums D, sdl_wip_nodes N
              WHERE     sdo_within_distance (
                            node_geom,
                            SDO_LRS.geom_segment_start_pt (geom),
@@ -907,7 +920,7 @@ AS
                                          hashcode,
                                          node_type,
                                          node_measure)
-            SELECT swd_id,
+            SELECT /*+LEADING(D N) INDEX(N SDL_WIP_NODES_SPIDX) */ swd_id,
                    p_batch_id,
                    hashcode,
                    'E',
@@ -1140,9 +1153,6 @@ AS
         n_ptr     ptr_array_type;
         seg_ids   int_array_type;
     BEGIN
-        nm_debug.debug_on;
-        nm_debug.delete_debug (TRUE);
-        nm_debug.debug ('Tols = ' || p_sdo_tol || ' and ' || p_m_tol);
 
         --
         IF p_line.sdo_gtype IN (2002, 2006)
