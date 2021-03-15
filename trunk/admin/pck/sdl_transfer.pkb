@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.19   Mar 11 2021 19:17:52   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.20   Mar 15 2021 07:47:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 11 2021 19:17:52  $
-    --       Date fetched Out : $Modtime:   Mar 11 2021 19:11:38  $
-    --       PVCS Version     : $Revision:   1.19  $
+    --       Date into PVCS   : $Date:   Mar 15 2021 07:47:10  $
+    --       Date fetched Out : $Modtime:   Mar 15 2021 07:45:12  $
+    --       PVCS Version     : $Revision:   1.20  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -309,8 +309,9 @@ AS
 
         SELECT ptr_num (np_id_seq.NEXTVAL, no_node_id_seq.NEXTVAL)
           BULK COLLECT INTO np_no_ids
-          FROM sdl_wip_nodes
-         WHERE batch_id = p_batch_id AND existing_node_id IS NULL;
+          FROM sdl_wip_nodes n1
+         WHERE batch_id = p_batch_id 
+         AND (existing_node_id IS NULL OR not exists ( select 1 from nm_nodes n2 where no_node_id = n1.EXISTING_NODE_ID ));
 
         DECLARE
             x          NUMBER;
@@ -318,9 +319,10 @@ AS
             no_count   INTEGER := 0;
         BEGIN
             FOR nodes
-                IN (    SELECT ROWID
-                          FROM sdl_wip_nodes
-                         WHERE batch_id = p_batch_id AND existing_node_id IS NULL
+                IN (    SELECT n1.ROWID, n1.EXISTING_NODE_ID
+                          FROM sdl_wip_nodes n1 
+                         WHERE batch_id = p_batch_id 
+                         AND (existing_node_id IS NULL OR not exists ( select 1 from nm_nodes n2 where no_node_id = n1.EXISTING_NODE_ID ))
                     FOR UPDATE OF existing_node_id)
             LOOP
                 no_count := no_count + 1;
@@ -330,6 +332,7 @@ AS
                     WHERE ROWID = nodes.ROWID
                 RETURNING n.node_geom.sdo_point.x, n.node_geom.sdo_point.y
                      INTO x, y;
+
 
                 NM3NET.CREATE_POINT (np_no_ids (no_count).ptr_id,
                                      x,
@@ -472,6 +475,11 @@ AS
 
             nm_debug.debug (l_sel_str);
 
+            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
+                || '  LOG ERRORS INTO err$_nm_elements_all '
+                || ' (''INSERT'') REJECT LIMIT UNLIMITED'
+                USING l_datum_nt_type, p_batch_id, ne_ids, p_batch_id;
+
             --raise_application_error(-20001, 'Stop');
 
             log_failures (p_batch_id, ne_ids);
@@ -517,7 +525,7 @@ AS
 
         l_sdl_ne_tab := get_ne_data (p_batch_id, l_profile_view);
 
-        --nm_debug.debug('retrieved route data details, count = '||l_sdl_ne_tab.count );
+        nm_debug.debug('retrieved route data details, count = '||l_sdl_ne_tab.count );
 
         EXECUTE IMMEDIATE l_ins_str
             USING p_batch_id, ne_ids;
@@ -633,7 +641,7 @@ AS
             END LOOP;
         END IF;
 
-        --nm_debug.debug('Setting ne-id and status');
+        nm_debug.debug('Setting ne-id and status');
 
         UPDATE sdl_wip_datums d
            SET status = 'TRANSFERRED',
@@ -716,9 +724,9 @@ AS
                            AND svr_sld_key = sld_key
                            AND svr_validation_type = 'T');
 
-        DELETE FROM err$_nm_elements_all
-              WHERE ne_id IN (SELECT t.ptr_value
-                                FROM TABLE (p_ne_ids) t);
+--        DELETE FROM err$_nm_elements_all
+--              WHERE ne_id IN (SELECT t.ptr_value
+--                                FROM TABLE (p_ne_ids) t);
     END;
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER)
