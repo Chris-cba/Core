@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.2   Jan 20 2021 11:46:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.3   Mar 15 2021 11:34:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix7.sql  $ 
---       Date into PVCS   : $Date:   Jan 20 2021 11:46:40  $
---       Date fetched Out : $Modtime:   Jan 20 2021 11:45:50  $
---       Version     	  : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Mar 15 2021 11:34:24  $
+--       Date fetched Out : $Modtime:   Mar 15 2021 11:29:00  $
+--       Version     	  : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -154,6 +154,23 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 -- DDL
 --------------------------------------------------------------------------------
+DECLARE
+  --
+  name_exists  EXCEPTION;
+  PRAGMA exception_init( name_exists, -955);
+  --
+BEGIN
+  --
+  DBMS_ERRLOG.create_error_log (dml_table_name => 'NM_ELEMENTS_ALL');
+  --
+EXCEPTION 
+  WHEN name_exists THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+
 SET TERM ON 
 PROMPT DDL Changes
 SET TERM OFF
@@ -272,6 +289,22 @@ SET FEEDBACK ON
 start sdl_invval.pkh
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT Creating Package Header sdl_ddl
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_ddl.pkh
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Header sdl_inclusion
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_inclusion.pkh
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Functions
@@ -362,6 +395,30 @@ SET FEEDBACK ON
 start sdl_validate.pkw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT Creating Package Body sdl_inclusion
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_inclusion.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Body sdl_transfer
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_transfer.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Body sdl_process
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_process.pkw
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Triggers
@@ -397,6 +454,15 @@ start who_trg.sql
 SET FEEDBACK OFF
 
 --
+-- Create synonyms
+--
+BEGIN
+  nm3ddl.Create_synonym_for_object('ERR$_NM_ELEMENTS_ALL');
+  nm3ddl.Create_synonym_for_object('SDL_INCLUSION');
+END;
+/
+
+--
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
 --------------------------------------------------------------------------------
@@ -405,7 +471,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4800_fix7.sql'
-				,p_remarks        => 'NET 4800 FIX 7 (Build 1)'
+				,p_remarks        => 'NET 4800 FIX 7 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
