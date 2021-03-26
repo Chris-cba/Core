@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.30   Mar 11 2021 21:50:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.31   Mar 26 2021 23:20:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 11 2021 21:50:42  $
-    --       Date fetched Out : $Modtime:   Mar 11 2021 21:49:04  $
-    --       PVCS Version     : $Revision:   1.30  $
+    --       Date into PVCS   : $Date:   Mar 26 2021 23:20:26  $
+    --       Date fetched Out : $Modtime:   Mar 26 2021 23:18:36  $
+    --       PVCS Version     : $Revision:   1.31  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -58,9 +58,9 @@ AS
     --
     PROCEDURE validate_mandatory_columns (p_batch_id IN NUMBER);
 
-    PROCEDURE validate_unique(p_batch_id       IN NUMBER,
-                                       p_profile_id     IN NUMBER,
-                                       p_profile_view   IN VARCHAR2);
+    PROCEDURE validate_unique (p_batch_id       IN NUMBER,
+                               p_profile_id     IN NUMBER,
+                               p_profile_view   IN VARCHAR2);
 
     --
     -----------------------------------------------------------------------------
@@ -86,12 +86,12 @@ AS
     --
     -----------------------------------------------------------------------------
     --
-FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
+    FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                            geom_length     IN NUMBER DEFAULT NULL,
                            start_measure   IN NUMBER DEFAULT 0,
-                           dp in number)
+                           dp              IN NUMBER)
         RETURN SDO_GEOMETRY;
-    
+
     PROCEDURE update_batch_for_adjustment (p_batch_id IN INTEGER)
     IS
         CURSOR c_update IS
@@ -108,14 +108,15 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                      AND sam.sam_sp_id = sfs.sfs_sp_id
                      AND sfs.sfs_sdh_id = saar.saar_sdh_id
                      AND sam.sam_sdh_id = saar.saar_sdh_id
-                     AND (saar.saar_user_id = SYS_CONTEXT('NM3CORE', 'USER_ID')
-                            OR saar.saar_user_id = -1)
+                     AND (   saar.saar_user_id =
+                             SYS_CONTEXT ('NM3CORE', 'USER_ID')
+                          OR saar.saar_user_id = -1)
                      AND EXISTS
                              (SELECT 1
                                 FROM sdl_attribute_adjustment_audit saaa
-                               WHERE saaa.saaa_sam_id = sam.sam_id
-                                 AND saaa.saaa_saar_id = saar.saar_id
-                                 AND saaa.saaa_sfs_id = sfs.sfs_id)
+                               WHERE     saaa.saaa_sam_id = sam.sam_id
+                                     AND saaa.saaa_saar_id = saar.saar_id
+                                     AND saaa.saaa_sfs_id = sfs.sfs_id)
                      AND sfs.sfs_id = p_batch_id
             ORDER BY saar.saar_id;
 
@@ -139,8 +140,11 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                 || ' AND '
                 || r_update.load_column_name
                 || CASE
-                      WHEN r_update.saar_source_value IS NULL THEN ' IS NULL '
-                      ELSE ' = ''' || r_update.saar_source_value || ''''
+                       WHEN r_update.saar_source_value IS NULL
+                       THEN
+                           ' IS NULL '
+                       ELSE
+                           ' = ''' || r_update.saar_source_value || ''''
                    END
                 || ' AND saaa.saaa_sam_id = '
                 || r_update.sam_id
@@ -194,11 +198,11 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
         validate_domain_columns (p_batch_id);
 
         validate_mandatory_columns (p_batch_id);
-        
-        sdl_inclusion.validate_sdl_inclusion_data(p_batch_id);
+
+        sdl_inclusion.validate_sdl_inclusion_data (p_batch_id);
 
         --No need to test uniqueness as only those route records which dont exist will be transferred
-                
+
         --The following procedure will try and make sense of the gtype of the geometry, set the type to a 3302/3306 and
         --will register any spatial related problems in the geometry such as measures not being incremental and having
         --duplicate vertices.
@@ -251,7 +255,8 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
-                                AND nvl(group_type, '$%&*') = nvl(nlt_gty_type,  '$%&*')
+                                AND NVL (group_type, '$%&*') =
+                                    NVL (nlt_gty_type, '$%&*')
                                 AND domain IS NOT NULL))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
@@ -283,7 +288,9 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                       || ''''
                       || ' from sdl_load_data where sld_sfs_id = '
                       || TO_CHAR (p_batch_id)
-                      || ' and '||load_column_name||' is not NULL '
+                      || ' and '
+                      || load_column_name
+                      || ' is not NULL '
                       || ' and not exists ( select 1 from hig_codes where hco_domain = '
                       || ''''
                       || domain
@@ -338,7 +345,8 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
-                                AND nvl(group_type, '$%&*') = nvl(nlt_gty_type,  '$%&*')
+                                AND NVL (group_type, '$%&*') =
+                                    NVL (nlt_gty_type, '$%&*')
                                 AND mandatory = 'Y'))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
@@ -420,8 +428,9 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                                   AND sam.sam_sdh_id = saar.saar_sdh_id
                                   AND sam.sam_view_column_name =
                                       saar.saar_target_attribute_name
-                                  AND (saar.saar_user_id = SYS_CONTEXT('NM3CORE', 'USER_ID')
-                                      OR saar.saar_user_id = -1)
+                                  AND (   saar.saar_user_id =
+                                          SYS_CONTEXT ('NM3CORE', 'USER_ID')
+                                       OR saar.saar_user_id = -1)
                          ORDER BY saar.saar_id))
         SELECT MAX (sam_id),
                   'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
@@ -469,12 +478,14 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
         END IF;
     END validate_adjustment_rules;
 
-    PROCEDURE validate_unique(p_batch_id       IN NUMBER,
-                                       p_profile_id     IN NUMBER,
-                                       p_profile_view   IN VARCHAR2) is
-    begin
-       null;
-    end;
+    PROCEDURE validate_unique (p_batch_id       IN NUMBER,
+                               p_profile_id     IN NUMBER,
+                               p_profile_view   IN VARCHAR2)
+    IS
+    BEGIN
+        NULL;
+    END;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -518,15 +529,34 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                                                'NE_DATE_CREATED',
                                                'NE_DATE_MODIFIED',
                                                'NE_MODIFIED_BY',
-                                               'NE_CREATED_BY' -- handled by the trigger
-                                                              )
-                        OR     column_name = 'NE_UNIQUE'
-                           AND EXISTS
-                                   (SELECT 1
-                                      FROM nm_types
-                                     WHERE     nt_type = l_nt_type
-                                           AND nt_pop_unique = 'N'))
-                   AND ROWNUM = 1;
+                                               'NE_CREATED_BY', -- handled by the trigger
+                                               'NE_UNIQUE' -- hanlded by user-entry or pop-unique - see next clause
+                                                          )
+                        OR (    column_name = 'NE_UNIQUE'
+                            AND EXISTS
+                                    (SELECT 1
+                                       FROM nm_types
+                                      WHERE     nt_type = l_nt_type
+                                            AND nt_pop_unique = 'N')) -- this means we have a user-entered NE_UNIQUE but have no column mapped.
+                        OR (    column_name = 'NE_UNIQUE'
+                            AND EXISTS
+                                    (SELECT 1
+                                       FROM nm_types
+                                      WHERE     nt_type = l_nt_type
+                                            AND nt_pop_unique = 'Y')
+                            AND EXISTS
+                                    (SELECT 1
+                                       FROM nm_type_columns
+                                      WHERE     ntc_unique_seq IS NOT NULL
+                                            AND ntc_nt_type = l_nt_type) -- we have a pop-unique with expected generator columns
+                            AND NOT EXISTS
+                                    (SELECT 1
+                                       FROM nm_type_columns,
+                                            sdl_attribute_mapping
+                                      WHERE     ntc_nt_type = l_nt_type
+                                            AND ntc_column_name =
+                                                sam_ne_column_name
+                                            AND ntc_unique_seq = 'Y')));
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
@@ -592,7 +622,7 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                            SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
                        AND table_name = 'NM_ELEMENTS_ALL'
                        AND nullable = 'N'
-					   AND ROWNUM = 1
+                       AND ROWNUM = 1
                        AND NOT EXISTS
                                (SELECT 1
                                   FROM sdl_datum_attribute_mapping,
@@ -800,10 +830,10 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
         END;
 
         nm_debug.debug ('Update working geometry complete');
-        
---      Test the geometry - they should now be a 3302/3306 geomrty type either from a 2D scaled with a known measure attribute
---      or through interpretation from a standard 3002/3006. If it is still not a 3D geometry, then fail it.
-        
+
+        --      Test the geometry - they should now be a 3302/3306 geomrty type either from a 2D scaled with a known measure attribute
+        --      or through interpretation from a standard 3002/3006. If it is still not a 3D geometry, then fail it.
+
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
                                             svr_sld_key,
@@ -818,7 +848,8 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                    'Geometry and attribute format does not support measures'
               FROM sdl_load_data g
              WHERE     g.sld_sfs_id = p_batch_id
-                   AND round(g.sld_working_geometry.sdo_gtype/1000,0) != 3;        
+                   AND ROUND (g.sld_working_geometry.sdo_gtype / 1000, 0) !=
+                       3;
 
 
         INSERT INTO sdl_validation_results (svr_sfs_id,
@@ -831,25 +862,48 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                    'S',
                    sld_key,
                    'SLD_LOAD_GEOMETRY',
-                   error_code,
+                   ERROR_CODE,
                    error_msg
               FROM (  SELECT sld_key,
-                             CASE WHEN error_code IS NOT NULL
-                                  THEN error_code
-                                  WHEN LENGTH(TRIM(TRANSLATE(error_msg, '0123456789', ' '))) IS NULL
-                                  THEN TO_NUMBER(error_msg)
-                                  ELSE -99
-                             END error_code,
-                             CASE WHEN error_code IS NOT NULL
-                                  THEN get_rdbms_error_message(error_code) || ' - ' || error_msg
-                                  WHEN LENGTH(TRIM(TRANSLATE(error_msg, '0123456789', ' '))) IS NULL
-                                  THEN get_rdbms_error_message(TO_NUMBER(error_msg)) || ' - ' || error_msg
-                                  ELSE error_msg
-                             END error_msg
+                             CASE
+                                 WHEN ERROR_CODE IS NOT NULL
+                                 THEN
+                                     ERROR_CODE
+                                 WHEN LENGTH (
+                                          TRIM (
+                                              TRANSLATE (error_msg,
+                                                         '0123456789',
+                                                         ' ')))
+                                          IS NULL
+                                 THEN
+                                     TO_NUMBER (error_msg)
+                                 ELSE
+                                     -99
+                             END    ERROR_CODE,
+                             CASE
+                                 WHEN ERROR_CODE IS NOT NULL
+                                 THEN
+                                        get_rdbms_error_message (ERROR_CODE)
+                                     || ' - '
+                                     || error_msg
+                                 WHEN LENGTH (
+                                          TRIM (
+                                              TRANSLATE (error_msg,
+                                                         '0123456789',
+                                                         ' ')))
+                                          IS NULL
+                                 THEN
+                                        get_rdbms_error_message (
+                                            TO_NUMBER (error_msg))
+                                     || ' - '
+                                     || error_msg
+                                 ELSE
+                                     error_msg
+                             END    error_msg
                         FROM (SELECT sld_key,
-                                     FIRST_VALUE (error_code)
+                                     FIRST_VALUE (ERROR_CODE)
                                          OVER (PARTITION BY sld_key
-                                               ORDER BY sld_key)    error_code,
+                                               ORDER BY sld_key)    ERROR_CODE,
                                      FIRST_VALUE (error_msg)
                                          OVER (PARTITION BY sld_key
                                                ORDER BY sld_key)    error_msg
@@ -859,22 +913,21 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                                                      status,
                                                      1,
                                                      INSTR (status, ' ', 1)))
-                                                 error_code,
+                                                 ERROR_CODE,
                                              status
                                                  error_msg
                                         FROM (SELECT sld_key,
-                                                       SDO_GEOM.validate_geometry_with_context (
+                                                     SDO_GEOM.validate_geometry_with_context (
                                                          sld_working_geometry,
                                                          l_diminfo)    status
                                                 FROM sdl_load_data
-                                               WHERE     sld_sfs_id = p_batch_id
+                                               WHERE     sld_sfs_id =
+                                                         p_batch_id
                                                      AND SDO_GEOM.validate_geometry_with_context (
                                                              sld_working_geometry,
                                                              l_diminfo) !=
                                                          'TRUE')))
-                    GROUP BY sld_key,
-                             error_code,
-                             error_msg);
+                    GROUP BY sld_key, ERROR_CODE, error_msg);
 
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
@@ -906,7 +959,9 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
 
         UPDATE sdl_file_submissions
            SET sfs_mbr_geometry =
-                   (SELECT sdo_aggr_mbr (sdo_lrs.convert_to_std_geom(sld_working_geometry))
+                   (SELECT sdo_aggr_mbr (
+                               SDO_LRS.convert_to_std_geom (
+                                   sld_working_geometry))
                       FROM sdl_load_data
                      WHERE sld_sfs_id = p_batch_id)
          WHERE sfs_id = p_batch_id;
@@ -916,7 +971,7 @@ FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
     --
     -----------------------------------------------------------------------------
     --
-FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
+    FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         RETURN NUMBER
     IS
         retval   NUMBER;
@@ -938,24 +993,24 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
                                 GROUP BY sld_key)));
 
         IF l_mod2 = 0 AND l_mod3 = 0
-        THEN --difficult to know!
-            declare
-               measures_ascending varchar2(5);
-            begin
-            select ascending_measures
-            into measures_ascending
-            from (
-            select sdo_lrs.is_measure_increasing(sld_working_geometry) ascending_measures
-            from sdl_load_data
-            where sld_sfs_id = p_batch_id )
-            group by ascending_measures;
+        THEN                                              --difficult to know!
+            DECLARE
+                measures_ascending   VARCHAR2 (5);
+            BEGIN
+                  SELECT ascending_measures
+                    INTO measures_ascending
+                    FROM (SELECT SDO_LRS.is_measure_increasing (
+                                     sld_working_geometry)    ascending_measures
+                            FROM sdl_load_data
+                           WHERE sld_sfs_id = p_batch_id)
+                GROUP BY ascending_measures;
 
-            retval := 3306;
-            exception
-               when too_many_rows then
-                  retval := NULL;
-            end;
-            
+                retval := 3306;
+            EXCEPTION
+                WHEN TOO_MANY_ROWS
+                THEN
+                    retval := NULL;
+            END;
         ELSIF l_mod2 = 0 AND l_mod3 > 0
         THEN
             -- Its not 3D so guess we should translate to LRS
@@ -999,12 +1054,13 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
 
                 IF p_length IS NOT NULL
                 THEN
-                   retval := SDO_LRS.scale_geom_segment (retval,
+                    retval :=
+                        SDO_LRS.scale_geom_segment (retval,
                                                     0,
                                                     p_length,
                                                     0,
                                                     p_sdo_tol);
---                    retval := scale_geom_l (retval, p_length, 0, NULL ); --pass the DP in as an option or by changing the argument list.
+                --                    retval := scale_geom_l (retval, p_length, 0, NULL ); --pass the DP in as an option or by changing the argument list.
                 END IF;
             ELSIF p_gtype IN (2002, 2206)
             THEN
@@ -1065,7 +1121,7 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
                    swd_id,
                    'GEOM',
                    ERROR_CODE,
-                   get_rdbms_error_message(ERROR_CODE) || ' - ' || error_msg
+                   get_rdbms_error_message (ERROR_CODE) || ' - ' || error_msg
               FROM (  SELECT sld_key,
                              swd_id,
                              ERROR_CODE,
@@ -1206,7 +1262,8 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
 
-		l_view_name := 'V_SDL_WIP_' || REPLACE (meta_row.sp_name, ' ', '_') || '_DATUMS';
+        l_view_name :=
+            'V_SDL_WIP_' || REPLACE (meta_row.sp_name, ' ', '_') || '_DATUMS';
 
         validate_datum_geometry (p_batch_id => p_batch_id);
 
@@ -1221,14 +1278,13 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         validate_dtm_column_len (p_batch_id       => p_batch_id,
                                  p_profile_id     => meta_row.sp_id,
                                  p_profile_view   => l_view_name);
-                                 
-        validate_unique(p_batch_id       => p_batch_id,
-                                 p_profile_id     => meta_row.sp_id,
-                                 p_profile_view   => l_view_name);
-                                 
+
+        validate_unique (p_batch_id       => p_batch_id,
+                         p_profile_id     => meta_row.sp_id,
+                         p_profile_view   => l_view_name);
+
 
         set_datum_status (p_batch_id);
-
     END validate_datums_in_batch;
 
     --
@@ -1505,24 +1561,23 @@ FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         RETURN retval;
     END;
 
---This function scales the geometry measures according to the length of the polyline segment.
---It originates from the nm_sdo package which underpins the Oracle SDO_LRS replacement - but has a slight change to 
--- allow decimal places to be configured.
---The function is copied into this package because there is no need for the SDO_LRS replacement
---after the change in license costs from Oracle and the full package may be deprecated at some stage.It also allows the 
---coding of a rounding parameter on the measures. 
+    --This function scales the geometry measures according to the length of the polyline segment.
+    --It originates from the nm_sdo package which underpins the Oracle SDO_LRS replacement - but has a slight change to
+    -- allow decimal places to be configured.
+    --The function is copied into this package because there is no need for the SDO_LRS replacement
+    --after the change in license costs from Oracle and the full package may be deprecated at some stage.It also allows the
+    --coding of a rounding parameter on the measures.
 
-FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
+    FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
                            geom_length     IN NUMBER DEFAULT NULL,
                            start_measure   IN NUMBER DEFAULT 0,
-                           dp in number)
+                           dp              IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval   SDO_GEOMETRY := geom;
-begin
-   sdo_lrs.redefine_geom_segment( retval, start_measure, geom_length );
-   return retval;
-end;
-  
+    BEGIN
+        SDO_LRS.redefine_geom_segment (retval, start_measure, geom_length);
+        RETURN retval;
+    END;
 END sdl_validate;
 /
