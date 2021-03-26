@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.31   Mar 26 2021 23:20:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.32   Mar 26 2021 23:36:52   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 26 2021 23:20:26  $
-    --       Date fetched Out : $Modtime:   Mar 26 2021 23:18:36  $
-    --       PVCS Version     : $Revision:   1.31  $
+    --       Date into PVCS   : $Date:   Mar 26 2021 23:36:52  $
+    --       Date fetched Out : $Modtime:   Mar 26 2021 23:35:38  $
+    --       PVCS Version     : $Revision:   1.32  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -554,9 +554,10 @@ AS
                                        FROM nm_type_columns,
                                             sdl_attribute_mapping
                                       WHERE     ntc_nt_type = l_nt_type
+									        AND sam_sp_id = p_profile_id
                                             AND ntc_column_name =
                                                 sam_ne_column_name
-                                            AND ntc_unique_seq = 'Y')));
+                                            AND ntc_unique_seq is not NULL)));
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
@@ -568,7 +569,7 @@ AS
         THEN
             raise_application_error (
                 -20001,
-                'Mandatory columns are not catered for in the load file profile');
+                'Mandatory columns, or unique key generator columns are not catered for in the load file profile');
         ELSE
             l_dummy := 0;
 
