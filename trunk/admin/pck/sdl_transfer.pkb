@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.20   Mar 15 2021 07:47:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.21   Mar 30 2021 14:51:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 15 2021 07:47:10  $
-    --       Date fetched Out : $Modtime:   Mar 15 2021 07:45:12  $
-    --       PVCS Version     : $Revision:   1.20  $
+    --       Date into PVCS   : $Date:   Mar 30 2021 14:51:24  $
+    --       Date fetched Out : $Modtime:   Mar 30 2021 14:50:34  $
+    --       PVCS Version     : $Revision:   1.21  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -771,8 +771,8 @@ AS
         FOR irec IN get_inclusion_data (p_group_nt_type)
         LOOP
             l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit ) '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit '
                 || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
                 || ' where c.ne_id = t.ptr_value '
                 || ' and c.'
@@ -807,8 +807,8 @@ AS
         FOR irec IN get_inclusion_data (p_datum_nt_type, p_group_nt_type)
         LOOP
             l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit, nm_begin_mp, nm_end_mp ) '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit, 0, c.ne_length '
                 || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
                 || ' where c.ne_id = t.ptr_value '
                 || ' and c.'
