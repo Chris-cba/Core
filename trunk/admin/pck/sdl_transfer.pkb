@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.21   Mar 30 2021 14:51:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.22   Mar 30 2021 21:13:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 30 2021 14:51:24  $
-    --       Date fetched Out : $Modtime:   Mar 30 2021 14:50:34  $
-    --       PVCS Version     : $Revision:   1.21  $
+    --       Date into PVCS   : $Date:   Mar 30 2021 21:13:26  $
+    --       Date fetched Out : $Modtime:   Mar 30 2021 21:10:02  $
+    --       PVCS Version     : $Revision:   1.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -189,7 +189,9 @@ AS
                  UNION
                  SELECT 'NE_START_DATE' FROM DUAL
                  UNION
-                 SELECT 'NE_END_DATE' FROM DUAL)  --select * from attrib_names
+                 SELECT 'NE_END_DATE' FROM DUAL
+                 UNION 
+                 SELECT 'NE_LENGTH' FROM DUAL)  --select * from attrib_names
                                                 ,
             attribs
             AS
@@ -361,7 +363,9 @@ AS
                    || ')'
               INTO l_ins_str
               FROM sdl_datum_attribute_mapping
-             WHERE sdam_profile_id = l_sp_id;
+             WHERE sdam_profile_id = l_sp_id
+             and sdam_column_name <> 'NE_LENGTH';
+
 
             SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
                    || LISTAGG (
@@ -389,12 +393,16 @@ AS
                    || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
               INTO l_sel_str
               FROM sdl_datum_attribute_mapping
-             WHERE sdam_profile_id = l_sp_id;
+             WHERE sdam_profile_id = l_sp_id
+             and sdam_column_name <> 'NE_LENGTH';
 
             /*INSERT INTO ne_id_sav
                 SELECT t.ptr_value, t.ptr_id
                   FROM TABLE (ne_ids) t;*/
 
+nm_debug.debug(l_ins_str);
+
+nm_debug.debug(l_sel_str);
 
             EXECUTE IMMEDIATE   l_ins_str
                              || ' '
@@ -751,76 +759,6 @@ AS
 
         DELETE FROM nm_points
               WHERE np_id IN (SELECT ptr_id FROM TABLE (np_ids));
-    END;
-
-    PROCEDURE create_group_auto_inclusions (ne_ids            IN ptr_num_array_type,
-                                            p_group_nt_type   IN VARCHAR2)
-    IS
-        CURSOR get_inclusion_data (c_nt_type IN VARCHAR2)
-        IS
-            SELECT nti_nw_parent_type,
-                   nti_nw_child_type,
-                   nti_parent_column,
-                   nti_child_column
-              FROM nm_type_inclusion
-             WHERE nti_nw_child_type = c_nt_type;
-
-        --
-        l_sql   VARCHAR2 (32767);
-    BEGIN
-        FOR irec IN get_inclusion_data (p_group_nt_type)
-        LOOP
-            l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit ) '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit '
-                || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
-                || ' where c.ne_id = t.ptr_value '
-                || ' and c.'
-                || irec.nti_child_column
-                || ' = p.'
-                || irec.nti_parent_column
-                || ' and p.ne_nt_type = :parent_nt_type '
-                || ' and c.ne_nt_type = :child_nt_type ';
-
-            EXECUTE IMMEDIATE l_sql
-                USING ne_ids, irec.nti_nw_parent_type, irec.nti_nw_child_type;
-        END LOOP;
-    END;
-
-    PROCEDURE create_datum_auto_inclusions (ne_ids            IN ptr_num_array_type,
-                                            p_datum_nt_type   IN VARCHAR2,
-                                            p_group_nt_type   IN VARCHAR2)
-    IS
-        CURSOR get_inclusion_data (c_nt_type         IN VARCHAR2,
-                                   c_group_nt_type   IN VARCHAR2)
-        IS
-            SELECT nti_nw_parent_type,
-                   nti_nw_child_type,
-                   nti_parent_column,
-                   nti_child_column
-              FROM nm_type_inclusion
-             WHERE     nti_nw_child_type = c_nt_type
-                   AND nti_nw_parent_type <> c_group_nt_type;
-
-        l_sql   VARCHAR2 (32767);
-    BEGIN
-        FOR irec IN get_inclusion_data (p_datum_nt_type, p_group_nt_type)
-        LOOP
-            l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit, nm_begin_mp, nm_end_mp ) '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit, 0, c.ne_length '
-                || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
-                || ' where c.ne_id = t.ptr_value '
-                || ' and c.'
-                || irec.nti_child_column
-                || ' = p.'
-                || irec.nti_parent_column
-                || ' and p.ne_nt_type = :parent_nt_type '
-                || ' and c.ne_nt_type = :child_nt_type ';
-
-            EXECUTE IMMEDIATE l_sql
-                USING ne_ids, irec.nti_nw_parent_type, irec.nti_nw_child_type;
-        END LOOP;
     END;
 
     --
