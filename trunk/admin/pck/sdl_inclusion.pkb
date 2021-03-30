@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_inclusion
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inclusion.pkb-arc   1.1   Mar 11 2021 19:25:52   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inclusion.pkb-arc   1.2   Mar 30 2021 15:47:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inclusion.pkb  $
-    --       Date into PVCS   : $Date:   Mar 11 2021 19:25:52  $
-    --       Date fetched Out : $Modtime:   Mar 11 2021 19:10:22  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Mar 30 2021 15:47:28  $
+    --       Date fetched Out : $Modtime:   Mar 30 2021 15:10:58  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -305,8 +305,8 @@ AS
         FOR irec IN get_inclusion_data (p_group_nt_type)
         LOOP
             l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit ) '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit '
                 || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
                 || ' where c.ne_id = t.ptr_value '
                 || ' and c.'
@@ -342,8 +342,8 @@ AS
         FOR irec IN get_inclusion_data (p_datum_nt_type, p_group_nt_type)
         LOOP
             l_sql :=
-                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date) '
-                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date)'
+                   'insert into nm_members (nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_start_date, nm_admin_unit, nm_begin_mp, nm_end_mp ) '
+                || ' select p.ne_id, c.ne_id, ''G'', p.ne_gty_group_type, greatest(p.ne_start_date, c.ne_start_date), p.ne_admin_unit, 0, c.ne_length '
                 || ' from nm_elements p, nm_elements c, table(:ne_ids) t'
                 || ' where c.ne_id = t.ptr_value '
                 || ' and c.'
