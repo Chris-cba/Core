@@ -1,13 +1,12 @@
-/* Formatted on 31/03/2021 12:10:34 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.23   Mar 31 2021 12:12:54   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.24   Mar 31 2021 16:54:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 31 2021 12:12:54  $
-    --       Date fetched Out : $Modtime:   Mar 31 2021 12:10:44  $
-    --       PVCS Version     : $Revision:   1.23  $
+    --       Date into PVCS   : $Date:   Mar 31 2021 16:54:12  $
+    --       Date fetched Out : $Modtime:   Mar 31 2021 16:52:02  $
+    --       PVCS Version     : $Revision:   1.24  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -67,6 +66,7 @@ AS
     IS
         np_no_ids         ptr_num_array_type;
         ne_ids            ptr_num_array_type;
+        grp_ne_ids        ptr_num_array_type;
         l_ins_str         VARCHAR2 (4000);
         l_sel_str         VARCHAR2 (4000);
         l_datum_geom      geom_id_tab;
@@ -217,6 +217,15 @@ AS
               FROM nm_unit_conversions
              WHERE     uc_unit_id_in = l_group_unit_id
                    AND uc_unit_id_out = l_datum_unit_id;
+                   
+        --Next, grab the route IDs that pass the test on whether they should be loaded. This comes from the review levels
+        --or from the manual over-ride after a review.
+
+        SELECT ptr_num (l.sld_key, ne_id_seq.NEXTVAL)
+          BULK COLLECT INTO grp_ne_ids
+          FROM sdl_load_data l
+         WHERE    l.sld_sfs_id = p_batch_id
+               AND l.sld_status = 'LOAD';                   
 
             --Create the new routes from the load data where status allows and there are datums to be created but
             --where the route does not exist.
@@ -245,7 +254,7 @@ AS
                             (SELECT ptr_id        sam_id,
                                     ptr_value     sam_ne_column_name
                                FROM TABLE (l_attrib_list))
-                    SELECT    ' select ne_id_seq.nextval, '
+                    SELECT    ' select new_ne_ids.ptr_value, '
                            || ''''
                            || 'G'
                            || ''''
@@ -260,7 +269,9 @@ AS
                            || ' from '
                            || l_profile_view
                            || ' ln '
+                           || 'table (:grp_ne_ids) new_ne_ids '
                            || ' where batch_id = :p_batch_id '
+                           || ' and ln.sld_key = new_ne_ids.ptr_id '
                            || ' and status = '
                            || ''''
                            || 'LOAD'
@@ -576,7 +587,7 @@ AS
                 SELECT ne_id,
                        new_ne_id,
                        'G',
-                       l_group_type,
+                       nm_obj_type,
                        ne_start_date,
                        ne_end_date,
                        0,
@@ -591,8 +602,9 @@ AS
                        end_slk
                   FROM (SELECT t.ptr_value
                                    new_ne_id,
-                               ne_id,
+                               gid.ptr_value ne_id,
                                datum_id,
+                               g.ne_gty_group_type nm_obj_type,
                                TRUNC (
                                    GREATEST (l.NE_START_DATE,
                                              (SELECT ne_start_date
@@ -606,13 +618,15 @@ AS
                                SDO_LRS.GEOM_SEGMENT_END_MEASURE (d.geom)
                                    end_slk
                           FROM sdl_wip_datums        d,
-                               TABLE (l_sdl_ne_tab)  l,
+                               TABLE (grp_ne_ids)    gid,
                                nm_elements           g,
-                               TABLE (ne_ids)        t
+                               TABLE (ne_ids)        t,
+                               TABLE (l_sdl_ne_tab)  l
                          WHERE     d.batch_id = p_batch_id
-                               AND l.ne_unique = g.ne_unique
+                               AND l.sld_key = gid.ptr_id
                                AND d.sld_key = l.sld_key
                                AND t.ptr_id = d.swd_id
+                               AND g.ne_id  = gid.ptr_value
                                AND l.status = 'LOAD');
 
             --                               AND EXISTS
