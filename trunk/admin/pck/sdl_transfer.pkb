@@ -1,12 +1,13 @@
+/* Formatted on 31/03/2021 12:10:34 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.22   Mar 30 2021 21:13:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.23   Mar 31 2021 12:12:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 30 2021 21:13:26  $
-    --       Date fetched Out : $Modtime:   Mar 30 2021 21:10:02  $
-    --       PVCS Version     : $Revision:   1.22  $
+    --       Date into PVCS   : $Date:   Mar 31 2021 12:12:54  $
+    --       Date fetched Out : $Modtime:   Mar 31 2021 12:10:44  $
+    --       PVCS Version     : $Revision:   1.23  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +20,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -91,11 +92,10 @@ AS
         l_sdl_ne_tab      sdl_ne_tab;
         l_attrib_list     ptr_vc_array_type;
     BEGIN
-    
-    -- cear out any errors that have been raised during earlier transfers (if still there)
-    
+        -- cear out any errors that have been raised during earlier transfers (if still there)
+
         clear_validation_results (p_batch_id => p_batch_id);
-        
+
         BEGIN
             SELECT sp_id,
                    'V_SDL_' || UPPER (sp_name) || '_NE',
@@ -190,9 +190,9 @@ AS
                  SELECT 'NE_START_DATE' FROM DUAL
                  UNION
                  SELECT 'NE_END_DATE' FROM DUAL
-                 UNION 
-                 SELECT 'NE_LENGTH' FROM DUAL)  --select * from attrib_names
-                                                ,
+                 UNION
+                 SELECT 'NE_LENGTH' FROM DUAL)    --select * from attrib_names
+                                              ,
             attribs
             AS
                 (SELECT NVL (s1.sam_id, ROWNUM * (-1))     sam_id,
@@ -312,8 +312,12 @@ AS
         SELECT ptr_num (np_id_seq.NEXTVAL, no_node_id_seq.NEXTVAL)
           BULK COLLECT INTO np_no_ids
           FROM sdl_wip_nodes n1
-         WHERE batch_id = p_batch_id 
-         AND (existing_node_id IS NULL OR not exists ( select 1 from nm_nodes n2 where no_node_id = n1.EXISTING_NODE_ID ));
+         WHERE     batch_id = p_batch_id
+               AND (   existing_node_id IS NULL
+                    OR NOT EXISTS
+                           (SELECT 1
+                              FROM nm_nodes n2
+                             WHERE no_node_id = n1.EXISTING_NODE_ID));
 
         DECLARE
             x          NUMBER;
@@ -322,9 +326,14 @@ AS
         BEGIN
             FOR nodes
                 IN (    SELECT n1.ROWID, n1.EXISTING_NODE_ID
-                          FROM sdl_wip_nodes n1 
-                         WHERE batch_id = p_batch_id 
-                         AND (existing_node_id IS NULL OR not exists ( select 1 from nm_nodes n2 where no_node_id = n1.EXISTING_NODE_ID ))
+                          FROM sdl_wip_nodes n1
+                         WHERE     batch_id = p_batch_id
+                               AND (   existing_node_id IS NULL
+                                    OR NOT EXISTS
+                                           (SELECT 1
+                                              FROM nm_nodes n2
+                                             WHERE no_node_id =
+                                                   n1.EXISTING_NODE_ID))
                     FOR UPDATE OF existing_node_id)
             LOOP
                 no_count := no_count + 1;
@@ -363,8 +372,8 @@ AS
                    || ')'
               INTO l_ins_str
               FROM sdl_datum_attribute_mapping
-             WHERE sdam_profile_id = l_sp_id
-             and sdam_column_name <> 'NE_LENGTH';
+             WHERE     sdam_profile_id = l_sp_id
+                   AND sdam_column_name <> 'NE_LENGTH';
 
 
             SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
@@ -393,16 +402,16 @@ AS
                    || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
               INTO l_sel_str
               FROM sdl_datum_attribute_mapping
-             WHERE sdam_profile_id = l_sp_id
-             and sdam_column_name <> 'NE_LENGTH';
+             WHERE     sdam_profile_id = l_sp_id
+                   AND sdam_column_name <> 'NE_LENGTH';
 
             /*INSERT INTO ne_id_sav
                 SELECT t.ptr_value, t.ptr_id
                   FROM TABLE (ne_ids) t;*/
 
-nm_debug.debug(l_ins_str);
+            nm_debug.debug (l_ins_str);
 
-nm_debug.debug(l_sel_str);
+            nm_debug.debug (l_sel_str);
 
             EXECUTE IMMEDIATE   l_ins_str
                              || ' '
@@ -483,10 +492,15 @@ nm_debug.debug(l_sel_str);
 
             nm_debug.debug (l_sel_str);
 
-            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
-                || '  LOG ERRORS INTO err$_nm_elements_all '
-                || ' (''INSERT'') REJECT LIMIT UNLIMITED'
-                USING l_datum_nt_type, p_batch_id, ne_ids, p_batch_id;
+            EXECUTE IMMEDIATE   l_ins_str
+                             || ' '
+                             || l_sel_str
+                             || '  LOG ERRORS INTO err$_nm_elements_all '
+                             || ' (''INSERT'') REJECT LIMIT UNLIMITED'
+                USING l_datum_nt_type,
+                      p_batch_id,
+                      ne_ids,
+                      p_batch_id;
 
             --raise_application_error(-20001, 'Stop');
 
@@ -533,7 +547,8 @@ nm_debug.debug(l_sel_str);
 
         l_sdl_ne_tab := get_ne_data (p_batch_id, l_profile_view);
 
-        nm_debug.debug('retrieved route data details, count = '||l_sdl_ne_tab.count );
+        nm_debug.debug (
+            'retrieved route data details, count = ' || l_sdl_ne_tab.COUNT);
 
         EXECUTE IMMEDIATE l_ins_str
             USING p_batch_id, ne_ids;
@@ -649,7 +664,7 @@ nm_debug.debug(l_sel_str);
             END LOOP;
         END IF;
 
-        nm_debug.debug('Setting ne-id and status');
+        nm_debug.debug ('Setting ne-id and status');
 
         UPDATE sdl_wip_datums d
            SET status = 'TRANSFERRED',
@@ -713,15 +728,30 @@ nm_debug.debug(l_sel_str);
                                             svr_status_code,
                                             svr_message)
             SELECT d.sld_key,
-                   p_batch_id,
+                   batch_id,
                    t.ptr_id,
                    'T',
                    ora_err_number$,
-                   SUBSTR(ora_err_mesg$,1,254)
+                   SUBSTR (ora_err_mesg$, 1, 254)
               FROM err$_nm_elements_all  e,
                    TABLE (p_ne_ids)      t,
                    sdl_wip_datums        d
-             WHERE t.ptr_id = d.swd_id AND e.ne_id = t.ptr_value;
+             WHERE     t.ptr_id = d.swd_id
+                   AND e.ne_id = t.ptr_value
+                   AND d.BATCH_ID = p_batch_id
+            UNION ALL
+            SELECT t.ptr_id,
+                   sld_sfs_id,
+                   NULL,
+                   'T',
+                   ora_err_number$,
+                   SUBSTR (ora_err_mesg$, 1, 254)
+              FROM err$_nm_elements_all  e,
+                   sdl_load_data         l,
+                   TABLE (p_ne_ids)      t
+             WHERE     t.ptr_id = l.SLD_KEY
+                   AND e.ne_id = t.ptr_value
+                   AND sld_sfs_id = p_batch_id;
 
         UPDATE sdl_load_data
            SET sld_status = 'INVALID'
@@ -731,10 +761,9 @@ nm_debug.debug(l_sel_str);
                      WHERE     svr_sfs_id = p_batch_id
                            AND svr_sld_key = sld_key
                            AND svr_validation_type = 'T');
-
---        DELETE FROM err$_nm_elements_all
---              WHERE ne_id IN (SELECT t.ptr_value
---                                FROM TABLE (p_ne_ids) t);
+    --        DELETE FROM err$_nm_elements_all
+    --              WHERE ne_id IN (SELECT t.ptr_value
+    --                                FROM TABLE (p_ne_ids) t);
     END;
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER)
