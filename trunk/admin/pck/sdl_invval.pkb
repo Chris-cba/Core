@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.5   Mar 09 2021 23:46:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_invval.pkb-arc   1.6   Apr 06 2021 18:42:10   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_invval.pkb  $
-    --       Date into PVCS   : $Date:   Mar 09 2021 23:46:50  $
-    --       Date fetched Out : $Modtime:   Mar 09 2021 23:45:14  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Apr 06 2021 18:42:10  $
+    --       Date fetched Out : $Modtime:   Apr 06 2021 18:34:56  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : Rob Coupe
     --
@@ -19,7 +19,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_sdh_id                 NUMBER;
     g_source_name            VARCHAR2 (30);
@@ -1361,7 +1361,7 @@ AS
                 || l_end_mp
                 || ' ) = '
                 || qq
-                || 'FALSE';
+                || 'FALSE''';
 
             --
             nm_debug.debug (l_loc_sql);
