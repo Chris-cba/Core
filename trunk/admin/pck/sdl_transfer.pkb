@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.24   Mar 31 2021 16:54:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.25   Apr 06 2021 12:57:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 31 2021 16:54:12  $
-    --       Date fetched Out : $Modtime:   Mar 31 2021 16:52:02  $
-    --       PVCS Version     : $Revision:   1.24  $
+    --       Date into PVCS   : $Date:   Apr 06 2021 12:57:38  $
+    --       Date fetched Out : $Modtime:   Apr 06 2021 12:56:40  $
+    --       PVCS Version     : $Revision:   1.25  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -268,7 +268,7 @@ AS
                               WITHIN GROUP (ORDER BY sam_id)
                            || ' from '
                            || l_profile_view
-                           || ' ln '
+                           || ' ln, '
                            || 'table (:grp_ne_ids) new_ne_ids '
                            || ' where batch_id = :p_batch_id '
                            || ' and ln.sld_key = new_ne_ids.ptr_id '
@@ -304,6 +304,7 @@ AS
                              || ' (''INSERT'') REJECT LIMIT UNLIMITED'
                 USING l_group_nt_type,
                       l_group_type,
+                      grp_ne_ids,
                       p_batch_id,
                       ne_ids,
                       l_group_nt_type;
