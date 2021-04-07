@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.26   Apr 06 2021 14:29:20   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.27   Apr 07 2021 11:15:46   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Apr 06 2021 14:29:20  $
-    --       Date fetched Out : $Modtime:   Apr 06 2021 14:27:16  $
-    --       PVCS Version     : $Revision:   1.26  $
+    --       Date into PVCS   : $Date:   Apr 07 2021 11:15:46  $
+    --       Date fetched Out : $Modtime:   Apr 07 2021 11:14:04  $
+    --       PVCS Version     : $Revision:   1.27  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -407,12 +407,12 @@ AS
                    || l_datum_view
                    || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
                    || 'where d.swd_id = n.swd_id '
+                   || ' and not exists ( select 1 from sdl_validation_results where svr_sld_key = d.sld_key and svr_sfs_id = d.batch_id ) '
                    || 'and d.batch_id = :batch_id '
                    || 'and n.start_node = s.hashcode '
                    || 'and n.end_node = e.hashcode '
                    || ') , '
                    || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id '
-                   || ' and not exists ( select 1 from sdl_validation_results where svr_sld_key = d.sld_key and svr_sfs_id = d.batch_id ) '
               INTO l_sel_str
               FROM sdl_datum_attribute_mapping
              WHERE     sdam_profile_id = l_sp_id
