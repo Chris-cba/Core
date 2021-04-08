@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.32   Mar 26 2021 23:36:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.33   Apr 08 2021 14:22:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 26 2021 23:36:52  $
-    --       Date fetched Out : $Modtime:   Mar 26 2021 23:35:38  $
-    --       PVCS Version     : $Revision:   1.32  $
+    --       Date into PVCS   : $Date:   Apr 08 2021 14:22:24  $
+    --       Date fetched Out : $Modtime:   Apr 08 2021 14:17:54  $
+    --       PVCS Version     : $Revision:   1.33  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -1170,7 +1170,8 @@ AS
                    -999,
                    'Geometry is NULL'
               FROM sdl_wip_datums
-             WHERE geom IS NULL;
+             WHERE batch_id = p_batch_id 
+			 AND   geom IS NULL;
     --
     --        check_self_intersections (p_batch_id);
 
