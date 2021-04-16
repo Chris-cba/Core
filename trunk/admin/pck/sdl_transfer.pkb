@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.28   Apr 16 2021 12:04:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.29   Apr 16 2021 12:16:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Apr 16 2021 12:04:14  $
-    --       Date fetched Out : $Modtime:   Apr 16 2021 11:55:08  $
-    --       PVCS Version     : $Revision:   1.28  $
+    --       Date into PVCS   : $Date:   Apr 16 2021 12:16:28  $
+    --       Date fetched Out : $Modtime:   Apr 16 2021 12:12:56  $
+    --       PVCS Version     : $Revision:   1.29  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -666,7 +666,7 @@ AS
                                SDO_LRS.GEOM_SEGMENT_END_MEASURE (d.geom)
                                    end_slk
                           FROM sdl_wip_datums        d,
-                               TABLE (grp_ne_ids)    gid,
+                               TABLE (adjusted_grp_ids)    gid,
                                nm_elements           g,
                                TABLE (ne_ids)        t,
                                TABLE (l_sdl_ne_tab)  l
