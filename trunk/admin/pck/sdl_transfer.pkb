@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.27   Apr 07 2021 11:15:46   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.28   Apr 16 2021 12:04:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Apr 07 2021 11:15:46  $
-    --       Date fetched Out : $Modtime:   Apr 07 2021 11:14:04  $
-    --       PVCS Version     : $Revision:   1.27  $
+    --       Date into PVCS   : $Date:   Apr 16 2021 12:04:14  $
+    --       Date fetched Out : $Modtime:   Apr 16 2021 11:55:08  $
+    --       PVCS Version     : $Revision:   1.28  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'sdl_transfer';
 
@@ -64,33 +64,34 @@ AS
     --
     PROCEDURE transfer_datums (p_batch_id IN NUMBER)
     IS
-        np_no_ids         ptr_num_array_type;
-        ne_ids            ptr_num_array_type;
-        grp_ne_ids        ptr_num_array_type;
-        l_ins_str         VARCHAR2 (4000);
-        l_sel_str         VARCHAR2 (4000);
-        l_datum_geom      geom_id_tab;
-        l_sp_id           NUMBER (38);
-        l_datum_view      VARCHAR2 (30);
-        l_profile_view    VARCHAR2 (30);
-        l_group_nt_type   VARCHAR2 (4);
-        l_group_type      VARCHAR2 (4);
-        l_group_unit_id   NUMBER;
-        l_datum_nt_type   VARCHAR2 (4);
-        l_datum_unit_id   NUMBER;
-        l_node_type       VARCHAR2 (4);
-        l_table_name      VARCHAR2 (30);
-        l_pk_column       VARCHAR2 (30);
-        l_column_name     VARCHAR2 (30);
+        np_no_ids          ptr_num_array_type;
+        ne_ids             ptr_num_array_type;
+        grp_ne_ids         ptr_num_array_type;
+        adjusted_grp_ids   ptr_num_array_type;
+        l_ins_str          VARCHAR2 (4000);
+        l_sel_str          VARCHAR2 (4000);
+        l_datum_geom       geom_id_tab;
+        l_sp_id            NUMBER (38);
+        l_datum_view       VARCHAR2 (30);
+        l_profile_view     VARCHAR2 (30);
+        l_group_nt_type    VARCHAR2 (4);
+        l_group_type       VARCHAR2 (4);
+        l_group_unit_id    NUMBER;
+        l_datum_nt_type    VARCHAR2 (4);
+        l_datum_unit_id    NUMBER;
+        l_node_type        VARCHAR2 (4);
+        l_table_name       VARCHAR2 (30);
+        l_pk_column        VARCHAR2 (30);
+        l_column_name      VARCHAR2 (30);
 
-        l_conv_factor     NUMBER := 1;
+        l_conv_factor      NUMBER := 1;
 
-        l_ptr             ptr_array_type;
+        l_ptr              ptr_array_type;
 
-        l_sql             VARCHAR2 (4000);
+        l_sql              VARCHAR2 (4000);
 
-        l_sdl_ne_tab      sdl_ne_tab;
-        l_attrib_list     ptr_vc_array_type;
+        l_sdl_ne_tab       sdl_ne_tab;
+        l_attrib_list      ptr_vc_array_type;
     BEGIN
         -- cear out any errors that have been raised during earlier transfers (if still there)
 
@@ -217,15 +218,14 @@ AS
               FROM nm_unit_conversions
              WHERE     uc_unit_id_in = l_group_unit_id
                    AND uc_unit_id_out = l_datum_unit_id;
-                   
-        --Next, grab the route IDs that pass the test on whether they should be loaded. This comes from the review levels
-        --or from the manual over-ride after a review.
 
-        SELECT ptr_num (l.sld_key, ne_id_seq.NEXTVAL)
-          BULK COLLECT INTO grp_ne_ids
-          FROM sdl_load_data l
-         WHERE    l.sld_sfs_id = p_batch_id
-               AND l.sld_status = 'LOAD';                   
+            --Next, grab the route IDs that pass the test on whether they should be loaded. This comes from the review levels
+            --or from the manual over-ride after a review.
+
+            SELECT ptr_num (l.sld_key, ne_id_seq.NEXTVAL)
+              BULK COLLECT INTO grp_ne_ids
+              FROM sdl_load_data l
+             WHERE l.sld_sfs_id = p_batch_id AND l.sld_status = 'LOAD';
 
             --Create the new routes from the load data where status allows and there are datums to be created but
             --where the route does not exist.
@@ -309,11 +309,55 @@ AS
                       ne_ids,
                       l_group_nt_type;
 
+            --
+            --trap any failures resulting from the route already existing - we need to trap the existing ne_ids
+            --
+            SELECT ptr_num (sld_key, ne_id)
+              BULK COLLECT INTO adjusted_grp_ids
+              FROM (SELECT sld_key, d.ne_id
+                      FROM err$_nm_elements_all  e,
+                           nm_elements_all       d,
+                           sdl_load_data,
+                           TABLE (grp_ne_ids)    t
+                     WHERE     ora_err_number$ = 1
+                           AND ora_err_mesg$ LIKE
+                                   'ORA-00001: unique constraint%NE_UK) violated%'
+                           AND e.ne_unique = d.ne_unique
+                           AND e.ne_nt_type = d.ne_nt_type
+                           AND sld_key = t.ptr_id
+                           AND e.ne_id = t.ptr_value
+                           AND sld_sfs_id = p_batch_id
+                    UNION
+                    SELECT t.ptr_id, t.ptr_value
+                      FROM TABLE (grp_ne_ids) t
+                     WHERE NOT EXISTS
+                               (SELECT 1
+                                  FROM err$_nm_elements_all
+                                 WHERE ne_id = t.ptr_value));
+
+            --remove error logs for rows that already exist - this is valid - there is a bit of belt and braces here
+
+            DELETE FROM err$_nm_elements_all e
+                  WHERE     ora_err_number$ = 1
+                        AND ora_err_mesg$ LIKE
+                                'ORA-00001: unique constraint%NE_UK) violated%'
+                        AND EXISTS
+                                (SELECT 1
+                                   FROM nm_elements         d,
+                                        TABLE (grp_ne_ids)  t,
+                                        sdl_load_data
+                                  WHERE     d.ne_unique = e.ne_unique
+                                        AND t.ptr_value = e.ne_id
+                                        AND t.ptr_id = sld_key
+                                        AND sld_sfs_id = p_batch_id);
+
+            --log remaining failures
+
             log_failures (p_batch_id, grp_ne_ids);
 
-            --create any auto-inclusions linked to the parent route
+            --create any auto-inclusions linked to the parent routes that have been created
 
-            sdl_inclusion.create_group_auto_inclusions (ne_ids,
+            sdl_inclusion.create_group_auto_inclusions (adjusted_grp_ids,
                                                         l_group_nt_type);
         END IF;
 
@@ -604,9 +648,11 @@ AS
                        end_slk
                   FROM (SELECT t.ptr_value
                                    new_ne_id,
-                               gid.ptr_value ne_id,
+                               gid.ptr_value
+                                   ne_id,
                                datum_id,
-                               g.ne_gty_group_type nm_obj_type,
+                               g.ne_gty_group_type
+                                   nm_obj_type,
                                TRUNC (
                                    GREATEST (l.NE_START_DATE,
                                              (SELECT ne_start_date
@@ -628,7 +674,7 @@ AS
                                AND l.sld_key = gid.ptr_id
                                AND d.sld_key = l.sld_key
                                AND t.ptr_id = d.swd_id
-                               AND g.ne_id  = gid.ptr_value
+                               AND g.ne_id = gid.ptr_value
                                AND l.status = 'LOAD');
 
             --                               AND EXISTS
@@ -777,9 +823,10 @@ AS
                      WHERE     svr_sfs_id = p_batch_id
                            AND svr_sld_key = sld_key
                            AND svr_validation_type = 'T');
-    --        DELETE FROM err$_nm_elements_all
-    --              WHERE ne_id IN (SELECT t.ptr_value
-    --                                FROM TABLE (p_ne_ids) t);
+
+        DELETE FROM err$_nm_elements_all
+              WHERE ne_id IN (SELECT t.ptr_value
+                                FROM TABLE (p_ne_ids) t);
     END;
 
     PROCEDURE remove_unwanted_nodes (p_batch_id IN NUMBER)
