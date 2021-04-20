@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.5   Apr 06 2021 15:17:26   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix7.sql-arc   1.6   Apr 20 2021 08:54:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix7.sql  $ 
---       Date into PVCS   : $Date:   Apr 06 2021 15:17:26  $
---       Date fetched Out : $Modtime:   Mar 15 2021 11:53:02  $
---       Version     	  : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Apr 20 2021 08:54:08  $
+--       Date fetched Out : $Modtime:   Apr 20 2021 08:52:38  $
+--       Version     	  : $Revision:   1.6  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -193,6 +193,21 @@ SET FEEDBACK ON
 start tdl_metadata_upg.sql
 SET FEEDBACK OFF
 
+INSERT INTO NM_ERRORS (NER_APPL,
+                       NER_ID,
+                       NER_DESCR,
+                       NER_CAUSE)
+    SELECT 'NET',
+           561,
+           'The chosen node is inconsistent with direction of first element in merge',
+              'The resultant merged element inherits attributes, including direction, from the first element of the two. '
+           || 'The supplied node and the inherited direction are in conflict. '
+           || 'The user should either not use the node and have the system work out which node to dissolve, choose the other node or reverse the order of element selection'
+      FROM DUAL
+     WHERE NOT EXISTS
+               (SELECT 1
+                  FROM NM_ERRORS
+                 WHERE NER_APPL = 'NET' AND NER_ID = 561);
 --------------------------------------------------------------------------------
 -- Views
 --------------------------------------------------------------------------------
@@ -427,6 +442,14 @@ SET FEEDBACK ON
 start nm3inv_view.pkw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT Creating Package Body nm3merge
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3merge.pkw
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Triggers
@@ -479,7 +502,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4800_fix7.sql'
-				,p_remarks        => 'NET 4800 FIX 7 (Build 2)'
+				,p_remarks        => 'NET 4800 FIX 7 (Build 3)'
 				,p_to_version     => NULL
 				);
 	--
