@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.0   Apr 22 2021 11:34:26   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.1   May 04 2021 11:21:36   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4900_fix1.sql  $ 
---       Date into PVCS   : $Date:   Apr 22 2021 11:34:26  $
---       Date fetched Out : $Modtime:   Apr 08 2021 14:23:06  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   May 04 2021 11:21:36  $
+--       Date fetched Out : $Modtime:   May 04 2021 11:15:06  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2021 Bentley Systems Incorporated. All rights reserved.
@@ -90,6 +90,63 @@ END;
 /
 
 WHENEVER SQLERROR CONTINUE
+--
+--------------------------------------------------------------------------------
+-- Metadata
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Applying Metadata Changes
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_dml.sql
+SET FEEDBACK OFF
+
+BEGIN
+  INSERT INTO hig_products (hpr_product,
+                            hpr_product_name,
+                            hpr_version,
+                            hpr_key,
+                            hpr_sequence)
+       VALUES ('LB',
+               'Location Bridge',
+               '4.9.0.0',
+               '76',
+               99);
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX
+    THEN
+        UPDATE hig_products
+           SET hpr_version = '4.9.0.0'
+         WHERE hpr_product = 'LB';
+END;
+/
+
+INSERT INTO NM_ERRORS (NER_APPL,
+                       NER_ID,
+                       NER_DESCR,
+                       NER_CAUSE)
+SELECT 'NET',
+        561,
+        'The chosen node is inconsistent with direction of first element in merge',
+        'The resultant merged element inherits attributes, including direction, from the first element of the two. '||
+            'The supplied node and the inherited direction are in conflict. '||
+            'The user should either not use the node and have the system work out which node to dissolve or choose the other node or reverse the order of element selection'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                     AND NER_ID = 561);
+
+SET TERM ON 
+PROMPT Creating Metadata
+SET TERM OFF
+--
+SET FEEDBACK ON
+start tdl_metadata_upg.sql
+SET FEEDBACK OFF
+
 --------------------------------------------------------------------------------
 -- Types
 --------------------------------------------------------------------------------
@@ -204,63 +261,6 @@ SET TERM OFF
 SET FEEDBACK ON
 start tdl_ddl_upg.sql
 SET FEEDBACK OFF
---
---------------------------------------------------------------------------------
--- Metadata
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Applying Metadata Changes
-SET TERM OFF
---
-SET FEEDBACK ON
-start sdl_dml.sql
-SET FEEDBACK OFF
-
-BEGIN
-  INSERT INTO hig_products (hpr_product,
-                            hpr_product_name,
-                            hpr_version,
-                            hpr_key,
-                            hpr_sequence)
-       VALUES ('LB',
-               'Location Bridge',
-               '4.9.0.0',
-               '76',
-               99);
-EXCEPTION
-    WHEN DUP_VAL_ON_INDEX
-    THEN
-        UPDATE hig_products
-           SET hpr_version = '4.9.0.0'
-         WHERE hpr_product = 'LB';
-END;
-/
-
-INSERT INTO NM_ERRORS (NER_APPL,
-                       NER_ID,
-                       NER_DESCR,
-                       NER_CAUSE)
-SELECT 'NET',
-        561,
-        'The chosen node is inconsistent with direction of first element in merge',
-        'The resultant merged element inherits attributes, including direction, from the first element of the two. '||
-            'The supplied node and the inherited direction are in conflict. '||
-            'The user should either not use the node and have the system work out which node to dissolve or choose the other node or reverse the order of element selection'
-  FROM DUAL
- WHERE NOT EXISTS(SELECT 1
-                    FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                     AND NER_ID = 561);
-
-SET TERM ON 
-PROMPT Creating Metadata
-SET TERM OFF
---
-SET FEEDBACK ON
-start tdl_metadata_upg.sql
-SET FEEDBACK OFF
-
 --
 --------------------------------------------------------------------------------
 -- Views
