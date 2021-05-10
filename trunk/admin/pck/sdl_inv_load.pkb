@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.5   Mar 05 2021 16:39:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_inv_load.pkb-arc   1.6   May 10 2021 17:15:20   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_inv_load.pkb  $
-    --       Date into PVCS   : $Date:   Mar 05 2021 16:39:44  $
-    --       Date fetched Out : $Modtime:   Mar 05 2021 16:36:52  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   May 10 2021 17:15:20  $
+    --       Date fetched Out : $Modtime:   May 10 2021 17:10:04  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : Rob Coupe
     --
@@ -20,7 +20,7 @@ AS
     --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
     --
-    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     FUNCTION is_nt_defined_attribute (p_sdh_id IN NUMBER)
         RETURN VARCHAR2;
@@ -367,6 +367,7 @@ AS
                         || ' l, nm_elements d, nm_linear_types '
                         || ' where tld_sfs_id = :p_sfs_id '
                         || ' and nlt_gty_type is null '
+                        || ' and l.ne_nt_type = nlt_nt_type '
                         || ' and l.ne_unique = d.ne_unique '
                         || ' and not exists ( select 1 from sdl_validation_results where svr_sfs_id = :p_sfs_id and svr_sld_key = l.tld_id ) ';
 
@@ -379,6 +380,8 @@ AS
                     END IF;
 
                     l_sql := l_sql || ')';
+                    
+                    nm_debug.debug(l_sql);
 
                     IF l_nt_type_attribute = 'FALSE'
                     THEN
@@ -406,10 +409,10 @@ AS
                                  l_end,
                                  l_dir,
                                  l_element_start_date
-                            USING l_sdh_row.sdh_destination_type, p_sfs_id, p_sfs_id;
+                            USING l_sdh_row.sdh_destination_type, p_sfs_id, p_sfs_id, p_sfs_id, p_sfs_id;
                     END IF;
 
-                    nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'Y');
+--                    nm3ctx.set_context ('BYPASS_MEMBERS_SDO_TRG', 'Y');  -- swith the bypass of triggers off
 
                     --
                     FORALL idx IN 1 .. l_iit.COUNT
@@ -432,25 +435,30 @@ AS
                                      GREATEST (l_date (idx),
                                                l_element_start_date (idx)),
                                      l_dir (idx),
-                                     1);
+                                     (select iit_admin_unit from nm_inv_items where iit_ne_id = l_iit (idx)));
 
                     -- grab theme data for the asset-type - check if a derived (dyn-segged) asset type
 
-                    BEGIN
-                        SELECT t.*
-                          INTO l_nth_row
-                          FROM nm_themes_all t, nm_inv_themes
-                         WHERE     nith_nit_id =
-                                   l_sdh_row.sdh_destination_type
-                               AND nith_nth_theme_id = nth_theme_id
-                               AND nth_base_table_theme IS NULL;
-
-                        l_theme_flag := 'Y';
-                    EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                            l_theme_flag := 'N';
-                    END;
+-- commented out as the code is intended to replace trigger execution to generate theme data - and the triggers are still enabled. Just set the theme flag off
+-- so no SDO automatcic dyn-seg.
+--
+--                    BEGIN
+--                        SELECT t.*
+--                          INTO l_nth_row
+--                          FROM nm_themes_all t, nm_inv_themes
+--                         WHERE     nith_nit_id =
+--                                   l_sdh_row.sdh_destination_type
+--                               AND nith_nth_theme_id = nth_theme_id
+--                               AND nth_base_table_theme IS NULL;
+--
+--                        l_theme_flag := 'Y';
+--                    EXCEPTION
+--                        WHEN NO_DATA_FOUND
+--                        THEN
+--                            l_theme_flag := 'N';
+--                    END;
+                    
+                    l_theme_flag := 'N';
 
                     IF l_theme_flag = 'Y'
                     THEN
