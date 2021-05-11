@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.1   May 04 2021 11:21:36   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.2   May 11 2021 09:03:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4900_fix1.sql  $ 
---       Date into PVCS   : $Date:   May 04 2021 11:21:36  $
---       Date fetched Out : $Modtime:   May 04 2021 11:15:06  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   May 11 2021 09:03:22  $
+--       Date fetched Out : $Modtime:   May 10 2021 13:30:30  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2021 Bentley Systems Incorporated. All rights reserved.
@@ -474,13 +474,6 @@ SET FEEDBACK ON
 start sdl_inclusion.pkh
 SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT Creating Package Header hig_alert
-SET TERM OFF
---
-SET FEEDBACK ON
-start hig_alert.pkh
-SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
 -- Package Bodies
@@ -636,14 +629,6 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3inv_view.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT Creating Package Body hig_alert
-SET TERM OFF
---
-SET FEEDBACK ON
-start hig_alert.pkw
 SET FEEDBACK OFF
 
 --
