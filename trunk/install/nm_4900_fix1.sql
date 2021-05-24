@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.2   May 11 2021 09:03:22   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4900_fix1.sql-arc   1.3   May 24 2021 10:42:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4900_fix1.sql  $ 
---       Date into PVCS   : $Date:   May 11 2021 09:03:22  $
---       Date fetched Out : $Modtime:   May 10 2021 13:30:30  $
---       Version     	  : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   May 24 2021 10:42:08  $
+--       Date fetched Out : $Modtime:   May 24 2021 10:22:56  $
+--       Version     	  : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2021 Bentley Systems Incorporated. All rights reserved.
@@ -89,7 +89,25 @@ BEGIN
 END;
 /
 
+--
+--------------------------------------------------------------------------------
+-- TDL DDL
+--------------------------------------------------------------------------------
+--
 WHENEVER SQLERROR CONTINUE
+SET TERM ON 
+PROMPT TDL DDL Changes
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sdl_ddl.sql
+SET FEEDBACK OFF	
+
+
+SET FEEDBACK ON
+start tdl_ddl_upg.sql
+SET FEEDBACK OFF
+--
 --
 --------------------------------------------------------------------------------
 -- Metadata
@@ -216,10 +234,6 @@ SET TERM ON
 PROMPT Applying DDL changes
 SET TERM OFF
 --
-SET FEEDBACK ON
-start sdl_ddl.sql
-SET FEEDBACK OFF	
-
 SET TERM ON 
 PROMPT Add HUS_ACK_TC to HIG_USERS
 SET TERM OFF
@@ -253,15 +267,6 @@ EXCEPTION
 END;
 /
 
-SET TERM ON 
-PROMPT DDL Changes
-SET TERM OFF
---
-
-SET FEEDBACK ON
-start tdl_ddl_upg.sql
-SET FEEDBACK OFF
---
 --------------------------------------------------------------------------------
 -- Views
 --------------------------------------------------------------------------------
