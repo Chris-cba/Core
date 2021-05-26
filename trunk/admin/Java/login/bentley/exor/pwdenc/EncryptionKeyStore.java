@@ -1,17 +1,17 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/EncryptionKeyStore.java-arc   1.1   Sep 07 2017 14:39:56   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/EncryptionKeyStore.java-arc   1.2   May 26 2021 08:39:10   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   EncryptionKeyStore.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Sep 07 2017 14:39:56  $
- *		Date Fetched Out : $Modtime:   Sep 04 2017 15:57:18  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   May 26 2021 08:39:10  $
+ *		Date Fetched Out : $Modtime:   May 18 2021 11:08:40  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2021 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -35,7 +35,12 @@ public class EncryptionKeyStore {
 				return "failure - key store not found";
 			}
 		} catch(Exception e) {
-			return "failure - " + e.getMessage();
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			
+			return "failure - " + e.getMessage() + "\n" + sStackTrace; 
 		}
 	}
 	
@@ -60,7 +65,12 @@ public class EncryptionKeyStore {
 			
 			return keyStorePath;
 		} catch(Exception e) {
-			return "failure - " + e.getMessage();
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			
+			return "failure - " + e.getMessage() + "\n" + sStackTrace; 
 		}
 	}
 		
@@ -116,7 +126,12 @@ public class EncryptionKeyStore {
 				return keyStorePath;
 			}
 		} catch(Exception e) {
-			return "failure - " + e.getMessage();
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			
+			return "failure - " + e.getMessage() + "\n" + sStackTrace; 
 		}
 	}
 	
@@ -124,7 +139,7 @@ public class EncryptionKeyStore {
 		try {
 			String keyStorePath = getPath();
 			
-			if(!keyStorePath.startsWith("failure - ")) {
+			if(!keyStorePath.startsWith("failure - ")) { 
 				KeyStore ks = KeyStore.getInstance("JCEKS");
 				FileInputStream fis = null;
 				
@@ -138,14 +153,24 @@ public class EncryptionKeyStore {
 						} catch(IOException ioe) {
 						}
 					}
-				}
+				} 
+				
+				String prop = Security.getProperty("jceks.key.serialFilter"); 
+				prop = prop.substring(0, prop.length() - 2); 
+				
+				Security.setProperty("jceks.key.serialFilter", prop + "bentley.exor.pwdenc.EncryptionKeyStore$1;!*"); 
 				
 				return ks.getKey(alias, keyPasswordStr.toCharArray()).getAlgorithm();
 			} else {
 				return keyStorePath;
 			}
-		} catch(Exception e) {
-			return "failure - " + e.getMessage();
+		} catch(Exception e) { 
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			
+			return "failure - " + e.getMessage() + "\n" + sStackTrace; 
 		}
 	}
 }
