@@ -5,11 +5,11 @@ AS
     --
     ---   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.103   May 11 2021 17:20:28   Mike.Huitson  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.104   Jun 03 2021 12:27:06   Chris.Baugh  $
     --       Module Name      : $Workfile:   nm3sdo.pkb  $
-    --       Date into PVCS   : $Date:   May 11 2021 17:20:28  $
-    --       Date fetched Out : $Modtime:   May 11 2021 12:42:42  $
-    --       PVCS Version     : $Revision:   2.103  $
+    --       Date into PVCS   : $Date:   Jun 03 2021 12:27:06  $
+    --       Date fetched Out : $Modtime:   Jun 03 2021 12:26:12  $
+    --       PVCS Version     : $Revision:   2.104  $
     --       Based on
     ------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.103  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.104  $"';
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
     g_batch_size              INTEGER
         := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -5339,12 +5339,10 @@ AS
         THEN
             --   nm_debug.debug_on;
             --   nm_debug.debug('insert with length = '||to_char(l_length)||' and '||to_char(sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo )));
-dbms_output.put_line('Geom before refine: '||awlrs_sdo.sdo_geom_to(l_geom,awlrs_sdo.c_wkt,'Y'));
             SDO_LRS.redefine_geom_segment (l_geom,
                                            g_usgm.diminfo,
                                            0,
                                            l_length);
-dbms_output.put_line('Geom after refine: '||awlrs_sdo.sdo_geom_to(l_geom,awlrs_sdo.c_wkt,'Y'));
         END IF;
         IF SDO_LRS.geom_segment_end_measure (l_geom, g_usgm.diminfo) !=
            l_length
@@ -5393,7 +5391,6 @@ dbms_output.put_line('Geom after refine: '||awlrs_sdo.sdo_geom_to(l_geom,awlrs_s
 
         --nm_debug.debug_on;
         --nm_debug.debug(cur_string);
-dbms_output.put_line('Inserting Geom: '||awlrs_sdo.sdo_geom_to(l_geom,awlrs_sdo.c_wkt,'Y'));
 
         EXECUTE IMMEDIATE cur_string
             USING p_ne_id, l_geom;
