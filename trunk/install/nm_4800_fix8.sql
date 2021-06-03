@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix8.sql-arc   1.0   Feb 19 2021 16:41:54   Barbara.Odriscoll  $
---       Date into PVCS   : $Date:   Feb 19 2021 16:41:54  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix8.sql-arc   1.1   Jun 03 2021 12:16:42   Chris.Baugh  $
+--       Date into PVCS   : $Date:   Jun 03 2021 12:16:42  $
 --       Module Name      : $Workfile:   nm_4800_fix8.sql  $
---       Date fetched Out : $Modtime:   Feb 19 2021 16:40:42  $
---       Version          : $Revision:   1.0  $
+--       Date fetched Out : $Modtime:   Jun 03 2021 12:14:26  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------------
 -- Copyright (c) 2021 Bentley Systems Incorporated.  All rights reserved.
@@ -64,87 +64,16 @@ END;
 /
 --
 --------------------------------------------------------------------------------
--- Package Headers
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Creating Package Header hig_alert
-SET TERM OFF
---
-SET FEEDBACK ON
-start hig_alert.pkh
-SET FEEDBACK OFF
---
---------------------------------------------------------------------------------
 -- Package Bodies
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT Creating Package Body hig_alert
+PROMPT Creating Package Body nm3sdo
 SET TERM OFF
 --
 SET FEEDBACK ON
-start hig_alert.pkw
+start nm3sdo.pkw
 SET FEEDBACK OFF
---
---
---------------------------------------------------------------------------------
--- Create HIG_ALERT_TYPE_CONDITIONS and HIG_QUERY_TYPE_ATTRIBUTES policies
---------------------------------------------------------------------------------
---
-SET TERM ON
-PROMPT Create HIG_ALERT Policies
-SET TERM OFF
-
-Declare
-  Policy_Already_Exists Exception;
-  Pragma Exception_Init(Policy_Already_Exists,-28101);
-  n  number;
-Begin
-
-  Select  count(*)
-  Into    n
-  From    v$version
-  Where   LOWER(banner) like '%enterprise%';
-  
-  IF n > 0 then
-    BEGIN
-     dbms_rls.add_policy
-         (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
-         ,object_name     => 'HIG_ALERT_TYPE_CONDITIONS'
-         ,policy_name     => 'HIG_ALERT_TYPE_CONDS_ADMIN'
-         ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-         ,policy_function => 'HIG_ALERT.HIG_ALERT_TYPE_CONDS_ADMIN'
-         ,statement_types => 'INSERT,UPDATE,DELETE'
-         ,update_check    => TRUE
-         ,enable          => TRUE
-         ,static_policy   => FALSE
-         );
-         
-    Exception
-      When Policy_Already_Exists Then
-        null;
-    END;    
-    
-    Begin
-     dbms_rls.add_policy
-         (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
-         ,object_name     => 'HIG_QUERY_TYPE_ATTRIBUTES'
-         ,policy_name     => 'HIG_QUERY_TYPE_ATTRIBS_ADMIN'
-         ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-         ,policy_function => 'HIG_ALERT.HIG_QUERY_TYPE_ATTRIBS_ADMIN'
-         ,statement_types => 'INSERT,UPDATE,DELETE'
-         ,update_check    => TRUE
-         ,enable          => TRUE
-         ,static_policy   => FALSE
-         );
-    Exception
-      When Policy_Already_Exists Then
-        null;
-    end;    
-  END IF;         
-End;
-/
 --
 --
 --------------------------------------------------------------------------------
