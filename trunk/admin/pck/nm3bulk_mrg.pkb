@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.52   Apr 16 2018 09:22:14   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.53   Jun 04 2021 11:51:10   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:14  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
---       PVCS Version     : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Jun 04 2021 11:51:10  $
+--       Date fetched Out : $Modtime:   Mar 09 2021 13:53:14  $
+--       PVCS Version     : $Revision:   2.53  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,14 +124,14 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.52  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.53  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
   qt  constant varchar2(1) := chr(39);  -- single quote
   m_mrg_date_format constant varchar2(15) := 'DD-MON-YYYY'; -- this is same as nm3mrg.g_mrg_date_format
 
-  subtype id_type is number(9);
+  subtype id_type is number;
   subtype hash_type is varchar2(20);
   subtype mp_type is number;
 
