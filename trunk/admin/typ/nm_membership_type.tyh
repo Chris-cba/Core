@@ -16,8 +16,8 @@ CREATE OR REPLACE type nm_membership_type
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as object (
-    NE_ID               number(9)     -- id of the route, group or datum
-  , PARENT_NE_ID        number(9)     -- id of the datum or inv item driving the query
+    NE_ID               number        -- id of the route, group or datum
+  , PARENT_NE_ID        number        -- id of the datum or inv item driving the query
   , NE_UNIQUE           varchar2(30)  -- NM_ELEMENTS_ALL.NE_UNIQUE%type
   , NE_DESCR            varchar2(240)  -- NM_ELEMENTS_ALL.NE_DESCR%type
   , NM_BEGIN_MP         number        -- NM_MEMBERS_ALL.NM_BEGIN_MP%type

@@ -17,7 +17,7 @@ CREATE OR REPLACE TYPE nm_placement AS object
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  pl_ne_id   integer(9)
+  pl_ne_id   number
  ,pl_start   number
  ,pl_end     number
  ,pl_measure number
