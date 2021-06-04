@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.83   Jul 23 2019 10:48:36   Steve.Cooper  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.84   Jun 04 2021 11:51:12   Chris.Baugh  $
     --       Module Name      : $Workfile:   nm3sdm.pkb  $
-    --       Date into PVCS   : $Date:   Jul 23 2019 10:48:36  $
-    --       Date fetched Out : $Modtime:   Jul 23 2019 10:46:56  $
-    --       PVCS Version     : $Revision:   2.83  $
+    --       Date into PVCS   : $Date:   Jun 04 2021 11:51:12  $
+    --       Date fetched Out : $Modtime:   Mar 09 2021 13:44:32  $
+    --       PVCS Version     : $Revision:   2.84  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     --
     --all global package variables here
     --
-    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.83  $"';
+    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.84  $"';
     --  g_body_sccsid is the SCCS ID for the package body
     --
     g_Package_Name   CONSTANT VARCHAR2 (30) := 'NM3SDM';
@@ -863,7 +863,7 @@ AS
                            'create table '
                         || p_Table
                         || ' ( ne_id number(38) not null, '
-                        || '   ne_id_of number(9) not null, '
+                        || '   ne_id_of number not null, '
                         || '   nm_begin_mp number not null, '
                         || '   nm_end_mp number not null, '
                         || '   geoloc mdsys.sdo_geometry not null,'
@@ -878,7 +878,7 @@ AS
                            'create table '
                         || p_Table
                         || ' ( ne_id number(38) not null, '
-                        || '   ne_id_of number(9) not null, '
+                        || '   ne_id_of number not null, '
                         || '   nm_begin_mp number not null, '
                         || '   nm_end_mp number not null, '
                         || '   geoloc mdsys.sdo_geometry not null,'
@@ -895,7 +895,7 @@ AS
                         || p_Table
                         || ' ( objectid number(38) not null, '
                         || '   ne_id number(38) not null, '
-                        || '   ne_id_of number(9) not null, '
+                        || '   ne_id_of number not null, '
                         || '   nm_begin_mp number not null, '
                         || '   nm_end_mp number not null, '
                         || '   geoloc mdsys.sdo_geometry not null,'
@@ -911,7 +911,7 @@ AS
                         || p_Table
                         || ' ( objectid number(38) not null, '
                         || '   ne_id number(38) not null, '
-                        || '   ne_id_of number(9) not null, '
+                        || '   ne_id_of number not null, '
                         || '   nm_begin_mp number not null, '
                         || '   nm_end_mp number not null, '
                         || '   geoloc mdsys.sdo_geometry not null,'
@@ -9149,36 +9149,7 @@ AS
     -----------------------------------------------------------------------------
     --
     --
-    Procedure Reshape_Other_Product (
-                                    p_Ne_Id   In    Nm_Elements.Ne_Id%Type,
-                                    p_Geom    In    Mdsys.Sdo_Geometry
-                                    )
-    Is
 
-    Begin
-      Nm_Debug.Debug('Nm3sdm.Reshape_Other_Product - Called');
-      Nm_Debug.Debug('Parameter - p_Ne_Id: ' || To_Char(p_Ne_Id));
-
-      --NSG
-      If Hig.Is_Product_Licensed( Nm3type.c_Nsg )  Then   
-
-        Execute Immediate 'Begin'                                                 || Chr(10) ||
-                          '  Nsg_Reshape.Reshape_Esu    ('                        || Chr(10) ||
-                          '                             p_Ne_Id   =>  :p_Ne_Id,'  || Chr(10) ||
-                          '                             p_Geom    =>  :p_Geom'    || Chr(10) ||
-                          '                             );'                       || Chr(10) ||
-                          'End;'                                                  || Chr(10)
-        Using   p_Ne_Id,
-                p_Geom;
-      End If;
-
-      Nm_Debug.Debug('Nm3sdm.Reshape_Other_Product - Finished');
-    End Reshape_Other_Product;
-
-    --
-    -----------------------------------------------------------------------------
-    --
-    --
     PROCEDURE reshape_element (p_ne_id   IN nm_elements.ne_id%TYPE,
                                p_geom    IN MDSYS.SDO_GEOMETRY)
     IS
@@ -9191,9 +9162,8 @@ AS
     BEGIN
         --nm_debug.debug_on;
         --nm_debug.debug('changing shapes');
-        l_layer     := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-        l_rec_nth   := nm3get.get_nth (l_layer);
-        l_new_geom  := p_geom;
+        l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
+        l_rec_nth := nm3get.get_nth (l_layer);
 
         IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
         THEN
@@ -9201,7 +9171,10 @@ AS
             -- Brought across the code from 2.10.1.1 branch into the mainstream
             -- version so that the SRID is set on the reshape
 
-            l_old_geom := nm3sdo.get_layer_element_geometry (l_layer, p_ne_id);
+            l_old_geom :=
+                nm3sdo.get_layer_element_geometry (l_layer, p_ne_id);
+
+            l_new_geom := p_geom;
 
             IF NVL (l_old_geom.sdo_srid, -9999) !=
                NVL (l_new_geom.sdo_srid, -9999)
@@ -9266,12 +9239,6 @@ AS
         UPDATE nm_elements
            SET ne_date_modified = SYSDATE
          WHERE ne_id = p_ne_id;            -- trigger will handled modified-by
-
-      Reshape_Other_Product (
-                            p_Ne_Id   =>  p_Ne_Id,
-                            p_Geom    =>  l_New_Geom
-                            );
-
     END reshape_element;
 
     --
