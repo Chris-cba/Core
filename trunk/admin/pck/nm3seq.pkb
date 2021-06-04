@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3seq.pkb-arc   2.22   Apr 16 2018 09:23:34   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3seq.pkb-arc   2.23   Jun 04 2021 11:51:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3seq.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:34  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Jun 04 2021 11:51:14  $
+--       Date fetched Out : $Modtime:   Mar 10 2021 13:52:10  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.22  $"
+--   nm3get_gen body   : "$Revision:   2.23  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3seq';
@@ -549,9 +549,9 @@ END curr_nel_id_seq;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION next_ne_id_seq RETURN PLS_INTEGER IS
+FUNCTION next_ne_id_seq RETURN NUMBER IS
 -- Get NE_ID_SEQ.NEXTVAL
-   l_retval PLS_INTEGER;
+   l_retval NUMBER;
 BEGIN
    SELECT NE_ID_SEQ.NEXTVAL
     INTO  l_retval
