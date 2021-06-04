@@ -17,9 +17,9 @@ CREATE OR REPLACE TYPE nm_lref AS object
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  lr_ne_id  integer(9)
+  lr_ne_id  number
  ,lr_offset number
- ,member FUNCTION get_ne_id RETURN integer
+ ,member FUNCTION get_ne_id RETURN number
  ,member FUNCTION get_offset RETURN number
  ,STATIC FUNCTION get_body_version RETURN VARCHAR2
  ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
