@@ -16,7 +16,7 @@ CREATE OR REPLACE type nm_id_code_meaning_type
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as object (
-   ID number(12)
+   ID number
   ,CODE varchar2(80)
   ,MEANING varchar2(500)
 )

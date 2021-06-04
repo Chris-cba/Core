@@ -20,7 +20,7 @@ CREATE OR REPLACE TYPE lb_linear_refnt AS OBJECT(
 -----------------------------------------------------------------------------
 --
     NetworkTypeId       NUMBER,        -- ID of the network type
-    NetworkElementID    NUMBER(9),     -- Network element ID
+    NetworkElementID    NUMBER,     -- Network element ID
     NetworkElementName  VARCHAR2(50),  -- Network element unique name
     NetworkElementDescr VARCHAR2(240), -- Optional network element description
     NetworkElementType  VARCHAR2(4),   -- Network element type code
